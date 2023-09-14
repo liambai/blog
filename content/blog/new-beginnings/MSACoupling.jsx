@@ -17,26 +17,18 @@ const MSAData = MSA.map(row =>
 )
 
 const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
-  const width = 400
+  const width = 350
   const height = 50
 
   const headerRef = useRef()
   const tableRef = useRef()
 
-  const xScale = d3
-    .scaleLinear()
-    .domain([0, nodeIds.length - 1])
-    .range([20, width - 20])
-
-  function handleNodeMouseOver(event, d) {
-    setFocusedNodes([d])
-  }
-
-  function handleNodeMouseOut() {
-    setFocusedNodes([])
-  }
-
   useEffect(() => {
+    const xScale = d3
+      .scaleLinear()
+      .domain([0, nodeIds.length - 1])
+      .range([width / 20, width - width / 20])
+
     const svg = d3
       .select(headerRef.current)
       .attr("width", width)
@@ -46,6 +38,7 @@ const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
       .x((d, i) => xScale(i))
       .y(d => height / 2)
 
+    // Header of the MSA as a linear amino acid chain
     svg
       .append("path")
       .datum(nodeIds)
@@ -64,10 +57,10 @@ const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
       .attr("r", 10)
       .attr("fill", "white")
       .attr("stroke", "black")
-      .attr("stroke-width", d => (focusedNodes.includes(d) ? 3 : 1))
-      .on("mouseover", handleNodeMouseOver)
-      .on("mouseout", handleNodeMouseOut)
-  }, [])
+      .attr("stroke-width", 1)
+      .on("mouseover", (event, d) => setFocusedNodes([d]))
+      .on("mouseout", () => setFocusedNodes([]))
+  }, [setFocusedNodes])
 
   useEffect(() => {
     const svg = d3.select(headerRef.current)
@@ -90,12 +83,8 @@ const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
       .append("td")
       .text(d => d.char)
       .style("text-align", "center")
-      .on("mouseover", function (event, d) {
-        setFocusedNodes([d.pos])
-      })
-      .on("mouseout", function () {
-        setFocusedNodes([])
-      })
+      .on("mouseover", (event, d) => setFocusedNodes([d.pos]))
+      .on("mouseout", () => setFocusedNodes([]))
 
     rows
       .selectAll("td")
@@ -104,7 +93,7 @@ const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
       )
     // Exit any rows not in the data
     rows.exit().remove()
-  }, [focusedNodes])
+  }, [focusedNodes, setFocusedNodes])
 
   return (
     <div
@@ -136,34 +125,6 @@ const NetworkViz = ({ focusedNodes, setFocusedNodes }) => {
   const backboneEdgeLength = 20
 
   const ref = useRef()
-
-  function handleEdgeMouseOver(event, d) {
-    if (d.backbone) {
-      return
-    }
-    d3.select(this)
-      .style("stroke-width", contactEdgeHoverWidth)
-      .style("stroke", "grey")
-    setFocusedNodes([2, 8])
-  }
-
-  function handleEdgeMouseOut(event, d) {
-    if (d.backbone) {
-      return
-    }
-    d3.select(this)
-      .style("stroke-width", contactEdgeWidth)
-      .style("stroke", "lightblue")
-    setFocusedNodes([])
-  }
-
-  function handleNodeMouseOver(event, d) {
-    setFocusedNodes([d.id])
-  }
-
-  function handleNodeMouseOut() {
-    setFocusedNodes([])
-  }
 
   // Define a function for handling node drag
   function drag(simulation) {
@@ -225,8 +186,22 @@ const NetworkViz = ({ focusedNodes, setFocusedNodes }) => {
       .style("stroke-width", d =>
         d.backbone ? backboneEdgeWidth : contactEdgeWidth
       )
-      .on("mouseover", handleEdgeMouseOver)
-      .on("mouseout", handleEdgeMouseOut)
+      .on("mouseover", (event, d) => {
+        if (!d.backbone) {
+          d3.select(this)
+            .style("stroke-width", contactEdgeHoverWidth)
+            .style("stroke", "grey")
+          setFocusedNodes([2, 8])
+        }
+      })
+      .on("mouseout", (event, d) => {
+        if (!d.backbone) {
+          d3.select(this)
+            .style("stroke-width", contactEdgeWidth)
+            .style("stroke", "lightblue")
+          setFocusedNodes([])
+        }
+      })
 
     const node = svg
       .selectAll(".node")
@@ -238,8 +213,8 @@ const NetworkViz = ({ focusedNodes, setFocusedNodes }) => {
       .attr("fill", "white")
       .attr("stroke", "black")
       .attr("stroke-width", nodeBorderWidth)
-      .on("mouseover", handleNodeMouseOver)
-      .on("mouseout", handleNodeMouseOut)
+      .on("mouseover", (event, d) => setFocusedNodes([d.id]))
+      .on("mouseout", () => setFocusedNodes([]))
       .call(drag(simulation))
 
     // Add simulation tick handler
@@ -252,7 +227,7 @@ const NetworkViz = ({ focusedNodes, setFocusedNodes }) => {
 
       node.attr("cx", d => d.x).attr("cy", d => d.y)
     })
-  }, [])
+  }, [setFocusedNodes])
 
   useEffect(() => {
     const svg = d3.select(ref.current)
