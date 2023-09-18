@@ -1,7 +1,7 @@
 ---
 title: What we can learn from evolving proteins
 date: "2023-09-16"
-description: Using evolutionary information from an Multiple Sequence Alignment (MSA) to predict protein contact and mutation effects.
+description: Predicting protein structure and function. Multiple Sequence Alignments (MSAs), the Potts model, EVCouplings.
 ---
 
 import MSACoupling from "./MSACoupling.jsx"
@@ -27,13 +27,12 @@ breakthroughs like AlphaFold and cutting-edge methods in protein design. Let's s
 A **Multiple Sequence Alignment (MSA)** compiles known variants of a protein and is compiled by
 searching vast protein sequence databases.
 
-<MSACoupling 
+<MSACoupling
   caption="
-    The structure on the right sketches how the amino acid chain might fold in space (the nodes
-    can be dragged). Hover over each row in the MSA to see the corresponding amino acid in the
+    The structure on the right sketches how the amino acid chain might fold in space (try dragging the nodes). 
+    Hover over each row in the MSA to see the corresponding amino acid in the
     folded structure. Hover over the blue link to see the contacting amino acid positions. 
   "
-
 />
 
 One key insight is that amino acid positions that tend to co-vary in the MSA likely
@@ -197,11 +196,107 @@ $$
 P(A)=\frac{1}{Z} \exp \left\{\sum_{1 \leq i \leq j \leq L} J_{i j}(A_i, A_j)+\sum_{1 \leq i \leq L} h_i(A_i)\right\}
 $$
 
-## Predicting 3D contacts
+## Predicting 3D structure
 
-Using the tools
+Given an amino acid sequence, what is the 3D structure that it folds into? This is the
+[protein folding problem](https://rootsofprogress.org/alphafold-protein-folding-explainer), a
+complex problem central to understanding biology. In 2021, researchers from DeepMind shared a
+groundbreaking model using deep learning, [AlphaFold](https://www.nature.com/articles/s41586-021-03819-2),
+declaring the problem as solved. The
+[implications](https://moalquraishi.wordpress.com/2020/12/08/alphafold2-casp14-it-feels-like-ones-child-has-left-home/)
+are profound.
+
+The [EVCouplings](https://evcouplings.org/) method we'll describe cannot compete with AlphaFold in
+accuracy, but it is foundational to AlphaFold, which similarly relies heavily on pairwise interaction
+signals from MSAs.
+
+Myriad forces choreograph the folding of a protein. Let's simplify and think only about
+pairs of amino acid positions that interact strongly with each other – and hypothesize that
+they are in spatial contact. These predicted contacts can act as a set of constraints from
+which we can then derive the full 3D structure.
+
+<MSACoupling
+  caption="
+    The structure on the right sketches how the amino acid chain might fold in space (try dragging the nodes). 
+    Hover over each row in the MSA to see the corresponding amino acid in the
+    folded structure. Hover over the blue link to see the contacting amino acid positions. 
+  "
+/>
+
+Hovering over the blue link, we see that positions $2$ and $8$ tend to co-vary in the MSA,
+and they are in contact in the folded protein. Let's use the tools we have to quantify this
+co-variance.
+
+### Mutual information
+
+Our $f_{ij}$ is a function that takes in two amino acids: $f_{ij}(A_i, A_j)$; however, we would like
+a direct measure of interaction given $i$ and $j$, without a dependence on specific amino acids. In
+other words, we want to average over all possible pairs of amino acids that can inhabit the two
+positions $i$ and $j$. To do this in a principled and effective way, we use a concept called
+**mutual information**:
+
+$$
+MI_{i j}=\sum_{A_i, A_j \in \mathcal X} f_{i j}\left(A_i, A_j\right) \ln \left(\frac{f_{i j}\left(A_i, A_j\right)}{f_i\left(A_i\right) f_j\left(A_j\right)}\right)
+$$
+
+where $\mathcal X$ is the set of 20 possible amino acids.
+
+Mutual information quantifies the amount of [information](https://en.wikipedia.org/wiki/Information_content)
+shared by $i$ and $j$: how much information we gain about $j$ by observing $i$. When $MI_{ij}$ is big,
+$i$ and $j$ are highly correlated and are therefore more likely to be in contact. This concept comes
+from a beautiful branch of mathematics called
+[information theory](https://en.wikipedia.org/wiki/Information_theory),
+initially developed by
+[Claude Shannon](https://www.quantamagazine.org/how-claude-shannons-information-theory-invented-the-future-20201222/)
+at Bell Labs in application to signal transmission in telephone systems.
+
+### Direct information
+
+As we talked about above, the local nature of $f_{ij}$ can be limiting: for one, it's bad at
+discerning transitive correlations. [EVCouplings](https://evcouplings.org/), for example,
+uses a different quantity to approximate the probability that $i$ and $j$ are in contact:
+
+$$
+P_{i j}^{D i r}\left(A_i, A_j\right)=\frac{1}{Z} \exp \left\{J_{i j}\left(A_i, A_j\right)+\tilde{h}_i\left(A_i\right)+\tilde{h}_j\left(A_j\right)\right\}
+$$
+
+where the $J_{ij}$'s are the global interaction terms we obtained by mean-field approximation, and the
+$\tilde{h}$ terms can be calculated by requiring the following constraints
+
+$$
+\sum_{A_j \in \mathcal X}P_{i j}^{D i r}\left(A_i, A_j\right) = f_i(A_i)
+$$
+
+$$
+\sum_{A_i \in \mathcal X}P_{i j}^{D i r}\left(A_i, A_j\right) = f_j(A_j)
+$$
+
+These constraints ensure that $P_{i j}^{D i r}$ follows the single amino acid frequencies we observe.
+For each pair of positions:
+
+1. Let's fix the amino acid at position $i$ to be L. Consider $P_{i j}^{D i r}(L, \mathrm{A_j})$
+   for all possible $A_j$'s if we sum them all up, we should get the probability of observing $L$
+   independently at position $i$, i.e. $f_i(L)$.
+
+2. The same idea but summing over all $A_i$'s.
+
+Once we have $P_{i j}^{D i r}$, we can average over all possible $A_i$'s and $A_j$'s in the same way
+as we did for mutual information:
+
+$$
+DI_{i j}=\sum_{A_i, A_j \in \mathcal X} P_{i j}^{\text {Dir }}\left(A_i, A_j\right) \ln \left(\frac{P_{i j}^{\text {Dir }}\left(A_i, A_j\right)}{f_i\left(A_i\right) f_j\left(A_j\right)}\right)
+$$
+
+This measure is called **direct information**, a more globally aware measure of pairwise interactions.
 
 ## Predicting the effects of mutations
+
+In searching for a good model of the protein family, we came up with a way to measure
+how much two positions interact with each other: $J_{ij}$. Can we apply it to the protein folding
+problem?
+
+Our $J_{ij}$ is a function that takes in two amino acids: $J_{ij}(A_i, A_j)$; however, we would like
+a direct measure of interaction given $i$ and $j$, without this dependent on specific amino acids.
 
 $$
 \Delta E\left(A^{\mathrm{mut}}, A^{\mathrm{wt}}\right)=E\left(A^{\mathrm{mut}}\right)-E\left(A^{\mathrm{wt}}\right)
