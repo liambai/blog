@@ -38,7 +38,7 @@ const Bio = () => {
         src="../images/profile-pic.png"
         width={50}
         height={50}
-        quality={95}
+        quality={50}
         alt="Profile picture"
       />
       {author?.name && (

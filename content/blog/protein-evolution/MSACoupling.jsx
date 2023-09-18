@@ -1,24 +1,13 @@
 import React, { useState, useEffect, useRef } from "react"
 import * as d3 from "d3"
 
-const nodeIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-const MSA = [
-  ["A", "T", "R", "A", "A", "L", "P", "E", "D", "C"],
-  ["A", "T", "R", "A", "T", "L", "P", "E", "D", "C"],
-  ["A", "T", "R", "C", "T", "L", "P", "E", "D", "C"],
-  ["A", "R", "R", "A", "T", "L", "P", "D", "D", "C"],
-  ["A", "R", "R", "A", "T", "L", "P", "D", "D", "A"],
-  ["A", "V", "R", "A", "T", "K", "P", "W", "D", "A"],
-  ["A", "V", "R", "A", "T", "L", "P", "W", "D", "A"],
-  ["A", "V", "R", "A", "T", "L", "P", "W", "D", "A"],
-]
-const MSAData = MSA.map(row =>
-  row.map((char, idx) => ({ pos: idx + 1, char: char }))
-)
+import Viz from "../../../src/components/viz"
+import { MSAData } from "./MSA"
 
+const nodeIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
   const width = 350
-  const height = 50
+  const headerHeight = 50
 
   const headerRef = useRef()
   const tableRef = useRef()
@@ -32,11 +21,11 @@ const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
     const svg = d3
       .select(headerRef.current)
       .attr("width", width)
-      .attr("height", height)
+      .attr("height", headerHeight)
     const lineGenerator = d3
       .line()
       .x((d, i) => xScale(i))
-      .y(d => height / 2)
+      .y(d => headerHeight / 2)
 
     // Header of the MSA as a linear amino acid chain
     svg
@@ -53,7 +42,7 @@ const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
       .enter()
       .append("circle")
       .attr("cx", (d, i) => xScale(i))
-      .attr("cy", height / 2)
+      .attr("cy", headerHeight / 2)
       .attr("r", 10)
       .attr("fill", "white")
       .attr("stroke", "black")
@@ -91,8 +80,6 @@ const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
       .style("background-color", d =>
         focusedNodes.includes(d.pos) ? "lightgrey" : "white"
       )
-    // Exit any rows not in the data
-    rows.exit().remove()
   }, [focusedNodes, setFocusedNodes])
 
   return (
@@ -101,8 +88,10 @@ const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
         width: width,
         display: "flex",
         flexDirection: "column",
+        marginBottom: -20,
       }}
     >
+      <h5 style={{ margin: "auto" }}>MSA</h5>
       <svg ref={headerRef} />
       <table style={{ tableLayout: "fixed" }} ref={tableRef}>
         <tbody></tbody>
@@ -113,7 +102,7 @@ const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
 
 const NetworkViz = ({ focusedNodes, setFocusedNodes }) => {
   const width = 200
-  const height = 250
+  const height = 280
 
   const backboneEdgeWidth = 2
   const contactEdgeWidth = 8
@@ -174,7 +163,7 @@ const NetworkViz = ({ focusedNodes, setFocusedNodes }) => {
           .distance(d => (d.backbone ? backboneEdgeLength : 0))
       )
       .force("charge", d3.forceManyBody().strength(-100))
-      .force("center", d3.forceCenter(width / 2, height / 2))
+      .force("center", d3.forceCenter(width / 2, height / 2 - 10))
 
     const link = svg
       .selectAll(".link")
@@ -186,7 +175,7 @@ const NetworkViz = ({ focusedNodes, setFocusedNodes }) => {
       .style("stroke-width", d =>
         d.backbone ? backboneEdgeWidth : contactEdgeWidth
       )
-      .on("mouseover", (event, d) => {
+      .on("mouseover", function (event, d) {
         if (!d.backbone) {
           d3.select(this)
             .style("stroke-width", contactEdgeHoverWidth)
@@ -194,7 +183,7 @@ const NetworkViz = ({ focusedNodes, setFocusedNodes }) => {
           setFocusedNodes([2, 8])
         }
       })
-      .on("mouseout", (event, d) => {
+      .on("mouseout", function (event, d) {
         if (!d.backbone) {
           d3.select(this)
             .style("stroke-width", contactEdgeWidth)
@@ -242,16 +231,18 @@ const NetworkViz = ({ focusedNodes, setFocusedNodes }) => {
   return <svg ref={ref} height={height} />
 }
 
-const MSACoupling = () => {
+const MSACoupling = ({ caption }) => {
   const [focusedNodes, setFocusedNodes] = useState([])
   return (
-    <div style={{ display: "flex" }}>
-      <MSAViz focusedNodes={focusedNodes} setFocusedNodes={setFocusedNodes} />
-      <NetworkViz
-        focusedNodes={focusedNodes}
-        setFocusedNodes={setFocusedNodes}
-      />
-    </div>
+    <Viz caption={caption}>
+      <div style={{ display: "flex" }}>
+        <MSAViz focusedNodes={focusedNodes} setFocusedNodes={setFocusedNodes} />
+        <NetworkViz
+          focusedNodes={focusedNodes}
+          setFocusedNodes={setFocusedNodes}
+        />
+      </div>
+    </Viz>
   )
 }
 

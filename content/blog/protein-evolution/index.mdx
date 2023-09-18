@@ -1,0 +1,208 @@
+---
+title: What we can learn from evolving proteins
+date: "2023-09-16"
+description: Using evolutionary information from an Multiple Sequence Alignment (MSA) to predict protein contact and mutation effects.
+---
+
+import MSACoupling from "./MSACoupling.jsx"
+import Distributions from "./Distributions.jsx"
+import MSAHighlighted from "./MSAHighlighted.jsx"
+import MSAFrequencies from "./MSAFrequencies.jsx"
+import MSACovariance from "./MSACovariance.jsx"
+import PottsImage from "./PottsImage.jsx"
+
+Proteins are incredible molecular machines that orchestrate almost all activity in our
+biological world. We are only beginning to understand them. This article is a deep dive
+into some statistical methods that enable us to understand new proteins by harnessing
+the power of evolution.
+
+Amino acids make up proteins and specify their structure and function. Over millions of years,
+evolution has conducted a massive experiment over the space of all possible amino acid sequences:
+those that encode a functional protein survive; those that don't are extinct.
+
+We can learn a surprising lot about a protein by studying similar variants of it
+we find in nature (its **protein family**). These hints from evolution have propelled
+breakthroughs like AlphaFold and cutting-edge methods in protein design. Let's see how.
+
+A **Multiple Sequence Alignment (MSA)** compiles known variants of a protein and is compiled by
+searching vast protein sequence databases.
+
+<MSACoupling 
+  caption="
+    The structure on the right sketches how the amino acid chain might fold in space (the nodes
+    can be dragged). Hover over each row in the MSA to see the corresponding amino acid in the
+    folded structure. Hover over the blue link to see the contacting amino acid positions. 
+  "
+
+/>
+
+One key insight is that amino acid positions that tend to co-vary in the MSA likely
+interact with each other in the folded structure, often via direct 3D contact. In the rest of this
+article, we'll dissect this MSA and make this idea concrete.
+
+## In search of a distribution
+
+Let's start with the question: given an MSA and an amino acid sequence, what's the probability that the
+sequence encodes a functional protein in the family of the MSA? In other words, given a
+sequence $A = (A_1, A_2, ..., A_L)$, we're looking for an appropriate probability distribution
+$P(A)$ based on the MSA.
+
+Knowing $P$ is powerful. It lends us insight into sequences that we've never
+encountered before (more on this later!). Oftentimes, $P$ is called a _model_.
+For the outcome of rolling a die, we have great models; proteins,
+unfortunately not so much.
+
+<Distributions
+  caption="
+    Hover over the bars to see the probabilities. Sequence probabilities are made up but follow
+    some patterns you might expect: sequences that are in or resemble sequences in the MSA have
+    higher probabilities. The set of all possible sequences, called the sequence space, is
+    mind-bendingly vast: the number of possible 10 amino acid sequences is 20^10 (~10 trillion)
+    because there are 20 amino acids; the bar graph is extremely truncated.
+  "
+/>
+
+### Counting amino acid frequencies
+
+Let's take a closer look the MSA.
+
+<MSAHighlighted />
+
+Some positions have the same amino acid across almost all rows.
+For example, every sequence has A in the first position – it is **evolutionarily conserved** –
+which means that it's probably important!
+
+To measure this concretely, let's count the frequencies of observing each amino acid
+at each position. Let $f_i(A_i)$ denote the frequency of observing the amino acid $A_i$
+at position $i$.
+
+<MSAFrequencies
+  caption="
+    Hover over the MSA to compute amino acid frequencies.
+  "
+/>
+
+If we have some sequence $A$ of $L$ amino acids, it's natural to define
+
+$$
+E(A) = \sum_{1 \leq i \leq L} f_i(A_i)
+$$
+
+$E(A)$ should be big when the amino acid frequencies in each position of $A$ matches
+the frequency patterns observed the in MSA, and small otherwise. For example, if $A$
+starts with the amino acid L, then $f_1(\text{L}) = 1$ is contributed to the sum; if it starts
+with any other amino acid, $0$ is contributed.
+
+$E$ is often called an **energy function** – it's not a probability distribution, but we
+can easily turn it into one by normalizing its values to sum to $1$ (let's worry about that
+later).
+
+### Pairwise frequencies
+
+But what about the co-variation between pairs of positions? As hinted in the introduction,
+it has important implications for the structure (and hence function) of a protein. Let's
+also count the co-occurrence frequencies.
+
+Let $f_{ij}(A_i, A_j)$ denote the frequency of observing amino acid $A_i$ at position
+$i$ _and_ amino acid $A_j$ at position $j$ at position $i$.
+
+<MSACovariance
+  caption="
+    Hover over the MSA to compute amino acid pairwise frequencies.
+  "
+/>
+
+Adding these pairwise terms to our energy function:
+
+$$
+E(A) = \sum_{1 \leq i \leq j \leq L} f_{ij} (A_i, A_j)+\sum_{1 \leq i \leq L} f_i(A_i)
+$$
+
+Now, we have a simple model that accounts for single-position amino acid frequencies _and_
+pairwise co-occurrence frequencies! In practice, the pairwise terms are often a bit more
+sophisticated and involve some more calculations based on the co-occurrence frequencies
+(we'll walk through how it's done in a popular method called
+[EVCouplings](https://evcouplings.org/) soon), but let's take a moment to appreciate this
+energy function in this general form.
+
+$$
+E(A) = \sum_{1 \leq i \leq j \leq L} J_{i j} (A_i, A_j)+\sum_{1 \leq i \leq L} h_i(A_i)
+$$
+
+As it turns out, physicists have thought about this problem since the 1950s, in a different
+context: the interacting spins of particles in solids like magnets. The $J_{ij}$ terms
+capture the energy cost of particles $i$ and $j$ to be in their respective states: its
+magnitude is high if they interact, low of they don't; the $h_i$ terms capture the energy
+cost of each particle being in its state.
+
+They call this the [Potts model](https://en.wikipedia.org/wiki/Potts_model), and a fancy name
+for the energy function is the Hamiltonian. This fascinating field of physics that uses
+these statistical models to explain macroscopic behaviors of matter is called statistical
+mechanics.
+
+<PottsImage
+  caption="
+    The Potts model on a square lattice. Black and white dots are in different states.
+    Figure from https://arxiv.org/abs/1511.03031.
+  "
+/>
+
+### Global pairwise terms
+
+Earlier, we considered using $f_{ij}$ as the term capturing pairwise interactions.
+$f_{ij}$ focuses on what's happening at positions $i$ and $j$ – nothing more. It's
+a _local_ model. Perhaps
+we can imagine a scenario where positions $i$ and $j$ each independently interact with
+position $k$, though they do not directly interact with each other. Due to this
+**transitive correlation** between $i$ and $j$, the nearsighted $f_{ij}$ would likely
+overestimate the interaction between them.
+
+$$
+i \longrightarrow k \longleftarrow j
+$$
+
+To disentangle such direct and indirect correlations, we want to have a more _global_
+model that accounts for _all_ pair correlations. [EVCouplings](https://evcouplings.org/)
+is a protein structure and function prediction tool that uses an approach called
+**mean-field approximation** (from [physics](https://en.wikipedia.org/wiki/Mean-field_theory);
+[paper](https://www.pnas.org/doi/10.1073/pnas.1111471108) applying it to MSAs). The calculations
+are straightforward:
+
+1. Compute the difference between the pairwise frequencies and the independent frequencies
+   and store them in a matrix $C$, called the pair excess matrix
+
+$$
+C_{ij}(A_i, A_j) = f_{ij}(A_i, A_j) - f_i(A_i)f_j(A_j)
+$$
+
+2. Compute the inverse of this matrix, $C^{-1}$, the entries of which are just the negative
+   of the $J_{ij}$ terms we seek
+
+$$
+J_{ij}(A_i, A_j) = - (C^{-1})_{ij}(A_i, A_j)
+$$
+
+The theory behind these steps is involved and beyond our scope, but intuitively, we can
+think of the matrix inversion as an averaging step that accounts for $all$ pair correlations
+and makes the model global.
+
+### The distribution
+
+We can turn our energy function into a probability distribution by 1) exponentiating, creating
+an [exponential family distribution](https://en.wikipedia.org/wiki/Exponential_family)
+that is mathematically easy to work with, and 2) dividing by the appropriate normalization
+constant $Z$ to make all probabilities sum to 1.
+
+$$
+P(A)=\frac{1}{Z} \exp \left\{\sum_{1 \leq i \leq j \leq L} J_{i j}(A_i, A_j)+\sum_{1 \leq i \leq L} h_i(A_i)\right\}
+$$
+
+## Predicting 3D contacts
+
+Using the tools
+
+## Predicting the effects of mutations
+
+$$
+\Delta E\left(A^{\mathrm{mut}}, A^{\mathrm{wt}}\right)=E\left(A^{\mathrm{mut}}\right)-E\left(A^{\mathrm{wt}}\right)
+$$

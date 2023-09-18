@@ -29,7 +29,8 @@
     "katex": "^0.16.8",
     "prismjs": "^1.29.0",
     "react": "^18.1.0",
-    "react-dom": "^18.1.0"
+    "react-dom": "^18.1.0",
+    "react-katex": "^3.0.1"
   },
   "devDependencies": {
     "prettier": "^2.8.8"
