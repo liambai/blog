@@ -1,6 +1,6 @@
 ---
 title: What we can learn from evolving proteins
-date: "2023-09-16"
+date: "2023-09-19"
 description: Predicting protein structure and function. Multiple Sequence Alignments (MSAs), the Potts model, Direct Coupling Analysis (DCA), EVCouplings.
 ---
 
@@ -22,7 +22,8 @@ those that encode a functional protein survive; those that don't are extinct.
 
 We can learn a surprising lot about a protein by studying similar variants of it
 we find in nature (its **protein family**). These hints from evolution have propelled
-breakthroughs like AlphaFold and cutting-edge methods in protein design. Let's see how.
+breakthroughs like [AlphaFold](https://www.forbes.com/sites/robtoews/2021/10/03/alphafold-is-the-most-important-achievement-in-ai-ever/?sh=6e0571586e0a)
+and many cutting-edge methods in protein design. Let's see how.
 
 A **Multiple Sequence Alignment (MSA)** compiles known variants of a protein and is compiled by
 searching vast protein sequence databases.
@@ -72,7 +73,7 @@ For example, every sequence has A in the first position – it is **evolutionar
 which means that it's probably important!
 
 To measure this concretely, let's count the frequencies of observing each amino acid
-at each position. Let $f_i(A_i)$ denote the frequency of observing the amino acid $A_i$
+at each position. Let $f_i(A_i)$ be the frequency of observing the amino acid $A_i$
 at position $i$.
 
 <MSAFrequencies
@@ -102,7 +103,7 @@ But what about the co-variation between pairs of positions? As hinted in the int
 it has important implications for the structure (and hence function) of a protein. Let's
 also count the co-occurrence frequencies.
 
-Let $f_{ij}(A_i, A_j)$ denote the frequency of observing amino acid $A_i$ at position
+Let $f_{ij}(A_i, A_j)$ be the frequency of observing amino acid $A_i$ at position
 $i$ _and_ amino acid $A_j$ at position $j$ at position $i$.
 
 <MSACovariance
@@ -185,8 +186,7 @@ $$
 The theory behind these steps is involved and beyond our scope, but intuitively, we can
 think of the matrix inversion as an averaging step that accounts for $all$ pair correlations
 and makes the model global. This method is often referred to as
-[**Direct Coupling Analysis**](https://en.wikipedia.org/wiki/Direct_coupling_analysis)
-(DCA).
+[**Direct Coupling Analysis (DCA)**](https://en.wikipedia.org/wiki/Direct_coupling_analysis).
 
 ### The distribution
 
@@ -204,7 +204,7 @@ $$
 Given an amino acid sequence, what is the 3D structure that it folds into? This is the
 [protein folding problem](https://rootsofprogress.org/alphafold-protein-folding-explainer), a
 complex problem central to understanding biology. In 2021, researchers from DeepMind shared a
-groundbreaking model using deep learning, [AlphaFold](https://www.nature.com/articles/s41586-021-03819-2),
+groundbreaking model using deep learning, [AlphaFold](https://www.nature.com/articles/s41586-021-03819-2)[8],
 declaring the problem as solved. The
 [implications](https://moalquraishi.wordpress.com/2020/12/08/alphafold2-casp14-it-feels-like-ones-child-has-left-home/)
 are profound.
@@ -306,7 +306,7 @@ demonstrating the usefulness of considering the global sequence context [1].
 ### Constructing the structure
 
 Given predicted contacts by DI, we need to carry out a few more computational steps
-– e.g. [simulated annealing](https://en.wikipedia.org/wiki/Simulated_annealing) – to
+– e.g. [**simulated annealing**](https://en.wikipedia.org/wiki/Simulated_annealing) – to
 generate the full predicted 3D structure. Omitting those details: the results are
 these beautiful predicted structures that often closely match the real structures.
 
@@ -345,8 +345,8 @@ E(A) = \sum_{1 \leq i \leq j \leq L} J_{i j} (A_i, A_j)+\sum_{1 \leq i \leq L} h
 $$
 
 Let's try to use this energy function as a guide to our experimental testing. Intuitively,
-sequences with low energy should be more likely to fail. Let $A^{\mathrm{wt}}$denote a wildtype,
-or natural, sequence, and let $A^{\mathrm{mut}}$ denote a mutant sequence:
+sequences with low energy should be more likely to fail. Let $A^{\mathrm{wt}}$ be a wildtype,
+or natural, sequence, and let $A^{\mathrm{mut}}$ be a mutant sequence:
 
 $$
 \Delta E\left(A^{\mathrm{mut}}, A^{\mathrm{wt}}\right)=E\left(A^{\mathrm{mut}}\right)-E\left(A^{\mathrm{wt}}\right)
@@ -372,8 +372,8 @@ the big swathes of blue (damaging mutations) speak to the difficulty of engineer
 
 The calculated energies correlated strongly with experimentally observed fitness (!), meaning
 that our energy function provides helpful guidance on how a given mutation might affect
-function. It's remarkable that with such a simple model and seemly so little information (just
-from MSAs), we can attain such profound predictive power.
+function. It's remarkable that with such a simple model and from seemly so little information (just
+MSAs!), we can attain such profound predictive power.
 
 <Image
   path={require("./deltaE-experimental.png")}
@@ -394,7 +394,7 @@ the sequences that have more positive $\Delta E$'s and therefore more likely to 
 
 Only considering point mutations can be limiting: what if the sequence we're differ at several
 positions from the one we started with? To venture outside the vicinity of the sequence we started
-with, let's try to directly sample from our probability distribution like this:
+with, let's try this:
 
 1. Start with a random sequence $A$.
 2. Mutate a random position to create a candidate sequence $A^{\mathrm{cand}}$.
@@ -404,19 +404,19 @@ with, let's try to directly sample from our probability distribution like this:
      difference and ideally with a knob we can control, like $P_{\mathrm{accept}} = \exp(-\Delta E / T)$.
      - the bigger this $\Delta E$ going in the unwanted direction, the smaller the acceptance probability.
      - $T \in (0, 1]$ lets us control how forgiving we want to be: $T = 1$ makes accepting more likely;
-       $T \to 0$ makes accepting less likely.
+       $T \to 0$ makes accepting less likely. $T$ is called the **temperature**.
 4. Go back to 2. and repeat many times.
 
-In the end, we'll have a sequence that is a random sample from our probability distribution
+In the end, we'll have a sequence that is a **random sample** from our probability distribution
 $P(A)=\frac{1}{Z} \exp(E(A)/T)$ (slightly modified to include $T$). Why this works involves a lot of
-cool math beyond our scope. This is the
-[Metropolis–Hastings algorithm](https://en.wikipedia.org/wiki/Metropolis%E2%80%93Hastings_algorithm),
+cool math that we won't have time to dive into now. This is the
+[**Metropolis–Hastings algorithm**](https://en.wikipedia.org/wiki/Metropolis%E2%80%93Hastings_algorithm),
 belonging to a class of useful tools for approximating complex distributions called
-[Markov chain Monte Carlo](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo) (MCMC).
+[**Markov chain Monte Carlo (MCMC)**](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo).
 
 In this [paper](https://www.science.org/doi/10.1126/science.aba3304), researchers did exactly this to
 with the goal of improving a protein called chorismate mutase (CM) [4]. They used MCMC to draw many
-samples from the DCA distribution and tested them experimentally.
+sequences from the DCA distribution and synthesized and tested them experimentally.
 
 When they set $T = 0.33$ (second row in the figure below), they created sequences with:
 
@@ -443,7 +443,16 @@ When they set $T = 0.33$ (second row in the figure below), they created sequence
 Taken together, our simple DCA model gave us the superpowers to improve on the best that
 nature had to offer!
 
-## Summary
+## Summary & what's next
+
+We talked about the direct coupling analysis model (DCA) with some of its cool applications.
+I hope by now you can join me in the fascination and appreciation of MSAs.
+
+Recently, a deep learning mechanism called **attention** [5], the technology underlying magical
+large language models like GPT, has taken the world by storm. As it turns out, protein
+sequences are much like natural language sequences on which attention prevails: a variant
+of attention called **axial attention** [6] works wonders on MSAs [7][8], creating models with
+better performance. I hope to do a deep dive on this soon!
 
 ## Links
 
@@ -469,6 +478,9 @@ I also recommend these papers that extend the ideas:
   nuances and limitations of this approach: our structure prediction method using $J_{ij}$'s is mostly good at detecting
   interactions between [side chains](https://en.wikipedia.org/wiki/Side_chain), and their orientations matter.
 
+(In these papers and the literature in general, the word **residue** is usually used to refer to what we have called
+_position_, e.g. a protein sequence consists of a chain of amino acid residues.)
+
 ### References
 
 [1] Marks, D.S. et al.
@@ -484,3 +496,13 @@ Nat Biotechnol 35, 128–135 (2017).
 
 [4] Russ WP, et al. [An evolution-based model for designing chorismate mutase enzymes](https://www.science.org/doi/10.1126/science.aba3304).
 Science. 2020;369(6502):440–445 (2020).
+
+[5] Vaswani A., et al. [Attention is all you need](https://arxiv.org/abs/1706.03762). NeurIPS (2017).
+
+[6] Ho J. et al. [Axial Attention in Multidimensional Transformers](https://arxiv.org/abs/1912.12180). arXiv (2019).
+
+[7] Rao, R.M., et al. [MSA Transformer](https://proceedings.mlr.press/v139/rao21a.html).
+Proceedings of Machine Learning Research 139:8844-8856 (2021).
+
+[8] Jumper, J. et al. [Highly accurate protein structure prediction with AlphaFold](https://www.nature.com/articles/s41586-021-03819-2).
+Nature 596, 583–589 (2021).

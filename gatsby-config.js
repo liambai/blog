@@ -17,7 +17,7 @@ module.exports = {
     description: `Blog about machine learning and proteins.`,
     siteUrl: `https://gatsbystarterblogsource.gatsbyjs.io/`,
     social: {
-      twitter: "",
+      twitter: "liambai21",
       linkedin: "liambai",
     },
     repo: "liambai/blog",

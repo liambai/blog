@@ -50,7 +50,8 @@ const Bio = () => {
           <a href={`https://www.linkedin.com/in/${social?.linkedin || ``}`}>
             LinkedIn
           </a>
-          .
+          {` `} and {` `}
+          <a href={`https://www.x.com/${social?.twitter || ``}`}>Twitter</a>.
         </p>
       )}
     </div>
