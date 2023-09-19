@@ -18,6 +18,7 @@ module.exports = {
     siteUrl: `https://gatsbystarterblogsource.gatsbyjs.io/`,
     social: {
       twitter: "",
+      linkedin: "liambai",
     },
   },
   plugins: [

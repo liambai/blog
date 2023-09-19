@@ -108,6 +108,7 @@ exports.createSchemaCustomization = ({ actions }) => {
 
     type Social {
       twitter: String
+      linkedin: String
     }
 
     type Mdx implements Node {

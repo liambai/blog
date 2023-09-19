@@ -357,7 +357,7 @@ captures how much the mutant's energy improved over the wildtype.
 In this [paper](https://www.nature.com/articles/nbt.3769) introducing the
 [mutation effect prediction tool](https://marks.hms.harvard.edu/evmutation/)
 in EVCouplings, researchers computed the $\Delta E$ of each mutant sequence in a saturation
-mutagenesis experiment on a protein called M.HaeIII.
+mutagenesis experiment on a protein called M.HaeIII [3].
 
 <Image
   path={require("./deltaE-mutations.png")}
@@ -392,16 +392,82 @@ the sequences that have more positive $\Delta E$'s and therefore more likely to 
 
 ### Generating new sequences
 
+Only considering point mutations can be limiting: what if the sequence we're differ at several
+positions from the one we started with? To venture outside the vicinity of the sequence we started
+with, let's try to directly sample from our probability distribution like this:
+
+1. Start with a random sequence $A$.
+2. Mutate a random position to create a candidate sequence $A^{\mathrm{cand}}$.
+3. Compare $E(A)$ with $E(A^{\mathrm{cand}})$.
+   - if energy increased, awesome: accept the candidate.
+   - if energy decreased, still accept the candidate with some probability proportional the energy
+     difference and ideally with a knob we can control, like $P_{\mathrm{accept}} = \exp(-\Delta E / T)$.
+     - the bigger this $\Delta E$ going in the unwanted direction, the smaller the acceptance probability.
+     - $T \in (0, 1]$ lets us control how forgiving we want to be: $T = 1$ makes accepting more likely;
+       $T \to 0$ makes accepting less likely.
+4. Go back to 2. and repeat many times.
+
+In the end, we'll have a sequence that is a random sample from our probability distribution
+$P(A)=\frac{1}{Z} \exp(E(A)/T)$ (slightly modified to include $T$). Why this works involves a lot of
+cool math beyond our scope. This is the
+[Metropolis–Hastings algorithm](https://en.wikipedia.org/wiki/Metropolis%E2%80%93Hastings_algorithm),
+belonging to a class of useful tools for approximating complex distributions called
+[Markov chain Monte Carlo](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo) (MCMC).
+
+In this [paper](https://www.science.org/doi/10.1126/science.aba3304), researchers did exactly this to
+with the goal of improving a protein called chorismate mutase (CM) [4]. They used MCMC to draw many
+samples from the DCA distribution and tested them experimentally.
+
+When they set $T = 0.33$ (second row in the figure below), they created sequences with:
+
+1. higher energy than natural sequences (the energy they use is the negative of our $E(A)$, i.e.
+   the smaller the better)
+2. enhanced activity compared to natural CM when expressed in E. coli (!)
+
+<Image
+  path={require("./CM-energy.jpeg")}
+  caption="
+  EcCM is a natural CM whose high activity is used as a benchmark and goalpost.
+  Statistical energies on the left are negatives of ours, i.e. the smaller the better.
+  norm. r.e. on the right stands for normalized relative enrichment. Absent more 
+  experimental details, we can interpret them as: more density around norm r.e. = 1
+  means higher CM activity. At T = 0.33 (second row), we saw improvements in both statistical
+  energy (left) and experimental CM activity (right) over natural proteins. Figure from [4].
+  The profile model on the bottom row contains only the independent h terms not no pairwise
+  J terms, showing worse performance. 
+  "
+  width="90%"
+/>
+<br />
+
+Taken together, our simple DCA model gave us the superpowers to improve on the best that
+nature had to offer!
+
+## Summary
+
 ## Links
 
 The ideas we discussed are primarily from the following papers:
 
-- [Protein 3D structure computed from evolutionary sequence variation](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0028766#pone.0028766.s017).
-  This paper describes DCA in detail along with useful intuitions. It's highly accessible and worthwhile.
+- [Protein 3D structure computed from evolutionary sequence variation](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0028766#pone.0028766.s017)
+  focuses on 3D structure prediction, describes DCA in detail, and provides helpful intuitions.
+  It's a highly accessible and worthwhile read.
 
-- [Mutation effects predicted from sequence co-variation](https://www.nature.com/articles/nbt.3769).
-  This paper presents the results on predicting mutation effects and introduces the powerful
+- [Mutation effects predicted from sequence co-variation](https://www.nature.com/articles/nbt.3769)
+  presents the results on predicting mutation effects and introduces the powerful
   [EVMutation](https://marks.hms.harvard.edu/evmutation/).
+
+- [An evolution-based model for designing chorismate mutase enzymes](https://www.science.org/doi/10.1126/science.aba3304)
+  is end-to-end protein engineering case study using our model.
+
+I also recommend these papers that extend the ideas:
+
+- [Robust and accurate prediction of residue–residue interactions across protein interfaces using evolutionary information](https://elifesciences.org/articles/02030)
+  applies this model to protein-protein interfaces, for which we need the MSAs of the two proteins side by side.
+
+- [Evolutionary couplings detect side-chain interactions](https://pubmed.ncbi.nlm.nih.gov/31328041/) dives into some
+  nuances and limitations of this approach: our structure prediction method using $J_{ij}$'s is mostly good at detecting
+  interactions between [side chains](https://en.wikipedia.org/wiki/Side_chain), and their orientations matter.
 
 ### References
 
