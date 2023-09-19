@@ -20,6 +20,7 @@ module.exports = {
       twitter: "",
       linkedin: "liambai",
     },
+    repo: "liambai/blog",
   },
   plugins: [
     `gatsby-plugin-image`,

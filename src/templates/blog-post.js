@@ -4,6 +4,7 @@ import { Link, graphql } from "gatsby"
 import Bio from "../components/bio"
 import Layout from "../components/layout"
 import Seo from "../components/seo"
+import Comments from "../components/comments"
 
 const BlogPostTemplate = ({
   data: { previous, next, site, mdx: post },
@@ -23,6 +24,8 @@ const BlogPostTemplate = ({
           <p>{post.frontmatter.date}</p>
         </header>
         {children}
+        <hr />
+        <Comments issueTerm={post.frontmatter.title} />
         <hr />
         <footer>
           <Bio />
