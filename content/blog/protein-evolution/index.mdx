@@ -6,7 +6,6 @@ description: Predicting protein structure and function. Multiple Sequence Alignm
 
 import MSACoupling from "./MSACoupling.jsx"
 import Distributions from "./Distributions.jsx"
-import MSAHighlighted from "./MSAHighlighted.jsx"
 import MSAFrequencies from "./MSAFrequencies.jsx"
 import MSACovariance from "./MSACovariance.jsx"
 import Image from "../../../src/components/image.jsx"
@@ -25,8 +24,8 @@ we find in nature (its **protein family**). These hints from evolution have prop
 breakthroughs like [AlphaFold](https://www.forbes.com/sites/robtoews/2021/10/03/alphafold-is-the-most-important-achievement-in-ai-ever/?sh=6e0571586e0a)
 and many cutting-edge methods in protein design. Let's see how.
 
-A **Multiple Sequence Alignment (MSA)** compiles known variants of a protein and is compiled by
-searching vast protein sequence databases.
+A **Multiple Sequence Alignment (MSA)** compiles known variants of a protein – which can come
+from different organisms – and is created by searching vast protein sequence databases.
 
 <MSACoupling
   caption="
@@ -55,21 +54,21 @@ unfortunately not so much.
 <Distributions
   caption="
     Hover over the bars to see the probabilities. Sequence probabilities are made up but follow
-    some patterns you might expect: sequences that are in or resemble sequences in the MSA have
+    some patterns you might expect: sequences that resemble sequences in the MSA have
     higher probabilities. The set of all possible sequences, called the sequence space, is
     mind-bendingly vast: the number of possible 10 amino acid sequences is 20^10 (~10 trillion)
-    because there are 20 amino acids; the bar graph is extremely truncated.
+    because there are 20 amino acids; the bar graph is very truncated.
   "
 />
 
 ### Counting amino acid frequencies
 
-Let's take a closer look the MSA.
+Let's take a closer look the MSA:
 
-<MSAHighlighted />
+<Image path={require("./MSAHighlighted.png")} width="60%" />
 
 Some positions have the same amino acid across almost all rows.
-For example, every sequence has A in the first position – it is **evolutionarily conserved** –
+For example, every sequence has L in the first position – it is **evolutionarily conserved** –
 which means that it's probably important!
 
 To measure this concretely, let's count the frequencies of observing each amino acid
@@ -104,7 +103,7 @@ it has important implications for the structure (and hence function) of a protei
 also count the co-occurrence frequencies.
 
 Let $f_{ij}(A_i, A_j)$ be the frequency of observing amino acid $A_i$ at position
-$i$ _and_ amino acid $A_j$ at position $j$ at position $i$.
+$i$ _and_ amino acid $A_j$ at position $j$.
 
 <MSACovariance
   caption="
@@ -129,10 +128,10 @@ $$
 E(A) = \sum_{1 \leq i \leq j \leq L} J_{i j} (A_i, A_j)+\sum_{1 \leq i \leq L} h_i(A_i)
 $$
 
-As it turns out, physicists have thought about this problem since the 1950s, in a different
+Actually, physicists have studied this energy function since the 1950s, in a different
 context: the interacting spins of particles in solids like magnets. The $J_{ij}$ terms
 capture the energy cost of particles $i$ and $j$ to be in their respective states: its
-magnitude is high if they interact, low of they don't; the $h_i$ terms capture the energy
+magnitude is big if they interact, small if they don't; the $h_i$ terms capture the energy
 cost of each particle being in its state.
 
 They call this the [Potts model](https://en.wikipedia.org/wiki/Potts_model), and a fancy name
@@ -155,7 +154,7 @@ Earlier, we considered using $f_{ij}$ as the term capturing pairwise interaction
 $f_{ij}$ focuses on what's happening at positions $i$ and $j$ – nothing more. It's
 a _local_ model. Perhaps
 we can imagine a scenario where positions $i$ and $j$ each independently interact with
-position $k$, though they do not directly interact with each other. Due to this
+position $k$, though they do not directly interact with each other. Because of this
 **transitive correlation** between $i$ and $j$, the nearsighted $f_{ij}$ would likely
 overestimate the interaction between them.
 
@@ -163,7 +162,7 @@ $$
 i \longrightarrow k \longleftarrow j
 $$
 
-To disentangle such direct and indirect correlations, we want to have a _global_
+To disentangle such direct and indirect correlations, we want a _global_
 model that accounts for _all_ pair correlations. [EVCouplings](https://evcouplings.org/)
 is a protein structure and function prediction tool that accomplishes this using
 [**mean-field approximation**](https://en.wikipedia.org/wiki/Mean-field_theory)
@@ -204,7 +203,7 @@ $$
 Given an amino acid sequence, what is the 3D structure that it folds into? This is the
 [protein folding problem](https://rootsofprogress.org/alphafold-protein-folding-explainer), a
 complex problem central to understanding biology. In 2021, researchers from DeepMind shared a
-groundbreaking model using deep learning, [AlphaFold](https://www.nature.com/articles/s41586-021-03819-2)[8],
+groundbreaking model using deep learning, [AlphaFold](https://www.nature.com/articles/s41586-021-03819-2) [8],
 declaring the problem as solved. The
 [implications](https://moalquraishi.wordpress.com/2020/12/08/alphafold2-casp14-it-feels-like-ones-child-has-left-home/)
 are profound.
@@ -213,7 +212,7 @@ The [EVCouplings](https://evcouplings.org/) method we'll describe cannot compete
 accuracy, but it is foundational to AlphaFold, which similarly relies heavily on pairwise interaction
 signals from MSAs.
 
-Myriad forces choreograph the folding of a protein. Let's simplify and think only about
+Myriad forces choreograph the folding of a protein. Let's simplify and focus on
 pairs of amino acid positions that interact strongly with each other – and hypothesize that
 they are in spatial contact. These predicted contacts can act as a set of constraints from
 which we can then derive the full 3D structure.
@@ -227,8 +226,10 @@ which we can then derive the full 3D structure.
 />
 
 Hovering over the blue link, we see that positions $2$ and $8$ tend to co-vary in the MSA,
-and they are in contact in the folded protein. Let's use the tools we have to quantify this
-co-variance.
+and they are in contact in the folded protein. Intuitively, it's important to maintaining the
+function of the protein that when one position changes, the other also changes in a specific way;
+failure to do so is likely a death sentence that explains the absence in our MSA. Let's use the tools
+we have to quantify this co-variance.
 
 ### Mutual information
 
@@ -245,17 +246,18 @@ $$
 where $\mathcal X$ is the set of 20 possible amino acids.
 
 Mutual information quantifies the amount of [information](https://en.wikipedia.org/wiki/Information_content)
-shared by $i$ and $j$: how much information we gain about $j$ by observing $i$. When $MI_{ij}$ is big,
-$i$ and $j$ are highly correlated and are therefore more likely to be in contact. This concept comes
+shared by $i$ and $j$: how much information we gain about $j$ by observing $i$. This concept comes
 from a beautiful branch of mathematics called
 [information theory](https://en.wikipedia.org/wiki/Information_theory),
 initially developed by
 [Claude Shannon](https://www.quantamagazine.org/how-claude-shannons-information-theory-invented-the-future-20201222/)
 at Bell Labs in application to signal transmission in telephone systems.
 
+In our case, a big $MI_{ij}$ means that positions $i$ and $j$ are highly correlated and hence more likely to be in contact.
+
 ### Direct information
 
-As we talked about, the local nature of $f_{ij}$ can be limiting: for one, it's bad at
+As we mentioned, the local nature of $f_{ij}$ can be limiting: for one, it's bad at
 discerning transitive correlations. [EVCouplings](https://evcouplings.org/) uses a different
 quantity to approximate the probability that $i$ and $j$ are in contact:
 
@@ -365,7 +367,6 @@ mutagenesis experiment on a protein called M.HaeIII [3].
   acids are shown as a bar on the bottom, labeled with * (sensitivity per site). Figure from [3]."
   width="100%"
 />
-<br />
 
 Not all positions are created equal – mutations at some positions are especially harmful. Moreover,
 the big swathes of blue (damaging mutations) speak to the difficulty of engineering proteins.
@@ -384,17 +385,16 @@ MSAs!), we can attain such profound predictive power.
   "
   width={450}
 />
-<br />
 
 The next time we find ourselves trying a saturation mutagenesis screen to identify an improved
-mutant, we can calculate some $\Delta E$'s first before stepping in the lab and focus only on
-the sequences that have more positive $\Delta E$'s and therefore more likely to succeed.
+mutant, we can calculate some $\Delta E$'s first before stepping in the lab and cam perhaps
+focus only on the sequences with more positive $\Delta E$'s that are more likely to work.
 
 ### Generating new sequences
 
 Only considering point mutations can be limiting: what if the sequence we're differ at several
-positions from the one we started with? To venture outside the vicinity of the sequence we started
-with, let's try this:
+positions from the original? To venture outside the vicinity of the original sequence,
+let's try this:
 
 1. Start with a random sequence $A$.
 2. Mutate a random position to create a candidate sequence $A^{\mathrm{cand}}$.
@@ -402,7 +402,7 @@ with, let's try this:
    - if energy increased, awesome: accept the candidate.
    - if energy decreased, still accept the candidate with some probability proportional the energy
      difference and ideally with a knob we can control, like $P_{\mathrm{accept}} = \exp(-\Delta E / T)$.
-     - the bigger this $\Delta E$ going in the unwanted direction, the smaller the acceptance probability.
+     - the bigger this $\Delta E$, which goes in the unwanted direction, the smaller the acceptance probability.
      - $T \in (0, 1]$ lets us control how forgiving we want to be: $T = 1$ makes accepting more likely;
        $T \to 0$ makes accepting less likely. $T$ is called the **temperature**.
 4. Go back to 2. and repeat many times.
@@ -429,21 +429,21 @@ When they set $T = 0.33$ (second row in the figure below), they created sequence
   caption="
   EcCM is a natural CM whose high activity is used as a benchmark and goalpost.
   Statistical energies on the left are negatives of ours, i.e. the smaller the better.
-  norm. r.e. on the right stands for normalized relative enrichment. Absent more 
+  norm. r.e. on the right stands for normalized relative enrichment; absent more 
   experimental details, we can interpret them as: more density around norm r.e. = 1
   means higher CM activity. At T = 0.33 (second row), we saw improvements in both statistical
-  energy (left) and experimental CM activity (right) over natural proteins. Figure from [4].
-  The profile model on the bottom row contains only the independent h terms not no pairwise
-  J terms, showing worse performance. 
+  energy (left) and experimental CM activity (right) over natural proteins.
+  The profile model on the bottom row contains only the independent h terms and no pairwise
+  J terms, with expected poor performance. Figure from [4].
   "
   width="90%"
 />
-<br />
 
 Taken together, our simple DCA model gave us the superpowers to improve on the best that
-nature had to offer!
+nature had to offer! Our energy function enables us to not only check a given sequence for
+its fitness, but also generate new sequences with high fitness.
 
-## Summary & what's next
+## Summary + what's next
 
 We talked about the direct coupling analysis model (DCA) with some of its cool applications.
 I hope by now you can join me in the fascination and appreciation of MSAs.
