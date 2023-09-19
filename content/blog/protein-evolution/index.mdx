@@ -1,7 +1,7 @@
 ---
 title: What we can learn from evolving proteins
 date: "2023-09-16"
-description: Predicting protein structure and function. Multiple Sequence Alignments (MSAs), the Potts model, EVCouplings.
+description: Predicting protein structure and function. Multiple Sequence Alignments (MSAs), the Potts model, Direct Coupling Analysis (DCA), EVCouplings.
 ---
 
 import MSACoupling from "./MSACoupling.jsx"
@@ -9,7 +9,7 @@ import Distributions from "./Distributions.jsx"
 import MSAHighlighted from "./MSAHighlighted.jsx"
 import MSAFrequencies from "./MSAFrequencies.jsx"
 import MSACovariance from "./MSACovariance.jsx"
-import PottsImage from "./PottsImage.jsx"
+import Image from "../../../src/components/image.jsx"
 
 Proteins are incredible molecular machines that orchestrate almost all activity in our
 biological world. We are only beginning to understand them. This article is a deep dive
@@ -139,11 +139,13 @@ for the energy function is the Hamiltonian. This fascinating field of physics th
 these statistical models to explain macroscopic behaviors of matter is called statistical
 mechanics.
 
-<PottsImage
+<Image
+  path={require("./potts.png")}
   caption="
     The Potts model on a square lattice. Black and white dots are in different states.
     Figure from https://arxiv.org/abs/1511.03031.
   "
+  width={300}
 />
 
 ### Global pairwise terms
@@ -160,12 +162,11 @@ $$
 i \longrightarrow k \longleftarrow j
 $$
 
-To disentangle such direct and indirect correlations, we want to have a more _global_
+To disentangle such direct and indirect correlations, we want to have a _global_
 model that accounts for _all_ pair correlations. [EVCouplings](https://evcouplings.org/)
-is a protein structure and function prediction tool that uses an approach called
-**mean-field approximation** (from [physics](https://en.wikipedia.org/wiki/Mean-field_theory);
-[paper](https://www.pnas.org/doi/10.1073/pnas.1111471108) applying it to MSAs). The calculations
-are straightforward:
+is a protein structure and function prediction tool that accomplishes this using
+[**mean-field approximation**](https://en.wikipedia.org/wiki/Mean-field_theory)
+[2]. The calculations are straightforward:
 
 1. Compute the difference between the pairwise frequencies and the independent frequencies
    and store them in a matrix $C$, called the pair excess matrix
@@ -183,7 +184,9 @@ $$
 
 The theory behind these steps is involved and beyond our scope, but intuitively, we can
 think of the matrix inversion as an averaging step that accounts for $all$ pair correlations
-and makes the model global.
+and makes the model global. This method is often referred to as
+[**Direct Coupling Analysis**](https://en.wikipedia.org/wiki/Direct_coupling_analysis)
+(DCA).
 
 ### The distribution
 
@@ -230,10 +233,10 @@ co-variance.
 ### Mutual information
 
 Our $f_{ij}$ is a function that takes in two amino acids: $f_{ij}(A_i, A_j)$; however, we would like
-a direct measure of interaction given $i$ and $j$, without a dependence on specific amino acids. In
-other words, we want to average over all possible pairs of amino acids that can inhabit the two
-positions $i$ and $j$. To do this in a principled and effective way, we use a concept called
-**mutual information**:
+a direct measure of interaction given only positions $i$ and $j$, without a dependence on specific
+amino acids. In other words, we want to average over all possible pairs of amino acids that can
+inhabit the two positions $i$ and $j$. To do this in a principled and effective way, we use a concept
+called **mutual information**:
 
 $$
 MI_{i j}=\sum_{A_i, A_j \in \mathcal X} f_{i j}\left(A_i, A_j\right) \ln \left(\frac{f_{i j}\left(A_i, A_j\right)}{f_i\left(A_i\right) f_j\left(A_j\right)}\right)
@@ -252,16 +255,16 @@ at Bell Labs in application to signal transmission in telephone systems.
 
 ### Direct information
 
-As we talked about above, the local nature of $f_{ij}$ can be limiting: for one, it's bad at
-discerning transitive correlations. [EVCouplings](https://evcouplings.org/), for example,
-uses a different quantity to approximate the probability that $i$ and $j$ are in contact:
+As we talked about, the local nature of $f_{ij}$ can be limiting: for one, it's bad at
+discerning transitive correlations. [EVCouplings](https://evcouplings.org/) uses a different
+quantity to approximate the probability that $i$ and $j$ are in contact:
 
 $$
 P_{i j}^{D i r}\left(A_i, A_j\right)=\frac{1}{Z} \exp \left\{J_{i j}\left(A_i, A_j\right)+\tilde{h}_i\left(A_i\right)+\tilde{h}_j\left(A_j\right)\right\}
 $$
 
-where the $J_{ij}$'s are the global interaction terms we obtained by mean-field approximation, and the
-$\tilde{h}$ terms can be calculated by requiring the following constraints
+where the $J_{ij}$'s are the global interaction terms obtained by mean-field approximation, and the
+$\tilde{h}$ terms can be calculated by imposing the following constraints
 
 $$
 \sum_{A_j \in \mathcal X}P_{i j}^{D i r}\left(A_i, A_j\right) = f_i(A_i)
@@ -275,29 +278,124 @@ These constraints ensure that $P_{i j}^{D i r}$ follows the single amino acid fr
 For each pair of positions:
 
 1. Let's fix the amino acid at position $i$ to be L. Consider $P_{i j}^{D i r}(L, \mathrm{A_j})$
-   for all possible $A_j$'s if we sum them all up, we should get the probability of observing $L$
-   independently at position $i$, i.e. $f_i(L)$.
+   for all possible $A_j$'s if we sum them all up, we get the probability of observing $L$
+   independently at position $i$, which should be $f_i(L)$.
 
 2. The same idea but summing over all $A_i$'s.
 
-Once we have $P_{i j}^{D i r}$, we can average over all possible $A_i$'s and $A_j$'s in the same way
-as we did for mutual information:
+Once we have $P_{i j}^{D i r}$, we can average over all possible $A_i$'s and $A_j$'s like we did for mutual information:
 
 $$
 DI_{i j}=\sum_{A_i, A_j \in \mathcal X} P_{i j}^{\text {Dir }}\left(A_i, A_j\right) \ln \left(\frac{P_{i j}^{\text {Dir }}\left(A_i, A_j\right)}{f_i\left(A_i\right) f_j\left(A_j\right)}\right)
 $$
 
-This measure is called **direct information**, a more globally aware measure of pairwise interactions.
+This measure is called **direct information**, a more globally-aware measure of pairwise interactions.
+When compared to real contacts in experimentally determined structures, DI performed much better than MI,
+demonstrating the usefulness of considering the global sequence context [1].
 
-## Predicting the effects of mutations
+<Image
+  path={require("./DI-vs-MI.png")}
+  caption="
+  Axes are amino acid positions.
+  The grey grooves are the actual contact in the experimentally obtained structures.
+  The red dots are the predicted contacts using DI; the blue dots are the predicted
+  contacts using MI. Data is shown for 2 proteins: ELAV4 and RAS. Figure from [1].
+  "
+/>
 
-In searching for a good model of the protein family, we came up with a way to measure
-how much two positions interact with each other: $J_{ij}$. Can we apply it to the protein folding
-problem?
+### Constructing the structure
 
-Our $J_{ij}$ is a function that takes in two amino acids: $J_{ij}(A_i, A_j)$; however, we would like
-a direct measure of interaction given $i$ and $j$, without this dependent on specific amino acids.
+Given predicted contacts by DI, we need to carry out a few more computational steps
+– e.g. [simulated annealing](https://en.wikipedia.org/wiki/Simulated_annealing) – to
+generate the full predicted 3D structure. Omitting those details: the results are
+these beautiful predicted structures that often closely match the real structures.
+
+<Image
+  path={require("./structures.png")}
+  caption="
+  Grey structures are real, experimentally observed; red structures are predicted using DI.
+  Root mean square deviation (RMSD) measures the average distance between atoms in the predicted
+  vs. observed structure and is used to score the quality of structure predictions; they are
+  shown on the arrows with the total number of amino acid positions in parentheses.
+  Figure from [1].
+  "
+/>
+
+## Predicting function
+
+At this point, you might think: this is all neat and all, but is it directly useful in
+any way? One common problem in industrial biotechnology is: given a protein that carries
+out some useful function – e.g. an enzyme that catalyses a desired reaction – how can we
+improve it by increasing its stability or activity?
+
+One approach is [saturation mutagenesis](https://en.wikipedia.org/wiki/Saturation_mutagenesis):
+take the protein's sequence, mutation every position to every possible amino acid, and test
+all the mutants to see if any yields an improvement. I know that sounds crazy, but it has been
+made possible by impressive advancements in automation-enabled
+[high-throughput screening](https://en.wikipedia.org/wiki/High-throughput_screening) (in
+comparison, progress in our biological understanding necessary to make more informed designs
+has generally lagged behind). Can we do better?
+
+### Predicting mutation effects
+
+Remember our energy function that measures the fitness of a sequence in the context of an MSA.
+
+$$
+E(A) = \sum_{1 \leq i \leq j \leq L} J_{i j} (A_i, A_j)+\sum_{1 \leq i \leq L} h_i(A_i)
+$$
+
+We can use the energy function as a guide to our experimental testing. Sequences with low
+energy are more likely to fail. Let $A^{\mathrm{wt}}$ denote a wildtype, or
+natural, sequence, and let $A^{\mathrm{mut}}$ denote a mutant sequence:
 
 $$
 \Delta E\left(A^{\mathrm{mut}}, A^{\mathrm{wt}}\right)=E\left(A^{\mathrm{mut}}\right)-E\left(A^{\mathrm{wt}}\right)
 $$
+
+captures how much the mutant's energy improved over the wildtype.
+
+In this [paper](https://www.nature.com/articles/nbt.3769) introducing the
+[mutation effect prediction tool](https://marks.hms.harvard.edu/evmutation/)
+in EVCouplings, researchers computed the $\Delta E$ of each mutant sequence in a saturation
+mutagenesis experiment on a protein called M.HaeIII.
+
+<Image
+  path={require("./deltaE-mutations.png")}
+  caption="Deeper shades of blue reflect more negative ΔE. Most mutations are damaging. Averages across amino
+  acids are shown as a bar on the bottom, labeled with * (sensitivity per site). Figure from [3]."
+  width="100%"
+/>
+<br />
+
+Not all positions are created equal – mutations at some positions are especially harmful. Moreover,
+the big swathes of blue (damaging mutations) speak to the difficulty of engineering proteins.
+
+The calculated energies correlated strongly with experimental measurements of fitness (!), meaning
+that our energy function provides helpful guidance on how a given mutation might affect function.
+
+<Image
+  path={require("./deltaE-experimental.png")}
+  caption="
+  Evolutionary statistical energy refers to our energy function E.
+  Left plot shows all mutants; right plot shows averages over amino acids at each position.
+  Figure from [3].
+  "
+  width={450}
+/>
+
+## Links
+
+The ideas discussed here are primarily from the following papers...
+
+### References
+
+[1] Marks, D.S. et al.
+[Protein 3D structure computed from evolutionary sequence variation](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0028766#pone.0028766.s017).
+PLoS One 6, e28766 (2011).
+
+[2] Weigt, M et all.
+[Direct-coupling analysis of residue coevolution captures native contacts across many protein families](https://www.pnas.org/doi/10.1073/pnas.1111471108).
+Proc. Natl. Acad. Sci. U.S.A. 108, E1293–E1301 (2011).
+
+[3] Hopf, T. et al. [Mutation effects predicted from sequence co-variation](https://www.nature.com/articles/nbt.3769).
+Nat Biotechnol 35, 128–135 (2017).
