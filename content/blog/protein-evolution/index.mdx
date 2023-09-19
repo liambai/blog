@@ -92,7 +92,7 @@ the frequency patterns observed the in MSA, and small otherwise. For example, if
 starts with the amino acid L, then $f_1(\text{L}) = 1$ is contributed to the sum; if it starts
 with any other amino acid, $0$ is contributed.
 
-$E$ is often called an **energy function** – it's not a probability distribution, but we
+$E$ is often called the **energy function** – it's not a probability distribution, but we
 can easily turn it into one by normalizing its values to sum to $1$ (let's worry about that
 later).
 
@@ -344,9 +344,9 @@ $$
 E(A) = \sum_{1 \leq i \leq j \leq L} J_{i j} (A_i, A_j)+\sum_{1 \leq i \leq L} h_i(A_i)
 $$
 
-We can use the energy function as a guide to our experimental testing. Sequences with low
-energy are more likely to fail. Let $A^{\mathrm{wt}}$ denote a wildtype, or
-natural, sequence, and let $A^{\mathrm{mut}}$ denote a mutant sequence:
+Let's try to use this energy function as a guide to our experimental testing. Intuitively,
+sequences with low energy should be more likely to fail. Let $A^{\mathrm{wt}}$denote a wildtype,
+or natural, sequence, and let $A^{\mathrm{mut}}$ denote a mutant sequence:
 
 $$
 \Delta E\left(A^{\mathrm{mut}}, A^{\mathrm{wt}}\right)=E\left(A^{\mathrm{mut}}\right)-E\left(A^{\mathrm{wt}}\right)
@@ -370,8 +370,10 @@ mutagenesis experiment on a protein called M.HaeIII.
 Not all positions are created equal – mutations at some positions are especially harmful. Moreover,
 the big swathes of blue (damaging mutations) speak to the difficulty of engineering proteins.
 
-The calculated energies correlated strongly with experimental measurements of fitness (!), meaning
-that our energy function provides helpful guidance on how a given mutation might affect function.
+The calculated energies correlated strongly with experimentally observed fitness (!), meaning
+that our energy function provides helpful guidance on how a given mutation might affect
+function. It's remarkable that with such a simple model and seemly so little information (just
+from MSAs), we can attain such profound predictive power.
 
 <Image
   path={require("./deltaE-experimental.png")}
@@ -382,10 +384,24 @@ that our energy function provides helpful guidance on how a given mutation might
   "
   width={450}
 />
+<br />
+
+The next time we find ourselves trying a saturation mutagenesis screen to identify an improved
+mutant, we can calculate some $\Delta E$'s first before stepping in the lab and focus only on
+the sequences that have more positive $\Delta E$'s and therefore more likely to succeed.
+
+### Generating new sequences
 
 ## Links
 
-The ideas discussed here are primarily from the following papers...
+The ideas we discussed are primarily from the following papers:
+
+- [Protein 3D structure computed from evolutionary sequence variation](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0028766#pone.0028766.s017).
+  This paper describes DCA in detail along with useful intuitions. It's highly accessible and worthwhile.
+
+- [Mutation effects predicted from sequence co-variation](https://www.nature.com/articles/nbt.3769).
+  This paper presents the results on predicting mutation effects and introduces the powerful
+  [EVMutation](https://marks.hms.harvard.edu/evmutation/).
 
 ### References
 
@@ -399,3 +415,6 @@ Proc. Natl. Acad. Sci. U.S.A. 108, E1293–E1301 (2011).
 
 [3] Hopf, T. et al. [Mutation effects predicted from sequence co-variation](https://www.nature.com/articles/nbt.3769).
 Nat Biotechnol 35, 128–135 (2017).
+
+[4] Russ WP, et al. [An evolution-based model for designing chorismate mutase enzymes](https://www.science.org/doi/10.1126/science.aba3304).
+Science. 2020;369(6502):440–445 (2020).
