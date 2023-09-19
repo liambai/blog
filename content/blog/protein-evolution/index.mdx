@@ -1,7 +1,7 @@
 ---
 title: What we can learn from evolving proteins
 date: "2023-09-19"
-description: Predicting protein structure and function. Multiple Sequence Alignments (MSAs), the Potts model, Direct Coupling Analysis (DCA), EVCouplings.
+description: Predicting protein structure and function. Multiple Sequence Alignments (MSAs), the protein folding problem, the Potts model, Direct Coupling Analysis (DCA), EVCouplings.
 ---
 
 import MSACoupling from "./MSACoupling.jsx"
@@ -21,7 +21,8 @@ those that encode a functional protein survive; those that don't are extinct.
 
 We can learn a surprising lot about a protein by studying similar variants of it
 we find in nature (its **protein family**). These hints from evolution have propelled
-breakthroughs like [AlphaFold](https://www.forbes.com/sites/robtoews/2021/10/03/alphafold-is-the-most-important-achievement-in-ai-ever/?sh=6e0571586e0a)
+breakthroughs like
+[AlphaFold](https://www.forbes.com/sites/robtoews/2021/10/03/alphafold-is-the-most-important-achievement-in-ai-ever/?sh=6e0571586e0a)
 and many cutting-edge methods in protein design. Let's see how.
 
 A **Multiple Sequence Alignment (MSA)** compiles known variants of a protein – which can come
@@ -31,7 +32,7 @@ from different organisms – and is created by searching vast protein sequence d
   caption="
     The structure on the right sketches how the amino acid chain might fold in space (try dragging the nodes). 
     Hover over each row in the MSA to see the corresponding amino acid in the
-    folded structure. Hover over the blue link to see the contacting amino acid positions. 
+    folded structure. Hover over the blue link to highlight the contacting positions. 
   "
 />
 
@@ -55,7 +56,7 @@ unfortunately not so much.
   caption="
     Hover over the bars to see the probabilities. Sequence probabilities are made up but follow
     some patterns you might expect: sequences that resemble sequences in the MSA have
-    higher probabilities. The set of all possible sequences, called the sequence space, is
+    higher probabilities. The set of all possible sequences (the sequence space) is
     mind-bendingly vast: the number of possible 10 amino acid sequences is 20^10 (~10 trillion)
     because there are 20 amino acids; the bar graph is very truncated.
   "
@@ -92,7 +93,7 @@ the frequency patterns observed the in MSA, and small otherwise. For example, if
 starts with the amino acid L, then $f_1(\text{L}) = 1$ is contributed to the sum; if it starts
 with any other amino acid, $0$ is contributed.
 
-$E$ is often called the **energy function** – it's not a probability distribution, but we
+$E$ is often called the **energy function**. It's not a probability distribution, but we
 can easily turn it into one by normalizing its values to sum to $1$ (let's worry about that
 later).
 
@@ -152,11 +153,10 @@ mechanics.
 
 Earlier, we considered using $f_{ij}$ as the term capturing pairwise interactions.
 $f_{ij}$ focuses on what's happening at positions $i$ and $j$ – nothing more. It's
-a _local_ model. Perhaps
-we can imagine a scenario where positions $i$ and $j$ each independently interact with
-position $k$, though they do not directly interact with each other. Because of this
-**transitive correlation** between $i$ and $j$, the nearsighted $f_{ij}$ would likely
-overestimate the interaction between them.
+a _local_ model. Perhaps we can imagine a scenario where positions $i$ and $j$ each
+independently interact with position $k$, though they do not directly interact with
+each other. Because of this **transitive correlation** between $i$ and $j$, the
+nearsighted $f_{ij}$ would likely overestimate the interaction between them.
 
 $$
 i \longrightarrow k \longleftarrow j
@@ -175,7 +175,7 @@ $$
 C_{ij}(A_i, A_j) = f_{ij}(A_i, A_j) - f_i(A_i)f_j(A_j)
 $$
 
-2. Compute the inverse of this matrix, $C^{-1}$, the entries of which are just the negative
+2. Compute the inverse of this matrix, $C^{-1}$, the entries of which are just the negatives
    of the $J_{ij}$ terms we seek
 
 $$
@@ -208,9 +208,9 @@ declaring the problem as solved. The
 [implications](https://moalquraishi.wordpress.com/2020/12/08/alphafold2-casp14-it-feels-like-ones-child-has-left-home/)
 are profound.
 
-The [EVCouplings](https://evcouplings.org/) method we'll describe cannot compete with AlphaFold in
-accuracy, but it is foundational to AlphaFold, which similarly relies heavily on pairwise interaction
-signals from MSAs.
+The [EVCouplings](https://evcouplings.org/) approach to the protein folding problem cannot compete
+with AlphaFold in accuracy, but it is foundational to AlphaFold, which similarly relies heavily on
+pairwise interaction signals from MSAs.
 
 Myriad forces choreograph the folding of a protein. Let's simplify and focus on
 pairs of amino acid positions that interact strongly with each other – and hypothesize that
@@ -221,14 +221,14 @@ which we can then derive the full 3D structure.
   caption="
     The structure on the right sketches how the amino acid chain might fold in space (try dragging the nodes). 
     Hover over each row in the MSA to see the corresponding amino acid in the
-    folded structure. Hover over the blue link to see the contacting amino acid positions. 
+    folded structure. Hover over the blue link to highlight the contacting positions. 
   "
 />
 
 Hovering over the blue link, we see that positions $2$ and $8$ tend to co-vary in the MSA,
 and they are in contact in the folded protein. Intuitively, it's important to maintaining the
 function of the protein that when one position changes, the other also changes in a specific way;
-failure to do so is likely a death sentence that explains the absence in our MSA. Let's use the tools
+failure to do so is likely a death sentence explaining the absence in our MSA. Let's use the tools
 we have to quantify this co-variance.
 
 ### Mutual information
@@ -331,23 +331,23 @@ out some useful function – e.g. an enzyme that catalyses a desired reaction �
 improve it by increasing its stability or activity?
 
 One approach is [saturation mutagenesis](https://en.wikipedia.org/wiki/Saturation_mutagenesis):
-take the protein's sequence, mutation every position to every possible amino acid, and test
+take the protein's sequence, mutate every position to every possible amino acid, and test
 all the mutants to see if any yields an improvement. I know that sounds crazy, but it has been
-made possible by impressive advancements in automation-enabled
+made possible by impressive developments in automation-enabled
 [high-throughput screening](https://en.wikipedia.org/wiki/High-throughput_screening) (in
 comparison, progress in our biological understanding necessary to make more informed designs
 has generally lagged behind). Can we do better?
 
 ### Predicting mutation effects
 
-Remember our energy function that measures the fitness of a sequence in the context of an MSA.
+Remember our energy function that measures the fitness of a sequence in the context of an MSA:
 
 $$
 E(A) = \sum_{1 \leq i \leq j \leq L} J_{i j} (A_i, A_j)+\sum_{1 \leq i \leq L} h_i(A_i)
 $$
 
-Let's try to use this energy function as a guide to our experimental testing. Intuitively,
-sequences with low energy should be more likely to fail. Let $A^{\mathrm{wt}}$ be a wildtype,
+Intuitively, sequences with low energy should be more likely to fail. Perhaps we can let energy
+guide our experimental testing. Let $A^{\mathrm{wt}}$ be a **wildtype**,
 or natural, sequence, and let $A^{\mathrm{mut}}$ be a mutant sequence:
 
 $$
@@ -368,8 +368,8 @@ mutagenesis experiment on a protein called M.HaeIII [3].
   width="100%"
 />
 
-Not all positions are created equal – mutations at some positions are especially harmful. Moreover,
-the big swathes of blue (damaging mutations) speak to the difficulty of engineering proteins.
+Not all positions are created equal: mutations at some positions are especially harmful.
+The big swathes of blue (damaging mutations) speak to the difficulty of engineering proteins.
 
 The calculated energies correlated strongly with experimentally observed fitness (!), meaning
 that our energy function provides helpful guidance on how a given mutation might affect
@@ -387,8 +387,9 @@ MSAs!), we can attain such profound predictive power.
 />
 
 The next time we find ourselves trying a saturation mutagenesis screen to identify an improved
-mutant, we can calculate some $\Delta E$'s first before stepping in the lab and cam perhaps
-focus only on the sequences with more positive $\Delta E$'s that are more likely to work.
+mutant, we can calculate some $\Delta E$'s first before stepping in the lab and can perhaps
+save time by focusing only on the sequences with more positive $\Delta E$'s that are more likely
+to work.
 
 ### Generating new sequences
 
@@ -408,8 +409,13 @@ let's try this:
 4. Go back to 2. and repeat many times.
 
 In the end, we'll have a sequence that is a **random sample** from our probability distribution
-$P(A)=\frac{1}{Z} \exp(E(A)/T)$ (slightly modified to include $T$). Why this works involves a lot of
-cool math that we won't have time to dive into now. This is the
+(slightly modified from before to include $T$)
+
+$$
+P(A)=\frac{1}{Z} \exp(E(A)/T)
+$$
+
+Why this works involves a lot of cool math that we won't have time to dive into now. This is the
 [**Metropolis–Hastings algorithm**](https://en.wikipedia.org/wiki/Metropolis%E2%80%93Hastings_algorithm),
 belonging to a class of useful tools for approximating complex distributions called
 [**Markov chain Monte Carlo (MCMC)**](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo).
