@@ -6,6 +6,7 @@ description: Predicting protein structure and function. Multiple Sequence Alignm
 
 import MSACoupling from "./MSACoupling.jsx"
 import Distributions from "./Distributions.jsx"
+import MSAHighlighted from "./MSAHighlighted.jsx"
 import MSAFrequencies from "./MSAFrequencies.jsx"
 import MSACovariance from "./MSACovariance.jsx"
 import Image from "../../../src/components/image.jsx"
@@ -66,7 +67,7 @@ unfortunately not so much.
 
 Let's take a closer look at the MSA:
 
-<Image path={require("./MSAHighlighted.png")} width="70%" />
+<MSAHighlighted />
 
 Some positions have the same amino acid across almost all rows.
 For example, every sequence has L in the first position – it is **evolutionarily conserved** –
