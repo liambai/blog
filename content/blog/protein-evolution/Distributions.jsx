@@ -143,13 +143,13 @@ const Distributions = ({ caption }) => {
         <HorizontalPDFGraph
           probs={dieProbs}
           title="Die outcomes"
-          width={250}
+          width={isMobile ? 300 : 250}
           leftLabelSpace={25}
         />
         <HorizontalPDFGraph
           probs={seqProbs}
           title="Sequences in a given family"
-          width={400}
+          width={isMobile ? 300 : 400}
           leftLabelSpace={100}
           incomplete
         />
