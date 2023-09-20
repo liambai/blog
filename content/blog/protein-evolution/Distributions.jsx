@@ -131,7 +131,8 @@ const HorizontalPDFGraph = ({
     }
   }, [incomplete, leftLabelSpace, probs, title, width])
 
-  return <svg ref={svgRef} style={{ margin: "auto" }} />
+  const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
+  return <svg ref={svgRef} style={{ margin: "auto", width: width }} />
 }
 
 const Distributions = ({ caption }) => {
@@ -139,19 +140,22 @@ const Distributions = ({ caption }) => {
   return (
     <Viz caption={caption}>
       <div
-        style={{ display: "flex", flexDirection: isMobile ? "column" : "row" }}
+        style={{
+          display: "flex",
+          flexDirection: isMobile ? "column" : "row",
+        }}
       >
         <HorizontalPDFGraph
           probs={dieProbs}
           title="Die outcomes"
-          width={isMobile ? 300 : 250}
+          width={isMobile ? window.innerWidth * 0.9 : 250}
           leftLabelSpace={isMobile ? 100 : 25}
           labelLength={25}
         />
         <HorizontalPDFGraph
           probs={seqProbs}
           title="Sequences in a given family"
-          width={isMobile ? 300 : 400}
+          width={isMobile ? window.innerWidth * 0.9 : 400}
           leftLabelSpace={isMobile ? 100 : 100}
           labelLength={100}
           incomplete
