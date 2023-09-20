@@ -7,7 +7,8 @@ import { MSAData } from "./MSA"
 
 const nodeIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
-  const width = 350
+  const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
+  const width = isMobile ? 300 : 350
   const headerHeight = 50
 
   const headerRef = useRef()
@@ -50,7 +51,7 @@ const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
       .attr("stroke-width", 1)
       .on("mouseover", (event, d) => setFocusedNodes([d]))
       .on("mouseout", () => setFocusedNodes([]))
-  }, [setFocusedNodes])
+  }, [width, setFocusedNodes])
 
   useEffect(() => {
     const svg = d3.select(headerRef.current)

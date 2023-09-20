@@ -2,23 +2,13 @@ import React, { useEffect, useRef } from "react"
 import * as d3 from "d3"
 import { useMediaQuery } from "react-responsive"
 
+import { MSAData } from "./MSA"
+
 const nodeIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-const MSA = [
-  ["L", "T", "R", "A", "A", "L", "Y", "E", "D", "C"],
-  ["L", "T", "R", "A", "T", "L", "Y", "E", "D", "C"],
-  ["L", "T", "R", "C", "T", "L", "P", "E", "D", "C"],
-  ["L", "R", "R", "A", "T", "L", "P", "D", "D", "C"],
-  ["L", "R", "R", "A", "T", "L", "P", "D", "D", "A"],
-  ["L", "V", "R", "A", "T", "K", "P", "W", "D", "A"],
-  ["L", "V", "R", "A", "T", "L", "P", "W", "D", "A"],
-  ["L", "V", "R", "A", "T", "L", "P", "W", "D", "A"],
-]
-const MSAData = MSA.map(row =>
-  row.map((char, idx) => ({ pos: idx + 1, char: char }))
-)
 
 const MSAHighlighted = () => {
-  const width = 350
+  const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
+  const width = isMobile ? 300 : 350
   const headerHeight = 50
 
   const headerRef = useRef()
@@ -59,7 +49,7 @@ const MSAHighlighted = () => {
       .attr("fill", "white")
       .attr("stroke", "black")
       .attr("stroke-width", d => (d === 1 ? 3 : 1))
-  }, [])
+  }, [width])
 
   useEffect(() => {
     const table = d3.select(tableRef.current)
@@ -81,7 +71,6 @@ const MSAHighlighted = () => {
     rows.exit().remove()
   }, [])
 
-  const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
   return (
     <div
       style={{

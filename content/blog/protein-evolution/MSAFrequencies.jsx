@@ -9,7 +9,8 @@ import Viz from "../../../src/components/viz"
 const nodeIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 const MSAFrequencies = ({ caption }) => {
-  const width = 350
+  const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
+  const width = isMobile ? 300 : 350
   const height = 50
 
   const headerRef = useRef()
@@ -103,7 +104,6 @@ const MSAFrequencies = ({ caption }) => {
     )
   }
 
-  const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
   return (
     <Viz caption={caption}>
       <div
