@@ -317,6 +317,10 @@ a:focus {
   margin-bottom: var(--spacing-8);
 }
 
+.math-display {
+  overflow-x: scroll;
+}
+
 /* Media queries */
 
 @media (max-width: 42rem) {
