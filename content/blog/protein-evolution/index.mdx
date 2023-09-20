@@ -72,9 +72,8 @@ Some positions have the same amino acid across almost all rows.
 For example, every sequence has L in the first position – it is **evolutionarily conserved** –
 which means that it's probably important!
 
-To measure this concretely, let's count the frequencies of observing each amino acid
-at each position. Let $f_i(A_i)$ be the frequency of observing the amino acid $A_i$
-at position $i$.
+To measure this, let's count the frequencies of observing each amino acid at each position.
+Let $f_i(A_i)$ be the frequency of observing the amino acid $A_i$ at position $i$.
 
 <MSAFrequencies
   caption="
@@ -89,7 +88,7 @@ E(A) = \sum_{1 \leq i \leq L} f_i(A_i)
 $$
 
 $E(A)$ should be big when the amino acid frequencies in each position of $A$ matches
-the frequency patterns observed the in MSA, and small otherwise. For example, if $A$
+the frequency patterns observed the in MSA and small otherwise. For example, if $A$
 starts with the amino acid L, then $f_1(\text{L}) = 1$ is contributed to the sum; if it starts
 with any other amino acid, $0$ is contributed.
 
@@ -129,15 +128,15 @@ $$
 E(A) = \sum_{1 \leq i \leq j \leq L} J_{i j} (A_i, A_j)+\sum_{1 \leq i \leq L} h_i(A_i)
 $$
 
-Actually, physicists have studied this energy function since the 1950s, in a different
-context: the interacting spins of particles in solids like magnets. The $J_{ij}$ terms
-capture the energy cost of particles $i$ and $j$ to be in their respective states: its
-magnitude is big if they interact, small if they don't; the $h_i$ terms capture the energy
-cost of each particle being in its state.
+Actually, physicists have studied this function since the 1950s, in a different context:
+the interacting spins of particles in solids like magnets. The $J_{ij}$ terms capture the
+energy cost of particles $i$ and $j$ coupling with each other in their respective states:
+its magnitude is big if they interact, small if they don't; the $h_i$ terms capture the
+energy cost of each particle being in its own state.
 
 They call this the [Potts model](https://en.wikipedia.org/wiki/Potts_model), and a fancy name
-for the energy function is the Hamiltonian. This fascinating field of physics that uses
-these statistical models to explain macroscopic behaviors of matter is called statistical
+for the energy function is the Hamiltonian. This fascinating field of physics applying these
+statistical models to explain macroscopic behaviors of matter is called statistical
 mechanics.
 
 <Image
@@ -202,7 +201,7 @@ $$
 
 Given an amino acid sequence, what is the 3D structure that it folds into? This is the
 [protein folding problem](https://rootsofprogress.org/alphafold-protein-folding-explainer), a
-complex problem central to understanding biology. In 2021, researchers from DeepMind shared a
+complex problem central to biology. In 2021, researchers from DeepMind presented a
 groundbreaking model using deep learning, [AlphaFold](https://www.nature.com/articles/s41586-021-03819-2) [8],
 declaring the problem as solved. The
 [implications](https://moalquraishi.wordpress.com/2020/12/08/alphafold2-casp14-it-feels-like-ones-child-has-left-home/)
@@ -226,10 +225,10 @@ which we can then derive the full 3D structure.
 />
 
 Hovering over the blue link, we see that positions $2$ and $8$ tend to co-vary in the MSA,
-and they are in contact in the folded protein. Intuitively, it's important to maintaining the
-function of the protein that when one position changes, the other also changes in a specific way;
-failure to do so is likely a death sentence explaining the absence in our MSA. Let's use the tools
-we have to quantify this co-variance.
+and they are in contact in the folded protein. Presumably, it's important to maintaining the
+function of the protein that when one position changes, the other also changes in a specific way –
+so important that failure for a sequence to do so is a death sentence explaining its absence in
+the MSA. Let's use the tools we have to quantify this co-variance.
 
 ### Mutual information
 
@@ -452,13 +451,18 @@ its fitness, but also generate new sequences with high fitness.
 ## Summary + what's next
 
 We talked about the direct coupling analysis model (DCA) with some of its cool applications.
-I hope by now you can join me in the fascination and appreciation of MSAs.
+I hope by now you would join me in the fascination and appreciation of MSAs.
+
+There are limitations: for example, DCA doesn't work well on rare sequences for which we
+lack the data to construct a big MSA. There are single-sequence methods such as
+[UniRep](https://www.nature.com/articles/s41592-019-0598-1) [9] that address this problem (and
+have their own tradeoffs). I will dive into them in a future post.
 
 Recently, a deep learning mechanism called **attention** [5], the technology underlying magical
 large language models like GPT, has taken the world by storm. As it turns out, protein
 sequences are much like natural language sequences on which attention prevails: a variant
 of attention called **axial attention** [6] works wonders on MSAs [7][8], creating models with
-better performance. I hope to do a deep dive on this soon!
+better performance. I also hope to do a deep dive on this soon!
 
 ## Links
 
@@ -512,3 +516,6 @@ Proceedings of Machine Learning Research 139:8844-8856 (2021).
 
 [8] Jumper, J. et al. [Highly accurate protein structure prediction with AlphaFold](https://www.nature.com/articles/s41586-021-03819-2).
 Nature 596, 583–589 (2021).
+
+[9] Alley, E.C., et al. [Unified rational protein engineering with sequence-based deep representation learning](https://www.nature.com/articles/s41592-019-0598-1).
+Nat Methods 16, 1315–1322 (2019).
