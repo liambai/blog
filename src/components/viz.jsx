@@ -7,7 +7,7 @@ const mobilefy = s =>
 const Viz = ({ caption, children }) => {
   const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
   return (
-    <div style={{ marginBottom: 30 }}>
+    <div style={{ width: "100%", marginBottom: 30 }}>
       {children}
       {caption && (
         <div
