@@ -132,7 +132,12 @@ const HorizontalPDFGraph = ({
   }, [incomplete, leftLabelSpace, probs, title, width])
 
   const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
-  return <svg ref={svgRef} style={{ margin: "auto", width: width }} />
+  return (
+    <svg
+      ref={svgRef}
+      style={{ margin: "auto", width: isMobile ? "100%" : width }}
+    />
+  )
 }
 
 const Distributions = ({ caption }) => {
@@ -148,14 +153,14 @@ const Distributions = ({ caption }) => {
         <HorizontalPDFGraph
           probs={dieProbs}
           title="Die outcomes"
-          width={isMobile ? window.innerWidth * 0.9 : 250}
+          width={isMobile ? 300 : 250}
           leftLabelSpace={isMobile ? 100 : 25}
           labelLength={25}
         />
         <HorizontalPDFGraph
           probs={seqProbs}
           title="Sequences in a given family"
-          width={isMobile ? window.innerWidth * 0.9 : 400}
+          width={isMobile ? 300 : 400}
           leftLabelSpace={isMobile ? 100 : 100}
           labelLength={100}
           incomplete

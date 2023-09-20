@@ -1,7 +1,7 @@
 import React from "react"
 import { useMediaQuery } from "react-responsive"
 
-const mobilefy = s =>
+const mobileify = s =>
   s.replaceAll("Hover over", "Tap on").replaceAll("hover over", "tap on")
 
 const Viz = ({ caption, children }) => {
@@ -16,7 +16,7 @@ const Viz = ({ caption, children }) => {
             color: "slategrey",
           }}
         >
-          {isMobile ? mobilefy(caption) : caption}
+          {isMobile ? mobileify(caption) : caption}
         </div>
       )}
     </div>
