@@ -26,6 +26,7 @@ const HorizontalPDFGraph = ({
   title,
   width,
   leftLabelSpace,
+  labelLength,
   incomplete = false,
 }) => {
   const svgRef = useRef()
@@ -86,7 +87,7 @@ const HorizontalPDFGraph = ({
       .enter()
       .append("text")
       .text(d => d[0])
-      .attr("x", margin.left)
+      .attr("x", leftLabelSpace - labelLength)
       .attr("y", d => y(d[0]) + y.bandwidth() / 2)
       .attr("dy", "0.35em")
       .attr("dx", "0.5em")
@@ -144,13 +145,15 @@ const Distributions = ({ caption }) => {
           probs={dieProbs}
           title="Die outcomes"
           width={isMobile ? 300 : 250}
-          leftLabelSpace={25}
+          leftLabelSpace={isMobile ? 100 : 25}
+          labelLength={25}
         />
         <HorizontalPDFGraph
           probs={seqProbs}
           title="Sequences in a given family"
           width={isMobile ? 300 : 400}
-          leftLabelSpace={100}
+          leftLabelSpace={isMobile ? 100 : 100}
+          labelLength={100}
           incomplete
         />
       </div>
