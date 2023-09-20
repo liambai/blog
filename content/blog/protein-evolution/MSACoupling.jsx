@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react"
 import * as d3 from "d3"
+import { useMediaQuery } from "react-responsive"
 
 import Viz from "../../../src/components/viz"
 import { MSAData } from "./MSA"
@@ -86,6 +87,7 @@ const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
     <div
       style={{
         width: width,
+        margin: "auto",
         display: "flex",
         flexDirection: "column",
         marginBottom: -20,
@@ -228,19 +230,27 @@ const NetworkViz = ({ focusedNodes, setFocusedNodes }) => {
     })
   }, [focusedNodes])
 
-  return <svg ref={ref} height={height} />
+  return (
+    <svg ref={ref} height={height} width={width} style={{ margin: "auto" }} />
+  )
 }
 
 const MSACoupling = ({ caption }) => {
+  const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
   const [focusedNodes, setFocusedNodes] = useState([])
   return (
     <Viz caption={caption}>
-      <div style={{ display: "flex" }}>
-        <MSAViz focusedNodes={focusedNodes} setFocusedNodes={setFocusedNodes} />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: isMobile ? "column-reverse" : "row",
+        }}
+      >
         <NetworkViz
           focusedNodes={focusedNodes}
           setFocusedNodes={setFocusedNodes}
         />
+        <MSAViz focusedNodes={focusedNodes} setFocusedNodes={setFocusedNodes} />
       </div>
     </Viz>
   )
