@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react"
 import * as d3 from "d3"
 import { BlockMath } from "react-katex"
+import { useMediaQuery } from "react-responsive"
 
 import { MSA, MSAData } from "./MSA"
 import Viz from "../../../src/components/viz"
@@ -102,11 +103,13 @@ const MSAFrequencies = ({ caption }) => {
     )
   }
 
+  const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
   return (
     <Viz caption={caption}>
       <div
         style={{
           display: "flex",
+          flexDirection: isMobile ? "column-reverse" : "row",
           marginBottom: -20,
         }}
       >
@@ -115,6 +118,7 @@ const MSAFrequencies = ({ caption }) => {
             width: width,
             display: "flex",
             flexDirection: "column",
+            margin: isMobile ? "auto" : 0,
           }}
         >
           <svg ref={headerRef} />
@@ -122,7 +126,12 @@ const MSAFrequencies = ({ caption }) => {
             <tbody></tbody>
           </table>
         </div>
-        <div style={{ margin: "auto" }}>
+        <div
+          style={{
+            margin: "auto",
+            height: isMobile ? 130 : "none",
+          }}
+        >
           {focusedColumn && (
             <div>
               {equations.map(equation => (

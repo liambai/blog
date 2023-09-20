@@ -1,6 +1,11 @@
 import React from "react"
+import { useMediaQuery } from "react-responsive"
+
+const mobilefy = s =>
+  s.replaceAll("Hover over", "Tap on").replaceAll("hover over", "tap on")
 
 const Viz = ({ caption, children }) => {
+  const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
   return (
     <div style={{ marginBottom: 30 }}>
       {children}
@@ -11,7 +16,7 @@ const Viz = ({ caption, children }) => {
             color: "slategrey",
           }}
         >
-          {caption}
+          {isMobile ? mobilefy(caption) : caption}
         </div>
       )}
     </div>

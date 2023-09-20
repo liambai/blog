@@ -246,11 +246,11 @@ const MSACoupling = ({ caption }) => {
           flexDirection: isMobile ? "column-reverse" : "row",
         }}
       >
+        <MSAViz focusedNodes={focusedNodes} setFocusedNodes={setFocusedNodes} />
         <NetworkViz
           focusedNodes={focusedNodes}
           setFocusedNodes={setFocusedNodes}
         />
-        <MSAViz focusedNodes={focusedNodes} setFocusedNodes={setFocusedNodes} />
       </div>
     </Viz>
   )

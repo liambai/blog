@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from "react"
 import * as d3 from "d3"
+import { useMediaQuery } from "react-responsive"
+
 import Viz from "../../../src/components/viz"
 
 const dieProbs = {
@@ -126,19 +128,18 @@ const HorizontalPDFGraph = ({
         .attr("cy", d => d)
         .attr("r", 1.5)
     }
-  }, [])
+  }, [incomplete, leftLabelSpace, probs, title, width])
 
-  return (
-    <div>
-      <svg ref={svgRef}></svg>
-    </div>
-  )
+  return <svg ref={svgRef} style={{ margin: "auto" }} />
 }
 
 const Distributions = ({ caption }) => {
+  const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
   return (
     <Viz caption={caption}>
-      <div style={{ display: "flex" }}>
+      <div
+        style={{ display: "flex", flexDirection: isMobile ? "column" : "row" }}
+      >
         <HorizontalPDFGraph
           probs={dieProbs}
           title="Die outcomes"

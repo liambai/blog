@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react"
 import * as d3 from "d3"
 import { BlockMath } from "react-katex"
+import { useMediaQuery } from "react-responsive"
 
 import { MSA, MSAData } from "./MSA"
 import Viz from "../../../src/components/viz"
@@ -51,7 +52,7 @@ const MSAViz = ({ focusedColumn, setFocusedColumn }) => {
       .attr("stroke-width", 1)
       .on("mouseover", (event, d) => setFocusedColumn(d))
       .on("mouseout", () => setFocusedColumn(null))
-  }, [])
+  }, [setFocusedColumn])
 
   useEffect(() => {
     const svg = d3.select(headerRef.current)
@@ -105,10 +106,13 @@ const MSAViz = ({ focusedColumn, setFocusedColumn }) => {
       return `f_{${subscript}}(\\text{${c[0]}}, \\text{${c[1]}}) = ${freq / 8}`
     })
   }
+
+  const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
   return (
     <div
       style={{
         display: "flex",
+        flexDirection: isMobile ? "column-reverse" : "row",
         marginBottom: -20,
       }}
     >
@@ -117,6 +121,7 @@ const MSAViz = ({ focusedColumn, setFocusedColumn }) => {
           width: width,
           display: "flex",
           flexDirection: "column",
+          margin: isMobile ? "auto" : 0,
         }}
       >
         <svg ref={headerRef} />
@@ -124,7 +129,7 @@ const MSAViz = ({ focusedColumn, setFocusedColumn }) => {
           <tbody></tbody>
         </table>
       </div>
-      <div style={{ margin: "auto" }}>
+      <div style={{ margin: "auto", height: isMobile ? 175 : "none" }}>
         {focusedColumn && (
           <div>
             {equations.map(equation => (
