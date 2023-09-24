@@ -9,17 +9,16 @@ const colors = [
   "lightgreen",
 ]
 const embeddings = [
-  { char: "t", embedding: [0.1, -0.2, 0.3, 0.4, -0.5] },
-  { char: "h", embedding: [-0.2, 0.3, -0.4, 0.1, 0.6] },
-  { char: "e", embedding: [0.3, 0.2, -0.1, -0.5, 0.4] },
-  { char: " ", embedding: [0, 0, 0, 0, 0] },
-  { char: "c", embedding: [0.4, -0.3, -0.2, 0.5, -0.1] },
-  { char: "a", embedding: [-0.5, 0.4, 0.2, -0.6, 0.3] },
-  { char: "t", embedding: [0.1, -0.2, 0.3, 0.4, -0.5] },
-  { char: " ", embedding: [0, 0, 0, 0, 0] },
-  { char: "s", embedding: [-0.4, 0.2, -0.5, 0.3, 0.1] },
-  { char: "a", embedding: [0.6, -0.1, 0.3, -0.4, -0.2] },
-  { char: "t", embedding: [0.1, -0.2, 0.3, 0.4, -0.5] },
+  { char: "L", embedding: [0.1, -0.2, 0.3, 0.4, -0.5] },
+  { char: "T", embedding: [-0.2, 0.3, -0.4, 0.1, 0.6] },
+  { char: "R", embedding: [0.3, 0.2, -0.1, -0.5, 0.4] },
+  { char: "A", embedding: [0.4, -0.3, -0.2, 0.5, -0.1] },
+  { char: "A", embedding: [0.3, -0.3, -0.2, 0.5, 0.1] },
+  { char: "L", embedding: [0.1, -0.1, 0.3, 0.4, -0.3] },
+  { char: "Y", embedding: [0.1, -0.2, 0.3, 0.4, -0.5] },
+  { char: "E", embedding: [-0.2, -0.8, 0.5, 0.3, 0.6] },
+  { char: "D", embedding: [-0.4, 0.2, -0.5, 0.3, 0.1] },
+  { char: "C", embedding: [0.6, -0.1, 0.3, -0.4, -0.2] },
 ]
 const data = embeddings.map((row, i) => ({
   id: i,
@@ -27,7 +26,7 @@ const data = embeddings.map((row, i) => ({
   ...row,
 }))
 
-const CharacterEmbedding = () => {
+const Embedding = () => {
   const svgRef = useRef()
   const [focusedCharIndex, setFocusedCharIndex] = useState(null)
 
@@ -172,9 +171,9 @@ const CharacterEmbedding = () => {
 
   return (
     <div style={{ textAlign: "center" }}>
-      <svg ref={svgRef} width={width} height={320} />
+      <svg ref={svgRef} width={width} height={310} />
     </div>
   )
 }
 
-export default CharacterEmbedding
+export default Embedding

@@ -9,17 +9,16 @@ const colors = [
   "lightgreen",
 ]
 const embeddings = [
-  { char: "t", embedding: [0.1, -0.2, 0.3, 0.4, -0.5] },
-  { char: "h", embedding: [-0.2, 0.3, -0.4, 0.1, 0.6] },
-  { char: "e", embedding: [0.3, 0.2, -0.1, -0.5, 0.4] },
-  { char: " ", embedding: [0, 0, 0, 0, 0] },
-  { char: "c", embedding: [0.4, -0.3, -0.2, 0.5, -0.1] },
-  { char: "a", embedding: [-0.5, 0.4, 0.2, -0.6, 0.3] },
-  { char: "t", embedding: [0.1, -0.2, 0.3, 0.4, -0.5] },
-  { char: " ", embedding: [0, 0, 0, 0, 0] },
-  { char: "s", embedding: [-0.4, 0.2, -0.5, 0.3, 0.1] },
-  { char: "a", embedding: [0.6, -0.1, 0.3, -0.4, -0.2] },
-  { char: "t", embedding: [0.1, -0.2, 0.3, 0.4, -0.5] },
+  { char: "L", embedding: [0.1, -0.2, 0.3, 0.4, -0.5] },
+  { char: "T", embedding: [-0.2, 0.3, -0.4, 0.1, 0.6] },
+  { char: "R", embedding: [0.3, 0.2, -0.1, -0.5, 0.4] },
+  { char: "A", embedding: [0.4, -0.3, -0.2, 0.5, -0.1] },
+  { char: "A", embedding: [0.3, -0.3, -0.2, 0.5, 0.1] },
+  { char: "L", embedding: [0.1, -0.1, 0.3, 0.4, -0.3] },
+  { char: "Y", embedding: [0.1, -0.2, 0.3, 0.4, -0.5] },
+  { char: "E", embedding: [-0.2, -0.8, 0.5, 0.3, 0.6] },
+  { char: "D", embedding: [-0.4, 0.2, -0.5, 0.3, 0.1] },
+  { char: "C", embedding: [0.6, -0.1, 0.3, -0.4, -0.2] },
 ]
 const data = embeddings.map((row, i) => ({
   id: i,
@@ -27,17 +26,18 @@ const data = embeddings.map((row, i) => ({
   ...row,
 }))
 
-const CharacterEmbedding = () => {
-  const svgRef = useRef()
+const Embedding = () => {
+  const labelSvgRef = useRef()
+  const embeddingSvgRef = useRef()
   const [focusedCharIndex, setFocusedCharIndex] = useState(null)
 
-  const width = 450
+  const width = 500
 
   useEffect(() => {
-    const svg = d3.select(svgRef.current)
+    const svg = d3.select(embeddingSvgRef.current)
     svg.html("")
 
-    const margin = { top: 20, right: 20, bottom: 20, left: 20 }
+    const margin = { top: 20, right: 20, bottom: 20, left: 30 }
 
     const tokenWidth = 20
     const sentenceXScale = d3
@@ -142,39 +142,60 @@ const CharacterEmbedding = () => {
             margin.left + i * vectorBoxWidth + offset + vectorBoxWidth / 2
         )
         .attr("y", margin.top + 100 + offset + 25)
-    }
 
-    if (focusedCharIndex !== null) {
-      svg.select(`#vector${focusedCharIndex}`).raise()
-      svg
-        .append("line")
-        .attr("x1", sentenceXScale(focusedCharIndex))
-        .attr("y1", margin.top + characterHeight)
-        .attr("x2", margin.left + focusedCharIndex * 12)
-        .attr("y2", margin.top + 100 + focusedCharIndex * 12)
-        .style("stroke", "gray")
-        .style("stroke-width", 2)
-      svg
-        .append("line")
-        .attr("x1", sentenceXScale(focusedCharIndex + 1))
-        .attr("y1", margin.top + characterHeight)
-        .attr(
-          "x2",
-          margin.left +
-            focusedCharIndex * 12 +
-            vectorBoxWidth * data[0].embedding.length
-        )
-        .attr("y2", margin.top + 100 + focusedCharIndex * 12)
-        .style("stroke", "gray")
-        .style("stroke-width", 2)
+      if (focusedCharIndex !== null) {
+        svg.select(`#vector${focusedCharIndex}`).raise()
+        svg
+          .append("line")
+          .attr("x1", sentenceXScale(focusedCharIndex))
+          .attr("y1", margin.top + characterHeight)
+          .attr("x2", margin.left + focusedCharIndex * 12)
+          .attr("y2", margin.top + 100 + focusedCharIndex * 12)
+          .style("stroke", "gray")
+          .style("stroke-width", 2)
+        svg
+          .append("line")
+          .attr("x1", sentenceXScale(focusedCharIndex + 1))
+          .attr("y1", margin.top + characterHeight)
+          .attr(
+            "x2",
+            margin.left +
+              focusedCharIndex * 12 +
+              vectorBoxWidth * data[0].embedding.length
+          )
+          .attr("y2", margin.top + 100 + focusedCharIndex * 12)
+          .style("stroke", "gray")
+          .style("stroke-width", 2)
+      }
     }
   }, [focusedCharIndex])
 
+  useEffect(() => {
+    // Draw the horizontal label
+    const svg = d3.select(labelSvgRef.current)
+    const bracketPath = "M 50 20 L 40 20 L 40 280 L 50 280"
+    svg
+      .append("path")
+      .attr("d", bracketPath)
+      .attr("stroke", "black")
+      .attr("stroke-width", 2)
+      .attr("fill", "none")
+    svg
+      .append("text")
+      .attr("x", -15)
+      .attr("y", 75)
+      .text("encoder")
+      .attr("font-size", 18)
+      .attr("fill", "black")
+      .attr("transform", "rotate(-90, 60, 110)")
+  }, [])
+
   return (
-    <div style={{ textAlign: "center" }}>
-      <svg ref={svgRef} width={width} height={320} />
+    <div style={{ display: "flex", justifyContent: "center" }}>
+      <svg ref={labelSvgRef} width={50} height={310} />
+      <svg ref={embeddingSvgRef} width={width} height={310} />
     </div>
   )
 }
 
-export default CharacterEmbedding
+export default Embedding
