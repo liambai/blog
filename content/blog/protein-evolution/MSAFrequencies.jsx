@@ -78,6 +78,7 @@ const MSAFrequencies = ({ caption }) => {
       .append("td")
       .text(d => d.char)
       .style("text-align", "center")
+      .style("cursor", "default")
       .on("mouseover", (event, d) => setFocusedColumn(d.pos))
       .on("mouseout", () => setFocusedColumn(null))
 

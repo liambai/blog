@@ -74,6 +74,7 @@ const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
       .append("td")
       .text(d => d.char)
       .style("text-align", "center")
+      .style("cursor", "default")
       .on("mouseover", (event, d) => setFocusedNodes([d.pos]))
       .on("mouseout", () => setFocusedNodes([]))
 

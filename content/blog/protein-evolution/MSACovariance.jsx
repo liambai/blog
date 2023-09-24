@@ -80,6 +80,7 @@ const MSAViz = ({ focusedColumn, setFocusedColumn }) => {
       .text(d => d.char)
       .style("text-align", "center")
       .style("background-color", d => (d.pos === 2 ? "lightgrey" : "white"))
+      .style("cursor", "default")
       .on("mouseover", (event, d) => setFocusedColumn(d.pos))
       .on("mouseout", () => setFocusedColumn(null))
 
