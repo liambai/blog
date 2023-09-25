@@ -318,6 +318,10 @@ a:focus {
   margin-bottom: var(--spacing-8);
 }
 
+.figure {
+  margin: var(--spacing-0) var(--spacing-0) var(--spacing-8) var(--spacing-0);
+}
+
 .math-display {
   margin: var(--spacing-0) var(--spacing-0) var(--spacing-8) var(--spacing-0);
   overflow-x: scroll;

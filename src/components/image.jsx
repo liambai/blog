@@ -1,29 +1,20 @@
 import React from "react"
+import Caption from "./caption"
 
 const Image = ({ path, caption, width = "100%", alt = "" }) => {
   return (
-    <div style={{ marginBottom: 30 }}>
+    <div className="figure">
       <div
         style={{
           margin: "auto",
+          marginBottom: 10,
           textAlign: "center",
           width: width,
         }}
       >
         <img style={{ width: width }} src={path.default} alt={alt} />
       </div>
-      {caption && (
-        <div
-          style={{
-            fontSize: 14,
-            width: "100%",
-            marginTop: 10,
-            color: "slategrey",
-          }}
-        >
-          {caption}
-        </div>
-      )}
+      <Caption caption={caption} />
     </div>
   )
 }

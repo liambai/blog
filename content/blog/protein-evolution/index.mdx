@@ -20,6 +20,13 @@ Amino acids make up proteins and specify their structure and function. Over mill
 evolution has conducted a massive experiment over the space of all possible amino acid sequences:
 those that encode a functional protein survive; those that don't are extinct.
 
+<Image
+  path={require("./sequence-evolution.png")}
+  caption="
+    Diagram from Roshan Rao's awesome [dissertation talk](https://youtu.be/hcJS9d09ECA?si=DXLsnOvbJH7wwrJ1).
+  "
+/>
+
 We can learn a surprising lot about a protein by studying similar variants of it
 we find in nature (its **protein family**). These hints from evolution have propelled
 breakthroughs like
@@ -57,7 +64,8 @@ unfortunately not so much.
   caption="
     Hover over the bars to see the probabilities. Sequence probabilities are made up but follow
     some patterns you might expect: sequences that resemble sequences in the MSA have
-    higher probabilities. The set of all possible sequences (the sequence space) is
+    higher probabilities. The set of all possible sequences (the 
+    [sequence space](https://en.wikipedia.org/wiki/Sequence_space_(evolution)) is
     mind-bendingly vast: the number of possible 10 amino acid sequences is 20^10 (~10 trillion)
     because there are 20 amino acids; the bar graph is very truncated.
   "
@@ -144,7 +152,7 @@ mechanics.
   path={require("./potts.png")}
   caption="
     The Potts model on a square lattice. Black and white dots are in different states.
-    Figure from https://arxiv.org/abs/1511.03031.
+    Figure from [https://arxiv.org/abs/1511.03031](https://arxiv.org/abs/1511.03031).
   "
   width={300}
 />
