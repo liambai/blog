@@ -23,7 +23,8 @@ those that encode a functional protein survive; those that don't are extinct.
 <Image
   path={require("./sequence-evolution.png")}
   caption="
-    Diagram from Roshan Rao's awesome [dissertation talk](https://youtu.be/hcJS9d09ECA?si=DXLsnOvbJH7wwrJ1).
+    Diagram from Roshan Rao's awesome [dissertation talk](https://youtu.be/hcJS9d09ECA?si=DXLsnOvbJH7wwrJ1)
+    on these topics.
   "
 />
 
@@ -90,7 +91,20 @@ Let $f_i(A_i)$ be the frequency of observing the amino acid $A_i$ at position $i
   "
 />
 
-If we have some sequence $A$ of $L$ amino acids, it's natural to define
+If we compile these frequencies into a matrix, we get what is known as a
+[**position-specific scoring matrix (PSSM)**](https://en.wikipedia.org/wiki/Position_weight_matrix),
+commonly visualized as a [sequence logo](https://en.wikipedia.org/wiki/Sequence_logo).
+
+<Image
+  path={require("./sitewise-logo.png")}
+  caption="
+    A sequence logo [generated](https://weblogo.berkeley.edu/logo.cgi) from our MSA.
+    The height of each amino acid is an indicator of its evolutionary conservation.
+  "
+  width="90%"
+/>
+
+Given some sequence $A$ of $L$ amino acids, it's natural to define
 
 $$
 E(A) = \sum_{1 \leq i \leq L} f_i(A_i)

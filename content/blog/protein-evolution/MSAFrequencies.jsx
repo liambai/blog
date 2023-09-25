@@ -87,7 +87,7 @@ const MSAFrequencies = ({ caption }) => {
       .style("background-color", d =>
         focusedColumn === d.pos ? "lightgrey" : "white"
       )
-  }, [focusedColumn, setFocusedColumn])
+  }, [width, focusedColumn, setFocusedColumn])
 
   let equations = []
   if (focusedColumn) {
