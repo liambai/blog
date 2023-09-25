@@ -1,5 +1,5 @@
 ---
-title: How to represent a sequence
+title: How to represent a protein sequence
 date: "2023-09-27"
 description: Learning protein representations. Representation learning, transfer learning, masked language models, BERT on proteins.
 ---
@@ -8,28 +8,31 @@ import AminoAcidEmbedding from "./AminoAcidEmbedding.jsx"
 import AminoAcidEmbeddingEncoding from "./AminoAcidEmbeddingEncoding.jsx"
 import CharacterEmbedding from "./CharacterEmbedding.jsx"
 import WordEmbedding from "./WordEmbedding.jsx"
+import Image from "../../../src/components/image.jsx"
 import { Link } from "gatsby"
 
-Breakthroughs in [sequencing technology](https://en.wikipedia.org/wiki/Massive_parallel_sequencing)
-came with a happy conundrum: we now have many orders of magnitude more protein sequence data than
-structural or functional data. We've uncovered massive tomes written in nature's language, DNA: they
-contain the blueprints of proteins, the change-makers of our wondrous biological tapestry, from the
-budding of a seed to the beating of a heart. But more often than not, we lack the ability to
-understand them.
+In the last decade,
+[next generation sequencing](https://en.wikipedia.org/wiki/Massive_parallel_sequencing)
+propelled biology into a new information age. This came with a happy conundrum: we now
+have many orders of magnitude more protein sequence data than structural or functional
+data. We uncovered massive tomes written in nature's language, the blueprint
+of our wondrous biological tapestry, from the budding of a seed to the beating
+of a heart. But more often than not, we lack the ability to understand them.
 
-An important piece of the puzzle is the ability to predict the structure and function of a protein
-from its sequence.
+An important piece of the puzzle is the ability to predict the structure and function of a
+protein from its sequence.
 
 $$
 \text{sequence} \longrightarrow \text{structure or function}
 $$
 
 Thinking about this as a machine learning problem, structural or functional data are **labels**.
-If we have many sequence-label pairs, we can show them to our model and iteratively correct our
-model's predictions based on how closely they match the true labels. This approach is called
-**supervised learning**.
+With access to many sequences and their corresponding labels, we can show them to our model and
+iteratively correct it's predictions based on how closely they match the true labels.
+This approach is called **supervised learning**.
 
-When labels are rare, we need to resort to more **unsupervised** approaches like this:
+When labels are rare, as in our case with proteins, we need to resort to more **unsupervised**
+approaches like this:
 
 1. Come up with a vector representation of the protein sequence that captures its important
    features. The vectors are called **embeddings**. This is no easy task: it's where the heavy
@@ -42,35 +45,35 @@ When labels are rare, we need to resort to more **unsupervised** approaches like
    the model we use can be simpler, such as linear or logistic
    [regression](https://en.wikipedia.org/wiki/Regression_analysis).
 
-This is sometimes called [transfer learning](https://en.wikipedia.org/wiki/Transfer_learning):
+This is sometimes called [**transfer learning**](https://en.wikipedia.org/wiki/Transfer_learning):
 the knowledge learned by the representation (1.) is later _transferred_ to a supervised task (2.).
 
 ## What about MSAs?
 
 We talked in a <Link to="/protein-evolution">previous post</Link> about ways to leverage
-the rich information hidden in the co-evolutionary data of proteins to predict structure
-and function. The problem is simpler:
+the rich information hidden in Multiple Sequence Alignments (MSAs) – the co-evolutionary data
+of proteins – to predict structure and function. That problem is easier:
 
 $$
 \text{sequence} + \text{MSA} \longrightarrow \text{structure or function}
 $$
 
-However, those approaches don't work well for proteins that are rare in nature or designed
+However, those solutions don't work well for proteins that are rare in nature or designed
 _de novo_ for which we don't have enough co-evolutionary data to make a good MSA.
 
-In those cases, can we still make reasonable predictions based on a single amino acid sequence
-as input? Another way to look at the methods in this article is that they answer that
-question. Models that don't rely on MSAs are not confined to a single protein family:
-they understand some fundamental properties of _all_ proteins and _generalize_ better.
-Our goal is to build such a model.
+In those cases, can we still make reasonable predictions based on a _single_ amino acid sequence?
+Another way to look at the techniques in this article is that they are answers to that
+question. They pick up where MSAs fail. Moreover, models that don't rely on MSAs aren't limited to a
+single protein family: they understand some fundamental properties of _all_ proteins. Our goal
+is to build such a model.
 
 ## Representation learning
 
 The general problem of converting some data into a vector representation is called
 [representation learning](https://en.wikipedia.org/wiki/Feature_learning), a key
-technique in natural language process (NLP). We focus on its application to protein sequences.
+technique in natural language processing (NLP). Let's see how it can be applied to proteins.
 
-We want a function that takes an amino acid sequence and spits out a embedding vectors. This
+We want a function that takes an amino acid sequence and outputs embedding vectors. This
 function is often called an **encoder**.
 
 <AminoAcidEmbeddingEncoding />
@@ -79,34 +82,65 @@ Two identical amino acids don't necessarily have the same embedding vector. This
 the embedding vector for each amino acid incorporates _context_ from its surrounding
 amino acids.
 
-If we want one vector that describes the the entire sequence – instead of a vector for each amino
-acid – we can simply average the values in each vector.
+If we want one vector that describes the the entire sequence – instead of a vector for each
+amino acid – we can simply average the values in each vector.
+
+### Tokens
 
 In NLP lingo, each amino acid is a **token**. Like amino acid sequences, we can embed an
-English sentence in the same way, using characters as tokens [^1].
+English sentence in the same way, using characters as tokens.
 
 <CharacterEmbedding />
 
-Let's dive into how we can create these vectors.
+As an aside, words are another reasonable choice for tokens in natural language.
+
+<WordEmbedding />
+
+Current state-of-the-art language models use something in-between the two: sub-word tokens.
+[tiktoken](https://github.com/openai/tiktoken) is the tokenizer used by OpenAI to break sentences
+down into lists of sub-word tokens.
+
+Now let's see how we can create these embedding vectors.
 
 ### Creating a task
 
-In learning this representation, we have no labels to guide us. How do we even know if our
-representation is any good? We need some task – a goal or _objective_ that our
-model can work towards, along with a scoring function telling us how it's doing.
-In other words, we want to make labels out of the unlabeled sequence data.
+Remember, we are constructing these vectors purely from sequences in an unsupervised setting.
+Without labels, how do we even know if our representation is any good? It would be nice to
+have some task: an _objective_ that our model can work towards, along with a scoring function
+telling us how it's doing.
 
-Let's consider the following task: given the same sequence with some positions masked away:
+Let's come up with one: given the sequence with some random positions masked away
 
 $$
 \text{L  T [MASK] A  A  L  Y [MASK] D  C}
 $$
 
-what should the masked amino acids be? We know the ground truth label: R, E.
+which amino acids should go in the masked positions?
 
----
+We know the ground truth label from the original sequence, which we can use to guide the model
+like we would in supervised learning. Presumably, if our model becomes good at predicting the
+masked amino acids, it must have learned something meaningful about the intricate dynamics within
+the protein.
 
-[^1]:
-    In NLP, words are another reasonable choice of tokens. State-of-the-art language models
-    often use sub-words as tokens. [tiktoken](https://github.com/openai/tiktoken) is the
-    tokenizer used by OpenAI to break sentences down into lists of sub-word tokens.
+This lets us take advantage of the wealth of known sequences (from publicly available large
+databases such as the [Protein Data Bank (PDB)](https://www.rcsb.org/)), each of which is now
+a labeled training example. In NLP, this approach is called **masked language modelling (MLM)**,
+a form of **self-supervised learning**.
+
+Here's a diagram illustrating how this works in natural language, using words as tokens.
+[BERT](<https://en.wikipedia.org/wiki/BERT_(language_model)>) stands for Bidirectional
+Encoder Representations from Transformer and is a class of state-of-the-art natural language
+encoders developed at Google.
+
+<Image
+  path={require("./BERT-MLM.png")}
+  caption="
+    Image from https://www.sbert.net/examples/unsupervised_learning/MLM/README.html.
+  "
+/>
+
+Another NLP aside: though we will focus on masked language modeling in this article, another
+way to construct this self-supervision task is via **causal language modeling**: given some
+tokens, ask the model to predict the _next_ one. This is the approach used in OpenAI's GPT.
+
+### The model

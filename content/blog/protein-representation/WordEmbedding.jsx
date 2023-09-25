@@ -161,7 +161,11 @@ const CharacterEmbedding = () => {
     }
   }, [focusedCharIndex])
 
-  return <svg ref={svgRef} width={width} height={400} />
+  return (
+    <div style={{ textAlign: "center" }}>
+      <svg ref={svgRef} width={width} height={220} />
+    </div>
+  )
 }
 
 export default CharacterEmbedding
