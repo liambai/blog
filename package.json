@@ -27,6 +27,7 @@
     "gatsby-transformer-remark": "^6.12.0",
     "gatsby-transformer-sharp": "^5.12.0",
     "katex": "^0.16.8",
+    "littlefoot": "https://github.com/liambai/littlefoot.git",
     "prismjs": "^1.29.0",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",

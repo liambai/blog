@@ -1642,6 +1642,23 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@pacote/get-style@2.0.2", "@pacote/get-style@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@pacote/get-style/-/get-style-2.0.2.tgz#1709512d2ae1d1469b747b3e6c6b536911af0f02"
+  integrity sha512-5Pwu8fOk0TNjP/yAsw8WgwgOnC1r890i51utJ1vjSjUolbrjv3TEtZHMKY00NzeEXIl3Gt5v8W5po3H/ftdhWw==
+
+"@pacote/pixels@2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@pacote/pixels/-/pixels-2.0.2.tgz#753059aa1dac2ae3a91457244a374b426e5557b2"
+  integrity sha512-VkvJ595J6xZ0hIRoD2rJtR0J+k7b5hCs8vzkMvr1/JIlk74MltOGYhCcr4u/iGQeSwkYCi28iLORwO4X4si5XQ==
+  dependencies:
+    "@pacote/get-style" "^2.0.2"
+
+"@pacote/throttle@2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@pacote/throttle/-/throttle-2.0.2.tgz#34f8c7f781bb29d4635d31514c917662bb6a39aa"
+  integrity sha512-Yn8SbAAFRTiVXBvh8E0aGG44TUZOueQFtHqjIwfYkoKJHknchc3PjktiMbRFBFUCWZiS68lHP9K1gXdGu/Z1vQ==
+
 "@parcel/bundler-default@2.8.3":
   version "2.8.3"
   resolved "https://registry.yarnpkg.com/@parcel/bundler-default/-/bundler-default-2.8.3.tgz#d64739dbc2dbd59d6629861bf77a8083aced5229"
@@ -7634,6 +7651,14 @@ linkfs@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/linkfs/-/linkfs-2.1.0.tgz#5cc774ad8ed6b0aae5a858bd67e3334cc300a917"
   integrity sha512-kmsGcmpvjStZ0ATjuHycBujtNnXiZR28BTivEu0gAMDTT7GEyodcK6zSRtu6xsrdorrPZEIN380x7BD7xEYkew==
+
+"littlefoot@https://github.com/liambai/littlefoot.git":
+  version "4.0.1"
+  resolved "https://github.com/liambai/littlefoot.git#aad970d82d682f23f154a615ea7d92832713e01d"
+  dependencies:
+    "@pacote/get-style" "2.0.2"
+    "@pacote/pixels" "2.0.2"
+    "@pacote/throttle" "2.0.2"
 
 lmdb@2.5.2:
   version "2.5.2"

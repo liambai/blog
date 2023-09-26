@@ -327,6 +327,15 @@ a:focus {
   overflow-x: scroll;
 }
 
+.littlefoot-button {
+  background: transparent;
+  border: none;
+  color: hsla(206, 90%, 20%, 0.7);
+  font-size: 13;
+  margin: 0;
+  padding: 0;
+}
+
 /* Media queries */
 
 @media (max-width: 42rem) {

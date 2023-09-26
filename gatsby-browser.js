@@ -10,3 +10,24 @@ import "./src/style.css"
 import "prismjs/themes/prism.css"
 
 import "katex/dist/katex.min.css"
+
+import littlefoot from "littlefoot"
+require("littlefoot/dist/littlefoot.css")
+
+export function onRouteUpdate() {
+  littlefoot({
+    activateOnHover: true,
+    dismissOnUnhover: true,
+    allowDuplicates: true,
+    footnoteSelector: "p",
+    buttonTemplate: `
+      <button
+        aria-label="Reference <% reference %>"
+        class="littlefoot-button"
+        id="<% reference %>"
+      />
+        [<% reference %>]
+      </button>
+    `,
+  })
+}

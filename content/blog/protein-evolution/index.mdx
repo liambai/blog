@@ -10,6 +10,7 @@ import MSAHighlighted from "./MSAHighlighted.jsx"
 import MSAFrequencies from "./MSAFrequencies.jsx"
 import MSACovariance from "./MSACovariance.jsx"
 import Image from "../../../src/components/image.jsx"
+import { Reference, ReferenceList } from "./References.jsx"
 
 Proteins are incredible molecular machines that orchestrate almost all activity in our
 biological world. We are only beginning to understand them. This article is a deep dive
@@ -65,8 +66,7 @@ unfortunately not so much.
   caption="
     Hover over the bars to see the probabilities. Sequence probabilities are made up but follow
     some patterns you might expect: sequences that resemble sequences in the MSA have
-    higher probabilities. The set of all possible sequences (the 
-    [sequence space](https://en.wikipedia.org/wiki/Sequence_space_(evolution)) is
+    higher probabilities. The set of all possible sequences (the sequence space) is
     mind-bendingly vast: the number of possible 10 amino acid sequences is 20^10 (~10 trillion)
     because there are 20 amino acids; the bar graph is very truncated.
   "
@@ -187,8 +187,8 @@ $$
 To disentangle such direct and indirect correlations, we want a _global_
 model that accounts for _all_ pair correlations. [EVCouplings](https://evcouplings.org/)
 is a protein structure and function prediction tool that accomplishes this using
-[**mean-field approximation**](https://en.wikipedia.org/wiki/Mean-field_theory)
-[2]. The calculations are straightforward:
+[**mean-field approximation**](https://en.wikipedia.org/wiki/Mean-field_theory) <Reference id={2} />.
+The calculations are straightforward:
 
 1. Compute the difference between the pairwise frequencies and the independent frequencies
    and store them in a matrix $C$, called the pair excess matrix
@@ -315,7 +315,7 @@ $$
 
 This measure is called **direct information**, a more globally-aware measure of pairwise interactions.
 When compared to real contacts in experimentally determined structures, DI performed much better than MI,
-demonstrating the usefulness of considering the global sequence context [1].
+demonstrating the usefulness of considering the global sequence context <Reference id={1} />.
 
 <Image
   path={require("./DI-vs-MI.png")}
@@ -323,7 +323,7 @@ demonstrating the usefulness of considering the global sequence context [1].
   Axes are amino acid positions.
   The grey grooves are the actual contact in the experimentally obtained structures.
   The red dots are the predicted contacts using DI; the blue dots are the predicted
-  contacts using MI. Data is shown for 2 proteins: ELAV4 and RAS. Figure from [1].
+  contacts using MI. Data is shown for 2 proteins: ELAV4 and RAS. Figure from {1}.
   "
   width="90%"
 />
@@ -342,7 +342,7 @@ these beautiful predicted structures that often closely match the real structure
   Root mean square deviation (RMSD) measures the average distance between atoms in the predicted
   vs. observed structure and is used to score the quality of structure predictions; they are
   shown on the arrows with the total number of amino acid positions in parentheses.
-  Figure from [1].
+  Figure from {1}.
   "
 />
 
@@ -382,12 +382,12 @@ captures how much the mutant's energy improved over the wildtype.
 In this [paper](https://www.nature.com/articles/nbt.3769) introducing the
 [mutation effect prediction tool](https://marks.hms.harvard.edu/evmutation/)
 in EVCouplings, researchers computed the $\Delta E$ of each mutant sequence in a saturation
-mutagenesis experiment on a protein called M.HaeIII [3].
+mutagenesis experiment on a protein called M.HaeIII <Reference id={3} />.
 
 <Image
   path={require("./deltaE-mutations.png")}
   caption="Deeper shades of blue reflect more negative ΔE. Most mutations are damaging. Averages across amino
-  acids are shown as a bar on the bottom, labeled with * (sensitivity per site). Figure from [3]."
+  acids are shown as a bar on the bottom, labeled with * (sensitivity per site). Figure from {3}."
 />
 
 Not all positions are created equal: mutations at some positions are especially harmful.
@@ -403,7 +403,7 @@ MSAs!), we can attain such profound predictive power.
   caption="
   Evolutionary statistical energy refers to our energy function E.
   Left plot shows all mutants; right plot shows averages over amino acids at each position.
-  Figure from [3].
+  Figure from {3}.
   "
   width="90%"
 />
@@ -443,8 +443,8 @@ belonging to a class of useful tools for approximating complex distributions cal
 [**Markov chain Monte Carlo (MCMC)**](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo).
 
 In this [paper](https://www.science.org/doi/10.1126/science.aba3304), researchers did exactly this to
-with the goal of improving a protein called chorismate mutase (CM) [4]. They used MCMC to draw many
-sequences from the DCA distribution and synthesized and tested them experimentally.
+with the goal of improving a protein called chorismate mutase (CM) <Reference id={4}/>. They used
+MCMC to draw many sequences from the DCA distribution and synthesized and tested them experimentally.
 
 When they set $T = 0.33$ (second row in the figure below), they created sequences with:
 
@@ -462,7 +462,7 @@ When they set $T = 0.33$ (second row in the figure below), they created sequence
   means higher CM activity. At T = 0.33 (second row), we saw improvements in both statistical
   energy (left) and experimental CM activity (right) over natural proteins.
   The profile model on the bottom row contains only the independent h terms and no pairwise
-  J terms, with expected poor performance. Figure from [4].
+  J terms, with expected poor performance. Figure from {4}.
   "
   width="90%"
 />
@@ -478,14 +478,17 @@ I hope by now you would join me in the fascination and appreciation of MSAs.
 
 There are limitations: for example, DCA doesn't work well on rare sequences for which we
 lack the data to construct a big MSA. There are single-sequence methods such as
-[UniRep](https://www.nature.com/articles/s41592-019-0598-1) [9] that address this problem (and
-come with their own tradeoffs). I will dive into them in a future post.
+[UniRep](https://www.nature.com/articles/s41592-019-0598-1) <Reference id={9} />
+and [ESM](https://github.com/facebookresearch/esm) <Reference id={10} />
+that address this problem (and come with their own tradeoffs). I will dive into them in a
+future post.
 
-Recently, a deep learning mechanism called **attention** [5], the technology underlying magical
-large language models like GPT, has taken the world by storm. As it turns out, protein
-sequences are much like natural language sequences on which attention prevails: a variant
-of attention called **axial attention** [6] works really well on MSAs [7][8], giving rise to
-models with even better performance. I also hope to do a deep dive on this soon!
+Recently, a deep learning mechanism called **attention** <Reference id={5} />, the technology
+underlying magical large language models like GPT, has taken the world by storm. As it turns out,
+protein sequences are much like natural language sequences on which attention prevails: a variant
+of attention called **axial attention** <Reference id={6} /> works really well on
+MSAs <Reference id={7} /> <Reference id={8} />,
+giving rise to models with even better performance. I also hope to do a deep dive on this soon!
 
 ## Links
 
@@ -516,29 +519,4 @@ _position_, e.g. a protein sequence consists of a chain of amino acid residues.)
 
 ### References
 
-[1] Marks, D.S. et al.
-[Protein 3D structure computed from evolutionary sequence variation](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0028766#pone.0028766.s017).
-PLoS One 6, e28766 (2011).
-
-[2] Weigt, M et all.
-[Direct-coupling analysis of residue coevolution captures native contacts across many protein families](https://www.pnas.org/doi/10.1073/pnas.1111471108).
-Proc. Natl. Acad. Sci. U.S.A. 108, E1293–E1301 (2011).
-
-[3] Hopf, T. et al. [Mutation effects predicted from sequence co-variation](https://www.nature.com/articles/nbt.3769).
-Nat Biotechnol 35, 128–135 (2017).
-
-[4] Russ WP, et al. [An evolution-based model for designing chorismate mutase enzymes](https://www.science.org/doi/10.1126/science.aba3304).
-Science. 2020;369(6502):440–445 (2020).
-
-[5] Vaswani A., et al. [Attention is all you need](https://arxiv.org/abs/1706.03762). NeurIPS (2017).
-
-[6] Ho J. et al. [Axial Attention in Multidimensional Transformers](https://arxiv.org/abs/1912.12180). arXiv (2019).
-
-[7] Rao, R.M., et al. [MSA Transformer](https://proceedings.mlr.press/v139/rao21a.html).
-Proceedings of Machine Learning Research 139:8844-8856 (2021).
-
-[8] Jumper, J. et al. [Highly accurate protein structure prediction with AlphaFold](https://www.nature.com/articles/s41586-021-03819-2).
-Nature 596, 583–589 (2021).
-
-[9] Alley, E.C., et al. [Unified rational protein engineering with sequence-based deep representation learning](https://www.nature.com/articles/s41592-019-0598-1).
-Nat Methods 16, 1315–1322 (2019).
+<ReferenceList />
