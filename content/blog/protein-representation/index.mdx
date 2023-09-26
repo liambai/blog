@@ -1,7 +1,7 @@
 ---
 title: How to represent a protein sequence
 date: "2023-09-27"
-description: Learning protein representations. Representation learning, transfer learning, masked language models, BERT on proteins.
+description: Learning protein representations. Transfer learning, representation learning, contextual embeddings, Transformers, masked language modeling, BERT, ESM, attention analysis.
 ---
 
 import AminoAcidEmbedding from "./AminoAcidEmbedding.jsx"
@@ -137,7 +137,7 @@ the protein.
 
 This lets us take advantage of the wealth of known sequences (from publicly available large
 databases such as the [Protein Data Bank (PDB)](https://www.rcsb.org/)), each of which is now
-a labeled training example. In NLP, this approach is called **masked language modelling (MLM)**,
+a labeled training example. In NLP, this approach is called **masked language modeling (MLM)**,
 a form of **self-supervised learning**.
 
 <Image path={require("./MLM.png")} />
@@ -157,7 +157,7 @@ The first protein language encoder model of this kind is
 [UniRep](https://www.nature.com/articles/s41592-019-0598-1) (universal representation),
 which used a technique called
 [Long Short Term Memory (LSTM)](https://en.wikipedia.org/wiki/Long_short-term_memory). (It uses
-the causal instead of masked language modelling objective, predicting amino acids from left to
+the causal instead of masked language modeling objective, predicting amino acids from left to
 right.)
 
 More recently, transformer models that rely on a mechanism called **attention** have taken the
@@ -193,7 +193,7 @@ and visualized in Jay Alammar's amazing post
 Here's a helpful [explanation](https://twitter.com/rasbt/status/1629884953965068288) on
 how they differ from the $w_{ij}$ weights in the fully-connected layer.
 
-As it turns out, once we train our model on the masked language modelling objective,
+As it turns out, once we train our model on the masked language modeling objective,
 the output embeddings become rich representations of the underlying sequence (!) –
 what we have been looking for.
 
