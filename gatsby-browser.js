@@ -19,7 +19,7 @@ export function onRouteUpdate() {
     activateOnHover: true,
     dismissOnUnhover: true,
     allowDuplicates: true,
-    footnoteSelector: "p",
+    footnoteSelector: "span",
     buttonTemplate: `
       <button
         aria-label="Reference <% reference %>"

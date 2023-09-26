@@ -55,7 +55,7 @@ const MSAFrequencies = ({ caption }) => {
       .attr("stroke-width", 1)
       .on("mouseover", (event, d) => setFocusedColumn(d))
       .on("mouseout", () => setFocusedColumn(null))
-  }, [setFocusedColumn])
+  }, [width, setFocusedColumn])
 
   useEffect(() => {
     const svg = d3.select(headerRef.current)

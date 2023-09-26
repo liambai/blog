@@ -129,7 +129,7 @@ const HorizontalPDFGraph = ({
         .attr("cy", d => d)
         .attr("r", 1.5)
     }
-  }, [incomplete, leftLabelSpace, probs, title, width])
+  }, [incomplete, leftLabelSpace, labelLength, probs, title, width])
 
   const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
   return (

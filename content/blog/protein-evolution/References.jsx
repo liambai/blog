@@ -1,4 +1,4 @@
-import React from "react"
+import getReferenceComponents from "../../../src/components/references"
 
 const references = {
   1: {
@@ -25,7 +25,7 @@ const references = {
   },
   4: {
     title: "An evolution-based model for designing chorismate mutase enzymes",
-    author: "Russ WP et al.",
+    author: "Russ W.P. et al.",
     url: "https://www.science.org/doi/10.1126/science.aba3304",
     journal: "Science. 2020;369(6502):440–445",
     year: 2020,
@@ -76,38 +76,40 @@ const references = {
   },
 }
 
-export const Reference = ({ id }) => {
-  const ref = references[id]
-  return (
-    <>
-      {/*
-        Display the ID passed to the button template. Kind of hack because littlefoot's
-        numbering system doesn't really support multiple references to the same footnote.
-      */}
-      <a id={id} href={`#fn:${id}`}>
-        {id}
-      </a>
-      <p class="footnote" id={`fn:${id}`} hidden>
-        {ref.author} <a href={ref.url}>{ref.title}</a>. {ref.journal} (
-        {ref.year}).
-      </p>
-    </>
-  )
-}
+export const { Reference, ReferenceList } = getReferenceComponents(references)
 
-export const ReferenceList = () => {
-  return (
-    <div>
-      <ol>
-        {Object.entries(references).map(([id, ref]) => (
-          <li style={{ fontSize: 13, color: "slategrey" }}>
-            <p>
-              {ref.author} <a href={ref.url}>{ref.title}</a>. {ref.journal} (
-              {ref.year}).
-            </p>
-          </li>
-        ))}
-      </ol>
-    </div>
-  )
-}
+// export const Reference = ({ id }) => {
+//   const ref = references[id]
+//   return (
+//     <>
+//       {/*
+//         Display the ID passed to the button template. Kind of hack because littlefoot's
+//         numbering system doesn't really support multiple references to the same footnote.
+//       */}
+//       <a id={id} href={`#fn:${id}`}>
+//         {id}
+//       </a>
+//       <p class="footnote" id={`fn:${id}`} hidden>
+//         {ref.author} <a href={ref.url}>{ref.title}</a>. {ref.journal} (
+//         {ref.year}).
+//       </p>
+//     </>
+//   )
+// }
+
+// export const ReferenceList = () => {
+//   return (
+//     <div>
+//       <ol>
+//         {Object.entries(references).map(([id, ref]) => (
+//           <li style={{ fontSize: 13, color: "slategrey" }}>
+//             <p>
+//               {ref.author} <a href={ref.url}>{ref.title}</a>. {ref.journal} (
+//               {ref.year}).
+//             </p>
+//           </li>
+//         ))}
+//       </ol>
+//     </div>
+//   )
+// }
