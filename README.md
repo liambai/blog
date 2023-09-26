@@ -3,11 +3,11 @@
 ### Run locally
 
 ```
-yarn gatsby develop
+yarn develop
 ```
 
 ### Build
 
 ```
-yarn gatsby build
+yarn build
 ```
