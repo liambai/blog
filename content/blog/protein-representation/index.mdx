@@ -35,8 +35,9 @@ When labels are rare, as in our case with proteins, we need to resort to more **
 approaches like this:
 
 1. Come up with a vector representation of the protein sequence that captures its important
-   features. The vectors are called **embeddings**. This is no easy task: it's where the heavy
-   lifting happens and will be the subject of this article.
+   features. The vectors are called **contextualized embeddings** (we'll refer to them simply
+   as _embedding vectors_). This is no easy task: it's where the heavy lifting happens and
+   will be the subject of this article.
 
    <AminoAcidEmbedding />
 
@@ -78,13 +79,6 @@ function is often called an **encoder**.
 
 <AminoAcidEmbeddingEncoding />
 
-Two identical amino acids don't necessarily have the same embedding vector. This is because
-the embedding vector for each amino acid incorporates _context_ from its surrounding
-amino acids.
-
-If we want one vector that describes the the entire sequence – instead of a vector for each
-amino acid – we can simply average the values in each vector.
-
 ### Tokens
 
 In NLP lingo, each amino acid is a **token**. Like amino acid sequences, we can embed an
@@ -100,7 +94,22 @@ Current state-of-the-art language models use something in-between the two: sub-w
 [tiktoken](https://github.com/openai/tiktoken) is the tokenizer used by OpenAI to break sentences
 down into lists of sub-word tokens.
 
-Now let's see how we can create these embedding vectors.
+### Context matters
+
+If you are familiar with earlier NLP embedding models like
+[word2vec](https://en.wikipedia.org/wiki/Word2vec), our _contextualized_ embedding is slightly
+different.
+
+TODO:
+
+Two identical amino acids don't necessarily have the same embedding vector. This is because
+the embedding vector for each amino acid incorporates _context_ from its surrounding
+amino acids.
+
+If we want one vector that describes the the entire sequence – instead of a vector for each
+amino acid – we can simply average the values in each vector.
+
+Now let's create these embedding vectors.
 
 ### Creating a task
 
@@ -109,7 +118,7 @@ Without labels, how do we even know if our representation is any good? It would 
 have some task: an _objective_ that our model can work towards, along with a scoring function
 telling us how it's doing.
 
-Let's come up with one: given the sequence with some random positions masked away
+Let's come up with a task: given the sequence with some random positions masked away
 
 $$
 \text{L  T [MASK] A  A  L  Y [MASK] D  C}
@@ -127,20 +136,80 @@ databases such as the [Protein Data Bank (PDB)](https://www.rcsb.org/)), each of
 a labeled training example. In NLP, this approach is called **masked language modelling (MLM)**,
 a form of **self-supervised learning**.
 
-Here's a diagram illustrating how this works in natural language, using words as tokens.
-[BERT](<https://en.wikipedia.org/wiki/BERT_(language_model)>) stands for Bidirectional
-Encoder Representations from Transformer and is a class of state-of-the-art natural language
-encoders developed at Google.
+<Image path={require("./MLM.png")} />
 
-<Image
-  path={require("./BERT-MLM.png")}
-  caption="
-    Image from https://www.sbert.net/examples/unsupervised_learning/MLM/README.html.
-  "
-/>
-
-Another NLP aside: though we will focus on masked language modeling in this article, another
-way to construct this self-supervision task is via **causal language modeling**: given some
+Though we will focus on masked language modeling in this article, another way to construct
+this self-supervision task is via **causal language modeling**: given some
 tokens, ask the model to predict the _next_ one. This is the approach used in OpenAI's GPT.
 
 ### The model
+
+(This section requires some basic knowledge of deep learning. If you are new to deep learning,
+I can't recommend enough Andrej Karpathy's
+[YouTube series](https://youtu.be/VMj-3S1tku0?si=jd52N4a0ZpWQNUQy) on NLP, which starts from
+the foundations of deep learning.)
+
+The first protein language encoder model of this kind is
+[UniRep](https://www.nature.com/articles/s41592-019-0598-1) (universal representation),
+which used a technique called
+[Long Short Term Memory (LSTM)](https://en.wikipedia.org/wiki/Long_short-term_memory). (It uses
+the causal instead of masked language modelling objective, predicting amino acids from left to
+right.)
+
+More recently, transformer models that rely on a mechanism called **attention** have taken the
+spotlight. [BERT](<https://en.wikipedia.org/wiki/BERT_(language_model)>) stands for Bidirectional
+Encoder Representations from Transformer and is a class of state-of-the-art natural language
+encoders developed at Google. We will talk in some detail about a BERT-like encoder model applied
+to proteins.
+
+<Image path={require("./architecture.png")} />
+
+BERT consists of 12 encoder blocks, each containing a self-attention layer and a
+fully-connected layer. On the highest level, they are just a collection of numbers
+(**parameters**) learned by the model; each edge in the diagram represents a parameter.
+
+Roughly speaking, the $\alpha_{ij}$ parameters in the self-attention layer, also known as
+attention scores, capture the _alignment_, or similarity, between two amino acids. If
+$\alpha_{ij}$ is large, we say that the $j^{th}$ token _attends_ to the $i^{th}$ token.
+Intuitively, each token can attend to different parts of the sequence, focusing on what's
+relevant to it and glancing over what's not.
+
+Here's an example of attention scores of a transformer trained on a word-tokenized
+sentence:
+
+<Image path={require("./attention-viz.png")} width="80%" />
+
+The token "it" attends strongly the token "animal" because of their close relationship
+– they refer to the same thing – whereas most other tokens are ignored. It is our goal
+to tease out similar _semantic_ relationships between amino acids.
+
+The details of how these $\alpha_{ij}$ attention scores are calculated are explained
+and visualized in Jay Alammar's amazing post
+[The Illustrated Transformer](http://jalammar.github.io/illustrated-transformer/).
+Here's a helpful [explanation](https://twitter.com/rasbt/status/1629884953965068288) on
+how they differ from the $w_{ij}$ weights in the fully-connected layer.
+
+As it turns out, once we train our model on the masked language modelling objective,
+the output embeddings become rich representations of the underlying sequence (!) –
+what we have been looking for.
+
+## Using the representation
+
+## Peeking into the black box
+
+<p>
+  <sup id="fnref:1">
+    <a href="#fn:1">1</a>
+  </sup>
+</p>
+
+<div class="footnotes">
+  <ol>
+    <li class="footnote" id="fn:1">
+      <p>
+        <a href="www.google.com">footnote.</a>
+      </p>
+      <p></p>
+    </li>
+  </ol>
+</div>

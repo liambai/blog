@@ -33,6 +33,10 @@ function parseAndRenderLinks(text) {
 }
 
 const caption = ({ caption }) => {
+  if (!caption) {
+    return null
+  }
+
   const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
   if (isMobile) {
     caption = mobileify(caption)
