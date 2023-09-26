@@ -5,11 +5,15 @@ const mobileify = s =>
   s.replaceAll("Hover over", "Tap on").replaceAll("hover over", "tap on")
 
 function renderReferences(text) {
-  const replaced = text.replaceAll(/\{\d+\}/g, (match, _) => {
+  const pattern = /\{\d+\}/g
+  if (!pattern.test(text)) {
+    return text
+  }
+  const replaced = text.replaceAll(pattern, (match, _) => {
     const id = parseInt(match[1])
     return `<a id=${id} href="#fn:${id}">[${id}]</a>`
   })
-  return <span dangerouslySetInnerHTML={{ __html: replaced }} />
+  return <span key="ref" dangerouslySetInnerHTML={{ __html: replaced }} />
 }
 
 function parseAndRenderLinks(text) {
@@ -23,7 +27,7 @@ function parseAndRenderLinks(text) {
       const linkText = parts[index]
       const link = parts[index + 1]
       return (
-        <a key={index} href={link}>
+        <a key={link} href={link}>
           {linkText}
         </a>
       )
@@ -41,7 +45,6 @@ const caption = ({ caption }) => {
   if (isMobile) {
     caption = mobileify(caption)
   }
-
   return (
     <div
       style={{
