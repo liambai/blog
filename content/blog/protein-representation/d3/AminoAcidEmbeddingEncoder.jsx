@@ -49,7 +49,7 @@ const AminoAcidEmbeddingEncoder = ({ caption }) => {
   return (
     <Viz caption={caption}>
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <svg ref={labelSvgRef} width={80} height={310} />
+        <svg ref={labelSvgRef} width={80} height={260} />
         <Embedding embeddings={embeddings} />
       </div>
     </Viz>

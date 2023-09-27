@@ -12,7 +12,7 @@ const embeddings = [
 const CharacterEmbedding = ({ caption }) => {
   return (
     <Viz caption={caption}>
-      <Embedding embeddings={embeddings} height={200} tokenWidth={50} />
+      <Embedding embeddings={embeddings} height={170} tokenWidth={50} />
     </Viz>
   )
 }

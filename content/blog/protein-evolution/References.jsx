@@ -77,39 +77,3 @@ const references = {
 }
 
 export const { Reference, ReferenceList } = getReferenceComponents(references)
-
-// export const Reference = ({ id }) => {
-//   const ref = references[id]
-//   return (
-//     <>
-//       {/*
-//         Display the ID passed to the button template. Kind of hack because littlefoot's
-//         numbering system doesn't really support multiple references to the same footnote.
-//       */}
-//       <a id={id} href={`#fn:${id}`}>
-//         {id}
-//       </a>
-//       <p class="footnote" id={`fn:${id}`} hidden>
-//         {ref.author} <a href={ref.url}>{ref.title}</a>. {ref.journal} (
-//         {ref.year}).
-//       </p>
-//     </>
-//   )
-// }
-
-// export const ReferenceList = () => {
-//   return (
-//     <div>
-//       <ol>
-//         {Object.entries(references).map(([id, ref]) => (
-//           <li style={{ fontSize: 13, color: "slategrey" }}>
-//             <p>
-//               {ref.author} <a href={ref.url}>{ref.title}</a>. {ref.journal} (
-//               {ref.year}).
-//             </p>
-//           </li>
-//         ))}
-//       </ol>
-//     </div>
-//   )
-// }
