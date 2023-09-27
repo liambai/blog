@@ -2,10 +2,9 @@ import React, { useState, useEffect, useRef } from "react"
 import * as d3 from "d3"
 import { useMediaQuery } from "react-responsive"
 
-import Viz from "../../../src/components/viz"
-import { MSAData } from "./MSA"
+import { nodeIds, MSAData } from "./MSA"
+import Viz from "../../../../src/components/viz"
 
-const nodeIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
   const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
   const width = isMobile ? 300 : 350

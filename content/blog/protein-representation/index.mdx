@@ -12,7 +12,7 @@ import AminoAcidOneHot from "./d3/AminoAcidOneHot.jsx"
 import Image from "../../../src/components/image.jsx"
 import { Link } from "gatsby"
 
-In the last decade, [next generation sequencing](https://en.wikipedia.org/wiki/Massive_parallel_sequencing) propelled biology into a new information age. This came with a happy conundrum: we now have many orders of magnitude more protein sequence data than structural or functional data. We uncovered massive tomes written in nature's language, the blueprint of our wondrous biological tapestry, from the budding of a seed to the beating of a heart. But more often than not, we lack the ability to understand them.
+In the last decade, [next generation sequencing](https://en.wikipedia.org/wiki/Massive_parallel_sequencing) propelled biology into a new information age. This came with a happy conundrum: we now have many orders of magnitude more protein sequence data than structural or functional data. We uncovered massive tomes written in nature's language – the blueprint of our wondrous biological tapestry – but lack the ability to understand them.
 
 <Image path={require("./images/PDB-sequences-vs-structures.png")} width="80%" />
 
@@ -173,4 +173,4 @@ Similarly, a lot of attention is directed to [binding sites](https://en.wikipedi
 
 <Image path={require("./images/attention-binding-site.png")} />
 
-Applying supervised learning to attention scores – instead of output representations – also achieves astonishing performance in contact prediction. Compared to GREMLIN[https://openseq.org/], an MSA-based method similar to the one we talked about in the <Link to="/protein-evolution">previous post</Link>, logistic regression trained on ESM's attention scores yielded better performance after only seeing 20 (!) labeled training examples.
+Applying supervised learning to attention scores – instead of output representations – also achieves astonishing performance in contact prediction. Compared to [GREMLIN](https://openseq.org/), an MSA-based method similar to the one we talked about in the <Link to="/protein-evolution">previous post</Link>, logistic regression trained on ESM's attention scores yielded better performance after only seeing 20 (!) labeled training examples.

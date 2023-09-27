@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react"
 import * as d3 from "d3"
 import { useMediaQuery } from "react-responsive"
 
-import Viz from "../../../src/components/viz"
+import Viz from "../../../../src/components/viz"
 
 const dieProbs = {
   1: 1 / 6,

@@ -4,47 +4,46 @@ date: "2023-09-19"
 description: Predicting protein structure and function. Multiple Sequence Alignments (MSAs), the protein folding problem, the Potts model, Direct Coupling Analysis (DCA), EVCouplings.
 ---
 
-import MSACoupling from "./MSACoupling.jsx"
-import Distributions from "./Distributions.jsx"
-import MSAHighlighted from "./MSAHighlighted.jsx"
-import MSAFrequencies from "./MSAFrequencies.jsx"
-import MSACovariance from "./MSACovariance.jsx"
+import MSACoupling from "./d3/MSACoupling.jsx"
+import Distributions from "./d3/Distributions.jsx"
+import MSAHighlighted from "./d3/MSAHighlighted.jsx"
+import MSAFrequencies from "./d3/MSAFrequencies.jsx"
+import MSACovariance from "./d3/MSACovariance.jsx"
 import Image from "../../../src/components/image.jsx"
 import { Reference, ReferenceList } from "./References.jsx"
 
-Proteins are incredible molecular machines that orchestrate almost all activity in our biological world. We are only beginning to understand them. This article is a deep dive into some statistical methods that enable us to understand new proteins by harnessing the power of evolution.
+Proteins are remarkable molecular machines that orchestrate almost all activity in our biological world, from the budding of seed to the beating of a heart. They keep us alive, and their malfunction makes us sick. Knowing how they work is key to understanding the precise mechanisms behind our diseases – and to coming up with better ways to treat them. This article is a deep dive into some statistical methods that – through the lens of evolution – give us a glimpse into the complex world of proteins.
 
-Amino acids make up proteins and specify their structure and function. Over millions of years, evolution has conducted a massive experiment over the space of all possible amino acid sequences: those that encode a functional protein survive; those that don't are extinct.
+[Amino acids](https://en.wikipedia.org/wiki/Amino_acid) make up proteins and specify their structure and function. Over millions of years, evolution has conducted a massive experiment over the [space](<https://en.wikipedia.org/wiki/Sequence_space_(evolution)>) of all possible amino acid sequences: those that encode a functional protein survive; those that don't are extinct.
 
 <Image
-  path={require("./sequence-evolution.png")}
+  path={require("./images/sequence-evolution.png")}
   caption="
-    Diagram from Roshan Rao's awesome [dissertation talk](https://youtu.be/hcJS9d09ECA?si=DXLsnOvbJH7wwrJ1) on these topics.
+    Throughout evolution, mutations change the sequences of proteins. Only the ones with highest [fitness](https://evolution.berkeley.edu/evolution-101/mechanisms-the-processes-of-evolution/evolutionary-fitness/) survive to be found in our world today. Diagram from Roshan Rao's awesome [dissertation talk](https://youtu.be/hcJS9d09ECA?si=DXLsnOvbJH7wwrJ1).
   "
 />
 
-We can learn a surprising lot about a protein by studying similar variants of it
-we find in nature (its **protein family**). These hints from evolution have enabled breakthroughs like [AlphaFold](https://www.forbes.com/sites/robtoews/2021/10/03/alphafold-is-the-most-important-achievement-in-ai-ever/?sh=6e0571586e0a) and many cutting-edge methods in protein design. Let's see how.
+We can learn a surprising lot about a protein by studying similar variants of it we find in nature (its **protein family**). These hints from evolution have empowered breakthroughs like [AlphaFold](https://www.forbes.com/sites/robtoews/2021/10/03/alphafold-is-the-most-important-achievement-in-ai-ever/?sh=6e0571586e0a) and many cutting-edge methods in predicting protein function. Let's see how.
 
 A **Multiple Sequence Alignment (MSA)** compiles known variants of a protein – which can come from different organisms – and is created by searching vast protein sequence databases.
 
 <MSACoupling
   caption="
-    The structure sketches how the amino acid chain might fold in space (try dragging the nodes). Hover over each row in the MSA to see the corresponding amino acid in the folded structure. Hover over the blue link to highlight the contacting positions. 
+    An MSA contains different variants of a sequence. The structure sketches how the amino acid chain might fold in space (try dragging the nodes). Hover over each row in the MSA to see the corresponding amino acid in the folded structure. Hover over the blue link to highlight the contacting positions. 
   "
 />
 
-One key insight is that amino acid positions that tend to co-vary in the MSA likely interact with each other in the folded structure, often via direct 3D contact. In the rest of this article, we'll dissect this MSA and make this idea concrete.
+Here's an example of signals hidden in MSAs: amino acid positions that tend to co-vary in the MSA tend to interact with each other in the folded structure, often via direct 3D contact. We'll make this idea concrete.
 
 ## In search of a distribution
 
-Let's start with the question: given an MSA and an amino acid sequence, what's the probability that the sequence encodes a functional protein in the family of the MSA? In other words, given a sequence $A = (A_1, A_2, ..., A_L)$, we're looking for an appropriate probability distribution $P(A)$ based on the MSA.
+Let's start with the question: given an MSA and an amino acid sequence, what's the probability that the sequence encodes a functional protein in the family of the MSA? In other words, given a sequence $A = (A_1, A_2, ..., A_L)$, we're looking for a fitting probability distribution $P(A)$ based on the MSA.
 
 Knowing $P$ is powerful. It lends us insight into sequences that we've never encountered before (more on this later!). Oftentimes, $P$ is called a _model_. For the outcome of rolling a die, we have great models; proteins, unfortunately not so much.
 
 <Distributions
   caption="
-    Hover over the bars to see the probabilities. Sequence probabilities are made up but follow some patterns you might expect: sequences that resemble sequences in the MSA have higher probabilities. The set of all possible sequences (the sequence space) is mind-bendingly vast: the number of possible 10 amino acid sequences is 20^10 (~10 trillion) because there are 20 amino acids; the bar graph is very truncated.
+    Hover over the bars to see the probabilities. Sequence probabilities are made up but follow some expected patterns: sequences that resemble sequences in the MSA have higher probabilities. The sequence space is mind-bendingly vast: the number of possible 10 amino acid sequences is 20^10 (~10 trillion) because there are 20 amino acids; the bar graph is very truncated.
   "
 />
 
@@ -60,21 +59,21 @@ To measure this, let's count the frequencies of observing each amino acid at eac
 
 <MSAFrequencies
   caption="
-    Hover over the MSA to compute amino acid frequencies.
+    Hover over the MSA to compute amino acid frequencies at each position.
   "
 />
 
 If we compile these frequencies into a matrix, we get what is known as a [**position-specific scoring matrix (PSSM)**](https://en.wikipedia.org/wiki/Position_weight_matrix), commonly visualized as a [sequence logo](https://en.wikipedia.org/wiki/Sequence_logo).
 
 <Image
-  path={require("./sitewise-logo.png")}
+  path={require("./images/sequence-logo.png")}
   caption="
-    A sequence logo [generated](https://weblogo.berkeley.edu/logo.cgi) from our MSA. The height of each amino acid is an indicator of its evolutionary conservation.
+    A sequence logo [generated](https://weblogo.berkeley.edu/logo.cgi) from our MSA. The height of each amino acid is an indicator of its degree of evolutionary conservation.
   "
   width="90%"
 />
 
-To evaluate some new sequence $A$ of $L$ amino acids, we can look at
+To evaluate some new sequence $A$ of $L$ amino acids, let's look at:
 
 $$
 E(A) = \sum_{1 \leq i \leq L} f_i(A_i)
@@ -92,7 +91,7 @@ Let $f_{ij}(A_i, A_j)$ be the frequency of observing amino acid $A_i$ at positio
 
 <MSACovariance
   caption="
-    Hover over the MSA to compute pairwise amino acid frequencies in reference to the second column.
+    Hover over the MSA to compute pairwise amino acid frequencies in reference to the second position.
   "
 />
 
@@ -108,12 +107,12 @@ $$
 E(A) = \sum_{1 \leq i \leq j \leq L} J_{i j} (A_i, A_j)+\sum_{1 \leq i \leq L} h_i(A_i)
 $$
 
-Actually, physicists have studied this function since the 1950s, in a different context: the interacting spins of particles in solids like magnets. The $J_{ij}$ terms capture the energy cost of particles $i$ and $j$ coupling with each other in their respective states: its magnitude is big if they interact, small if they don't; the $h_i$ terms capture the energy cost of each particle being in its own state.
+Physicists have actually studied this function since the 1950s, in a different context: the interacting spins of particles in solids like magnets. The $J_{ij}$ terms capture the energy cost of particles $i$ and $j$ coupling with each other in their respective states: its magnitude is big if they interact, small if they don't; the $h_i$ terms capture the energy cost of each particle being in its own state.
 
-They call this the [Potts model](https://en.wikipedia.org/wiki/Potts_model), and a fancy name for the energy function is the Hamiltonian. This fascinating field of physics applying these statistical models to explain macroscopic behaviors of matter is called statistical mechanics.
+They call this the [**Potts model**](https://en.wikipedia.org/wiki/Potts_model), and a fancy name for the energy function is the [Hamiltonian](<https://en.wikipedia.org/wiki/Hamiltonian_(quantum_mechanics)>). This fascinating field of physics applying these statistical models to explain macroscopic behaviors of matter is called statistical mechanics.
 
 <Image
-  path={require("./potts.png")}
+  path={require("./images/potts.png")}
   caption="
     The Potts model on a square lattice. Black and white dots are in different states. Figure from [https://arxiv.org/abs/1511.03031](https://arxiv.org/abs/1511.03031).
   "
@@ -122,27 +121,27 @@ They call this the [Potts model](https://en.wikipedia.org/wiki/Potts_model), and
 
 ### Global pairwise terms
 
-Earlier, we considered using $f_{ij}$ as the term capturing pairwise interactions. $f_{ij}$ focuses on what's happening at positions $i$ and $j$ – nothing more. It's a _local_ model. Perhaps we can imagine a scenario where positions $i$ and $j$ each independently interact with position $k$, though they do not directly interact with each other. Because of this **transitive correlation** between $i$ and $j$, the nearsighted $f_{ij}$ would likely overestimate the interaction between them.
+Earlier, we considered using $f_{ij}$ as the term capturing pairwise interactions. $f_{ij}$ focuses on what's happening at positions $i$ and $j$ – nothing more. It's a _local_ measurement. Imagine this: positions $i$ and $j$ each independently interact with position $k$, though they do not directly interact with each other. With this **transitive correlation** between $i$ and $j$, the nearsighted $f_{ij}$ would likely overestimate the interaction between them.
 
 $$
 i \longrightarrow k \longleftarrow j
 $$
 
-To disentangle such direct and indirect correlations, we want a _global_ model that accounts for _all_ pair correlations. [EVCouplings](https://evcouplings.org/) is a protein structure and function prediction tool that accomplishes this using [**mean-field approximation**](https://en.wikipedia.org/wiki/Mean-field_theory) <Reference id={2} />. The calculations are straightforward:
+To disentangle such direct and indirect correlations, we want a _global_ measurement that accounts for _all_ pair correlations. [EVCouplings](https://evcouplings.org/) is a protein structure and function prediction tool that accomplishes this using [**mean-field approximation**](https://en.wikipedia.org/wiki/Mean-field_theory) <Reference id={2} />. The calculations are straightforward:
 
-1. Compute the difference between the pairwise frequencies and the independent frequencies and store them in a matrix $C$, called the pair excess matrix
+1. Compute the difference between the pairwise frequencies and the independent frequencies and store them in a matrix $C$, called the pair excess matrix.
 
 $$
 C_{ij}(A_i, A_j) = f_{ij}(A_i, A_j) - f_i(A_i)f_j(A_j)
 $$
 
-2. Compute the inverse of this matrix, $C^{-1}$, the entries of which are just the negatives of the $J_{ij}$ terms we seek
+2. Compute the inverse of this matrix, $C^{-1}$, the entries of which are just the negatives of the $J_{ij}$ terms we seek.
 
 $$
 J_{ij}(A_i, A_j) = - (C^{-1})_{ij}(A_i, A_j)
 $$
 
-The theory behind these steps is involved and beyond our scope, but intuitively, we can think of the matrix inversion as an averaging step that accounts for $all$ pair correlations and makes the model global. This method is often referred to as [**Direct Coupling Analysis (DCA)**](https://en.wikipedia.org/wiki/Direct_coupling_analysis).
+The theory behind these steps is involved and beyond our scope, but intuitively, we can think of the matrix inversion as an averaging step that incorporates all pair correlations globally. This method is called [**Direct Coupling Analysis (DCA)**](https://en.wikipedia.org/wiki/Direct_coupling_analysis).
 
 ### The distribution
 
@@ -154,9 +153,7 @@ $$
 
 ## Predicting 3D structure
 
-Given an amino acid sequence, what is the 3D structure that it folds into? This is the [protein folding problem](https://rootsofprogress.org/alphafold-protein-folding-explainer), a complex problem central to biology. In 2021, researchers from DeepMind presented a groundbreaking model using deep learning, [AlphaFold](https://www.nature.com/articles/s41586-021-03819-2) <Reference id={8} />, declaring the problem as solved. The [implications](https://moalquraishi.wordpress.com/2020/12/08/alphafold2-casp14-it-feels-like-ones-child-has-left-home/) are profound.
-
-The [EVCouplings](https://evcouplings.org/) approach to the protein folding problem cannot compete with AlphaFold in accuracy, but it is foundational to AlphaFold, which similarly relies heavily on pairwise interaction signals from MSAs.
+Given an amino acid sequence, what is the 3D structure that it folds into? This is the [protein folding problem](https://rootsofprogress.org/alphafold-protein-folding-explainer) central to biology. In 2021, researchers from DeepMind presented a groundbreaking model using deep learning, [AlphaFold](https://www.nature.com/articles/s41586-021-03819-2) <Reference id={8} />, declaring the problem as solved. The [implications](https://moalquraishi.wordpress.com/2020/12/08/alphafold2-casp14-it-feels-like-ones-child-has-left-home/) are profound. (Although the [EVCouplings](https://evcouplings.org/) approach to the this problem we're about to discuss cannot compete with AlphaFold in accuracy, it is foundational to AlphaFold, which similarly relies heavily on pairwise interaction signals from MSAs.)
 
 Myriad forces choreograph the folding of a protein. Let's simplify and focus on
 pairs of amino acid positions that interact strongly with each other – and hypothesize that they are in spatial contact. These predicted contacts can act as a set of constraints from which we can then derive the full 3D structure.
@@ -167,11 +164,11 @@ pairs of amino acid positions that interact strongly with each other – and hyp
   "
 />
 
-Hovering over the blue link, we see that positions $2$ and $8$ tend to co-vary in the MSA, and they are in contact in the folded protein. Presumably, it's important to maintaining the function of the protein that when one position changes, the other also changes in a specific way – so important that failure for a sequence to do so is a death sentence that explains its absence in the MSA. Let's use the tools we have to quantify this co-variance.
+Hovering over the blue link, we see that positions $2$ and $8$ tend to co-vary in the MSA – and they are in contact in the folded structure. Presumably, it's important to maintaining the function of the protein that when one position changes, the other also changes in a specific way – so important that failure for a sequence to do so is a death sentence that explains its absence in the MSA. Let's quantify this co-variance.
 
 ### Mutual information
 
-Our $f_{ij}$ is a function that takes in two amino acids: $f_{ij}(A_i, A_j)$; however, we would like a direct measure of interaction given only positions $i$ and $j$, without a dependence on specific amino acids. In other words, we want to average over all possible pairs of amino acids that can inhabit the two positions $i$ and $j$. To do this in a principled and effective way, we use a concept called **mutual information**:
+Our $f_{ij}$ is a function that takes in two amino acids: $f_{ij}(A_i, A_j)$; however, we would like a direct measure of interaction given only positions $i$ and $j$, without a dependence on specific amino acids. In other words, we want to average over all possible pairs of amino acids that can inhabit the two positions $i$ and $j$. To do this in a principled and effective way, we can use a concept called **mutual information**:
 
 $$
 MI_{i j}=\sum_{A_i, A_j \in \mathcal X} f_{i j}\left(A_i, A_j\right) \ln \left(\frac{f_{i j}\left(A_i, A_j\right)}{f_i\left(A_i\right) f_j\left(A_j\right)}\right)
@@ -179,31 +176,35 @@ $$
 
 where $\mathcal X$ is the set of 20 possible amino acids.
 
-Mutual information quantifies the amount of [information](https://en.wikipedia.org/wiki/Information_content) shared by $i$ and $j$: how much information we gain about $j$ by observing $i$. This concept comes from a beautiful branch of mathematics called [information theory](https://en.wikipedia.org/wiki/Information_theory), initially developed by [Claude Shannon](https://www.quantamagazine.org/how-claude-shannons-information-theory-invented-the-future-20201222/) at Bell Labs in application to signal transmission in telephone systems.
+Mutual information measures the amount of [information](https://en.wikipedia.org/wiki/Information_content) shared by $i$ and $j$: how much information we gain about $j$ by observing $i$. This concept comes from a beautiful branch of mathematics called [information theory](https://en.wikipedia.org/wiki/Information_theory), initially developed by [Claude Shannon](https://www.quantamagazine.org/how-claude-shannons-information-theory-invented-the-future-20201222/) at Bell Labs in application to signal transmission in telephone systems.
 
-In our case, a big $MI_{ij}$ means that positions $i$ and $j$ are highly correlated and hence more likely to be in contact.
+In our case, a large $MI_{ij}$ means that positions $i$ and $j$ are highly correlated and therefore more likely to be in 3D contact.
 
 ### Direct information
 
-As we mentioned, the local nature of $f_{ij}$ can be limiting: for one, it's bad at discerning transitive correlations. [EVCouplings](https://evcouplings.org/) uses a different quantity to approximate the probability that $i$ and $j$ are in contact:
+As we mentioned, the local nature of $f_{ij}$ can be limiting: for one, it's bad at discerning transitive correlations that might convince us of spurious contacts. [EVCouplings](https://evcouplings.org/) uses a different quantity to approximate the probability that $i$ and $j$ are in contact:
 
 $$
 P_{i j}^{D i r}\left(A_i, A_j\right)=\frac{1}{Z} \exp \left\{J_{i j}\left(A_i, A_j\right)+\tilde{h}_i\left(A_i\right)+\tilde{h}_j\left(A_j\right)\right\}
 $$
 
-where the $J_{ij}$'s are the global interaction terms obtained by mean-field approximation, and the $\tilde{h}$ terms can be calculated by imposing the following constraints
+where the $J_{ij}$'s are the global interaction terms obtained by mean-field approximation, and the $\tilde{h}$ terms can be calculated by imposing the following constraints:
 
 $$
+\begin{equation}
 \sum_{A_j \in \mathcal X}P_{i j}^{D i r}\left(A_i, A_j\right) = f_i(A_i)
+\end{equation}
 $$
 
 $$
+\begin{equation}
 \sum_{A_i \in \mathcal X}P_{i j}^{D i r}\left(A_i, A_j\right) = f_j(A_j)
+\end{equation}
 $$
 
 These constraints ensure that $P_{i j}^{D i r}$ follows the single amino acid frequencies we observe. For each pair of positions:
 
-1. Let's fix the amino acid at position $i$ to be L. Consider $P_{i j}^{D i r}(L, \mathrm{A_j})$ for all possible $A_j$'s if we sum them all up, we get the probability of observing $L$ independently at position $i$, which should be $f_i(L)$.
+1. Let's fix the amino acid at position $i$ to be L. Consider $P_{i j}^{D i r}(L, \mathrm{A_j})$ for all possible $A_j$'s. If we sum them all up, we get the probability of observing $L$ independently at position $i$, which should be $f_i(L)$.
 
 2. The same idea but summing over all $A_i$'s.
 
@@ -216,7 +217,7 @@ $$
 This measure is called **direct information**, a more globally-aware measure of pairwise interactions. When compared to real contacts in experimentally determined structures, DI performed much better than MI, demonstrating the usefulness of considering the global sequence context <Reference id={1} />.
 
 <Image
-  path={require("./DI-vs-MI.png")}
+  path={require("./images/DI-vs-MI.png")}
   caption="
     Axes are amino acid positions. The grey grooves are the actual contact in the experimentally obtained structures. The red dots are the predicted contacts using DI; the blue dots are the predicted contacts using MI. Data is shown for 2 proteins: ELAV4 and RAS. Figure from {1}.
   "
@@ -225,12 +226,12 @@ This measure is called **direct information**, a more globally-aware measure of 
 
 ### Constructing the structure
 
-Given predicted contacts by DI, we need to carry out a few more computational steps – e.g. [**simulated annealing**](https://en.wikipedia.org/wiki/Simulated_annealing) – to generate the full predicted 3D structure. Omitting those details: the results are these beautiful predicted structures that often closely match the real structures.
+Given predicted contacts by DI, we need to carry out a few more computational steps – e.g. [simulated annealing](https://en.wikipedia.org/wiki/Simulated_annealing) – to generate the full predicted 3D structure. Omitting those details: the results are these beautiful predicted structures that often closely match the real structures.
 
 <Image
-  path={require("./structures.png")}
+  path={require("./images/structures.png")}
   caption="
-  Grey structures are real, experimentally observed; red structures are predicted using DI. Root mean square deviation (RMSD) measures the average distance between atoms in the predicted vs. observed structure and is used to score the quality of structure predictions; they are shown on the arrows with the total number of amino acid positions in parentheses. Figure from {1}.
+    Grey structures are real, experimentally observed; red structures are predicted using DI. Root mean square deviation (RMSD) measures the average distance between atoms in the predicted vs. observed structure and is used to score the quality of structure predictions; they are shown on the arrows with the total number of amino acid positions in parentheses. Figure from {1}.
   "
 />
 
@@ -238,7 +239,7 @@ Given predicted contacts by DI, we need to carry out a few more computational st
 
 At this point, you might think: this is all neat and all, but is it directly useful in any way? One common problem in industrial biotechnology is: given a protein that carries out some useful function – e.g. an enzyme that catalyses a desired reaction – how can we improve it by increasing its stability or activity?
 
-One approach is [saturation mutagenesis](https://en.wikipedia.org/wiki/Saturation_mutagenesis): take the protein's sequence, mutate every position to every possible amino acid, and test all the mutants to see if any yields an improvement. I know that sounds crazy, but it has been made possible by impressive developments in automation-enabled [high-throughput screening](https://en.wikipedia.org/wiki/High-throughput_screening) (in comparison, progress in our biological understanding necessary to make more informed designs has generally lagged behind). Can we do better?
+One approach is [saturation mutagenesis](https://en.wikipedia.org/wiki/Saturation_mutagenesis): take the protein's sequence, mutate every position to every possible amino acid, and test all the mutants to see if any yields an improvement. I know that sounds crazy, but it has been made possible by impressive developments in automation-enabled [high-throughput screening](https://en.wikipedia.org/wiki/High-throughput_screening) (in comparison, progress in our biological understanding necessary to make more informed guesses has generally lagged behind). Can we do better?
 
 ### Predicting mutation effects
 
@@ -259,7 +260,7 @@ captures how much the mutant's energy improved over the wildtype.
 In this [paper](https://www.nature.com/articles/nbt.3769) introducing the [mutation effect prediction tool](https://marks.hms.harvard.edu/evmutation/) in EVCouplings, researchers computed the $\Delta E$ of each mutant sequence in a saturation mutagenesis experiment on a protein called M.HaeIII <Reference id={3} />.
 
 <Image
-  path={require("./deltaE-mutations.png")}
+  path={require("./images/deltaE-mutations.png")}
   caption="
     Deeper shades of blue reflect more negative ΔE. Most mutations are damaging. Averages across amino acids are shown as a bar on the bottom, labeled with * (sensitivity per site). Figure from {3}.
   "
@@ -270,7 +271,7 @@ Not all positions are created equal: mutations at some positions are especially 
 The calculated energies correlated strongly with experimentally observed fitness (!), meaning that our energy function provides helpful guidance on how a given mutation might affect function. It's remarkable that with such a simple model and from seemly so little information (just MSAs!), we can attain such profound predictive power.
 
 <Image
-  path={require("./deltaE-experimental.png")}
+  path={require("./images/deltaE-experimental.png")}
   caption="
     Evolutionary statistical energy refers to our energy function E. Left plot shows all mutants; right plot shows averages over amino acids at each position. Figure from {3}.
   "
@@ -281,7 +282,7 @@ The next time we find ourselves trying a saturation mutagenesis screen to identi
 
 ### Generating new sequences
 
-Only considering point mutations can be limiting: what if the sequence we're differ at several positions from the original? To venture outside the vicinity of the original sequence, let's try this:
+Only considering point mutations is kinda lame: what if the sequence we're differ at several positions from the original? To venture outside the vicinity of the original sequence, let's try this:
 
 1. Start with a random sequence $A$.
 2. Mutate a random position to create a candidate sequence $A^{\mathrm{cand}}$.
@@ -289,11 +290,11 @@ Only considering point mutations can be limiting: what if the sequence we're dif
    - if energy increased, awesome: accept the candidate.
    - if energy decreased, still accept the candidate with some probability proportional the energy difference and ideally with a knob we can control, like $P_{\mathrm{accept}} = \exp(-\Delta E / T)$.
      - the bigger this $\Delta E$, which goes in the unwanted direction, the smaller the acceptance probability.
-     - $T \in (0, 1]$ lets us control how forgiving we want to be: $T = 1$ makes accepting more likely;
+     - $T \in (0, 1]$ lets us control how forgiving we want to be: $T \to 1$ makes accepting more likely;
        $T \to 0$ makes accepting less likely. $T$ is called the **temperature**.
 4. Go back to 2. and repeat many times.
 
-In the end, we'll have a sequence that is a **random sample** from our probability distribution (slightly modified from before to include $T$)
+In the end, we'll have a sequence that is a **random sample** from our probability distribution (slightly modified from before to include $T$).
 
 $$
 P(A)=\frac{1}{Z} \exp(E(A)/T)
@@ -301,7 +302,7 @@ $$
 
 Why this works involves a lot of cool math that we won't have time to dive into now. This is the [**Metropolis–Hastings algorithm**](https://en.wikipedia.org/wiki/Metropolis%E2%80%93Hastings_algorithm), belonging to a class of useful tools for approximating complex distributions called [**Markov chain Monte Carlo (MCMC)**](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo).
 
-In this [paper](https://www.science.org/doi/10.1126/science.aba3304), researchers did exactly this to with the goal of improving a protein called chorismate mutase (CM) <Reference id={4}/>. They used MCMC to draw many sequences from the DCA distribution and synthesized and tested them experimentally.
+In this [paper](https://www.science.org/doi/10.1126/science.aba3304), researchers did exactly this to with the goal of improving a protein called chorismate mutase (CM) <Reference id={4}/>. They used MCMC to draw many sequences from the DCA distribution and then [synthesized](https://en.wikipedia.org/wiki/DNA_synthesis) them for experimental testing.
 
 When they set $T = 0.33$ (second row in the figure below), they created sequences with:
 
@@ -310,7 +311,7 @@ When they set $T = 0.33$ (second row in the figure below), they created sequence
 2. enhanced activity compared to natural CM when expressed in E. coli (!)
 
 <Image
-  path={require("./CM-energy.jpeg")}
+  path={require("./images/CM-energy.jpeg")}
   caption="
     EcCM is a natural CM whose high activity is used as a benchmark and goalpost. Statistical energies on the left are negatives of ours, i.e. the smaller the better. norm. r.e. on the right stands for normalized relative enrichment; absent more experimental details, we can interpret them as: more density around norm r.e. = 1 means higher CM activity. At T = 0.33 (second row), we saw improvements in both statistical energy (left) and experimental CM activity (right) over natural proteins. The profile model on the bottom row contains only the independent h terms and no pairwise
     J terms, with expected poor performance. Figure from {4}.
@@ -318,19 +319,19 @@ When they set $T = 0.33$ (second row in the figure below), they created sequence
   width="90%"
 />
 
-Taken together, our simple DCA model gave us the superpowers to improve on the best that nature had to offer! Our energy function enables us to not only check a given sequence for its fitness, but also generate new sequences with high fitness.
+Taken together, a simple DCA model gave us the amazing ability to improve on the best that nature had to offer! Our energy function enables us to not only check a given sequence for its fitness, but also generate new ones with high fitness.
 
 ## Summary + what's next
 
-We talked about the direct coupling analysis model (DCA) with some of its cool applications. I hope by now you would join me in the fascination and appreciation of MSAs.
+We talked about the direct coupling analysis (DCA) model with some of its cool applications. I hope by now you would join me in the fascination and appreciation of MSAs.
 
-There are limitations: for example, DCA doesn't work well on rare sequences for which we lack the data to construct a big MSA. There are single-sequence methods like [UniRep](https://www.nature.com/articles/s41592-019-0598-1) <Reference id={9} /> and [ESM](https://github.com/facebookresearch/esm) <Reference id={10} /> that address this problem (and come with their own tradeoffs). I will dive into them in a future post.
+There are limitations: for example, DCA doesn't work well on rare sequences for which we lack the data to construct a deep MSA. Single-sequence methods like [UniRep](https://www.nature.com/articles/s41592-019-0598-1) <Reference id={9} /> and [ESM](https://github.com/facebookresearch/esm) <Reference id={10} /> combat this problem (and come with their own tradeoffs). I will dive into them in a future post.
 
 Recently, a deep learning mechanism called **attention** <Reference id={5} />, the technology underlying magical large language models like GPT, has taken the world by storm. As it turns out, protein sequences are much like natural language sequences on which attention prevails: a variant of attention called **axial attention** <Reference id={6} /> works really well on MSAs <Reference id={7} /> <Reference id={8} />, giving rise to models with even better performance. I also hope to do a deep dive on this soon!
 
 ## Links
 
-The ideas we discussed are primarily from the following papers:
+The ideas we discussed are primarily based on:
 
 - [Protein 3D structure computed from evolutionary sequence variation](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0028766#pone.0028766.s017) focuses on 3D structure prediction, describes DCA in detail, and provides helpful intuitions. It's a highly accessible and worthwhile read.
 
@@ -338,7 +339,7 @@ The ideas we discussed are primarily from the following papers:
 
 - [An evolution-based model for designing chorismate mutase enzymes](https://www.science.org/doi/10.1126/science.aba3304) is an end-to-end protein engineering case study using our model.
 
-I also recommend these papers that extend the ideas:
+I also recommend the following papers that extend these ideas:
 
 - [Robust and accurate prediction of residue–residue interactions across protein interfaces using evolutionary information](https://elifesciences.org/articles/02030) applies this model to protein-protein interfaces, for which we need the MSAs of the two proteins side by side.
 

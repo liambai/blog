@@ -2,9 +2,8 @@ import React, { useEffect, useRef } from "react"
 import * as d3 from "d3"
 import { useMediaQuery } from "react-responsive"
 
-import { MSAData } from "./MSA"
-
-const nodeIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+import { nodeIds, MSAData } from "./MSA"
+import Viz from "../../../../src/components/viz"
 
 const MSAHighlighted = () => {
   const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
@@ -72,19 +71,21 @@ const MSAHighlighted = () => {
   }, [])
 
   return (
-    <div
-      style={{
-        margin: "auto",
-        width: width,
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <svg ref={headerRef} />
-      <table style={{ tableLayout: "fixed" }} ref={tableRef}>
-        <tbody></tbody>
-      </table>
-    </div>
+    <Viz>
+      <div
+        style={{
+          margin: "auto",
+          width: width,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <svg ref={headerRef} />
+        <table style={{ tableLayout: "fixed" }} ref={tableRef}>
+          <tbody></tbody>
+        </table>
+      </div>
+    </Viz>
   )
 }
 

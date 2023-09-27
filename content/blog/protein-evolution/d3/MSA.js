@@ -1,3 +1,5 @@
+export const nodeIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
 export const MSA = [
   ["L", "T", "R", "A", "A", "L", "Y", "E", "D", "C"],
   ["L", "T", "R", "A", "T", "L", "Y", "E", "D", "C"],
