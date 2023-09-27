@@ -1,7 +1,7 @@
 {
-  "name": "gatsby-starter-blog",
+  "name": "liam-blog",
   "private": true,
-  "description": "A starter for a blog powered by Gatsby and Markdown",
+  "description": "Liam's blog.",
   "version": "0.1.0",
   "author": "Liam Bai <liambai2000@gmail.com>",
   "bugs": {
