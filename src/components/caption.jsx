@@ -36,12 +36,13 @@ function parseAndRenderLinks(text) {
   })
 }
 
-const caption = ({ caption }) => {
+const Caption = ({ caption }) => {
+  const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
+
   if (!caption) {
     return null
   }
 
-  const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
   if (isMobile) {
     caption = mobileify(caption)
   }
@@ -50,6 +51,7 @@ const caption = ({ caption }) => {
       style={{
         fontSize: 13.5,
         color: "slategrey",
+        textAlign: "left",
       }}
     >
       {parseAndRenderLinks(caption)}
@@ -57,4 +59,4 @@ const caption = ({ caption }) => {
   )
 }
 
-export default caption
+export default Caption

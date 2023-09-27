@@ -4,18 +4,17 @@ date: "2023-09-27"
 description: Learning protein representations. Transfer learning, protein language models, contextual embeddings, Transformers, masked language modeling, BERT, ESM, attention analysis.
 ---
 
-import AminoAcidEmbedding from "./AminoAcidEmbedding.jsx"
-import AminoAcidEmbeddingEncoding from "./AminoAcidEmbeddingEncoding.jsx"
-import CharacterEmbedding from "./CharacterEmbedding.jsx"
-import WordEmbedding from "./WordEmbedding.jsx"
+import AminoAcidEmbedding from "./d3/AminoAcidEmbedding.jsx"
+import AminoAcidEmbeddingEncoder from "./d3/AminoAcidEmbeddingEncoder.jsx"
+import CharacterEmbedding from "./d3/CharacterEmbedding.jsx"
+import WordEmbedding from "./d3/WordEmbedding.jsx"
+import AminoAcidOneHot from "./d3/AminoAcidOneHot.jsx"
 import Image from "../../../src/components/image.jsx"
 import { Link } from "gatsby"
 
-WIP...
-
----
-
 In the last decade, [next generation sequencing](https://en.wikipedia.org/wiki/Massive_parallel_sequencing) propelled biology into a new information age. This came with a happy conundrum: we now have many orders of magnitude more protein sequence data than structural or functional data. We uncovered massive tomes written in nature's language, the blueprint of our wondrous biological tapestry, from the budding of a seed to the beating of a heart. But more often than not, we lack the ability to understand them.
+
+<Image path={require("./images/PDB-sequences-vs-structures.png")} width="80%" />
 
 An important piece of the puzzle is the ability to predict the structure and function of a protein from its sequence.
 
@@ -54,11 +53,11 @@ The general problem of converting some data into a vector representation is call
 
 We want a function that takes an amino acid sequence and outputs representation vectors. This function is often called an **encoder**.
 
-<AminoAcidEmbeddingEncoding />
+<AminoAcidEmbeddingEncoder />
 
 ### Tokens
 
-In NLP lingo, each amino acid is a **token**. Like amino acid sequences, we can embed an English sentence in the same way, using characters as tokens.
+In NLP lingo, each amino acid is a **token**. Similarly, we can embed an English sentence in the same way, using characters as tokens.
 
 <CharacterEmbedding />
 
@@ -70,11 +69,13 @@ Current state-of-the-art language models use something in-between the two: _sub-
 
 ### Context matters
 
-If you are familiar with earlier NLP embedding models like [word2vec](https://en.wikipedia.org/wiki/Word2vec), our _contextualized_ embedding is slightly different.
+If you are familiar with NLP embedding models like [word2vec](https://en.wikipedia.org/wiki/Word2vec), the word _embedding_ might be a bit confusing. Vanilla embeddings – like the simplest [one-hot encodings](https://en.wikipedia.org/wiki/One-hot) or vectors created by word2vec – map each token to a _unique_ vector. They are much easier to create and often serves as _input_ to neural networks, which only understand numbers, not text.
 
-TODO:
+<AminoAcidOneHot />
 
-Two identical amino acids don't necessarily have the same embedding vector. This is because the embedding vector for each amino acid incorporates _context_ from its surrounding amino acids.
+In contrast, our _contextualized_ embedding vectors for each token, as the name suggests, incorporates _context_ from its surrounding tokens. Therefore, _two identical tokens don't necessarily have the same embedding vector_. These vectors are the _output_ of our neural networks.
+
+(For this reason, I refer to these contextualized embedding vectors as representation vectors – or simply representations – throughout this article.)
 
 If we want one vector that describes the the entire sequence – instead of a vector for each amino acid – we can simply average the values in each vector.
 
@@ -87,7 +88,7 @@ Remember, we are constructing these vectors purely from sequences in an unsuperv
 Let's come up with a task: given the sequence with some random positions masked away
 
 $$
-\text{L  T [MASK] A  A  L  Y [MASK] D  C}
+\text{L T [?] A A L Y [?] D C}
 $$
 
 which amino acids should go in the masked positions?
@@ -96,7 +97,7 @@ We know the ground truth label from the original sequence, which we can use to g
 
 This lets us take advantage of the wealth of known sequences (from publicly available large databases such as the [Protein Data Bank (PDB)](https://www.rcsb.org/)), each of which is now a labeled training example. In NLP, this approach is called **masked language modeling (MLM)**, a form of **self-supervised learning**.
 
-<Image path={require("./MLM.png")} />
+<Image path={require("./images/MLM.png")} />
 
 Though we will focus on masked language modeling in this article, another way to construct this self-supervision task is via **causal language modeling**: given some tokens, ask the model to predict the _next_ one. This is the approach used in OpenAI's GPT.
 
@@ -108,7 +109,7 @@ The first protein language encoder model of this kind is [UniRep](https://www.na
 
 More recently, transformer models that rely on a mechanism called **self- attention** have taken the spotlight. [BERT](<https://en.wikipedia.org/wiki/BERT_(language_model)>) stands for Bidirectional Encoder Representations from Transformer and is a class of state-of-the-art natural language encoders developed at Google. We will talk in some detail about a BERT-like encoder model applied to proteins.
 
-<Image path={require("./architecture.png")} />
+<Image path={require("./images/architecture.png")} />
 
 BERT consists of 12 encoder blocks, each containing a self-attention layer and a fully-connected layer. On the highest level, they are just a collection of numbers (**parameters**) learned by the model; each edge in the diagram represents a parameter.
 
@@ -116,7 +117,7 @@ Roughly speaking, the $\alpha_{ij}$ parameters in the self-attention layer, also
 
 Here's an example of attention scores of a transformer trained on a word-tokenized sentence:
 
-<Image path={require("./attention-viz.png")} width="80%" />
+<Image path={require("./images/attention-viz.png")} width="80%" />
 
 The token "it" attends strongly the token "animal" because of their close relationship – they refer to the same thing – whereas most other tokens are ignored. It is our goal to tease out similar _semantic_ relationships between amino acids.
 
@@ -131,7 +132,10 @@ I hoped to convey some basic intuition about self-attention and masked language 
 
 1. The attention computations are usually repeated many times independently and in parallel. Each layer in the neural net contains $N$ sets of attention scores, i.e. $N$ **attention heads** ($N = 12$ in BERT). The attention scores from the different heads are combined via a learned linear projection.
 
-2. The tokens need to be first converted into vectors before they can be processed by the neural net. TODO:
+2. The tokens first need to be converted into vectors before they can be processed by the neural net.
+
+   - For this we use a vanilla embedding of amino acids – like [one-hot encoding](https://en.wikipedia.org/wiki/One-hot) – not to be confused with our output representations often called contextualized embeddings.
+   - This input embedding contains a few other pieces of information, such as the [positions](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/) of each amino acid within the sequence.
 
 3. Following the original Transformer, BERT uses [layer normalization](https://arxiv.org/abs/1607.06450), a technique that makes training deep neural nets easier.
 
@@ -139,9 +143,7 @@ I hoped to convey some basic intuition about self-attention and masked language 
 
 ### Using the representation
 
-Once we have our representation vectors, we can train simple models like logistic regression with our vectors as input. This is the approach used in [ESM](https://github.com/facebookresearch/esm), achieving state-of-the-art performance on predictions of 3D contacts and mutation effects after seeing only a handful (!) of labeled training examples.
-
-This might be surprising, but we can think of the logistic regression model as merely teasing out the information already contained in the input representation, an easy task.
+Once we have our representation vectors, we can train simple models like logistic regression with our vectors as input. This is the approach used in [ESM](https://github.com/facebookresearch/esm), achieving state-of-the-art performance on predictions of 3D contacts and mutation effects. We can think of the logistic regression model as merely teasing out the information already contained in the input representation, an easy task.
 
 If you are interested in these results, check out [these](https://www.pnas.org/doi/full/10.1073/pnas.2016239118) [papers](https://www.biorxiv.org/content/10.1101/2020.12.15.422761v1) from the ESM team.
 
@@ -153,16 +155,22 @@ We've been talking a lot about all this "information" learned by our representat
 
 UniRep vectors capture biochemical properties of amino acids and phylogeny in sequences from different organisms.
 
-<Image path={require("./UniRep-clustering.png")} />
+<Image path={require("./images/UniRep-clustering.png")} />
 
 More incredibly, one of the neurons in UniRep's LSTM network showed firing patterns highly correlated with the [secondary structure](https://en.wikipedia.org/wiki/Protein_secondary_structure) of the protein: alpha helices and beta sheets. UniRep has clearly learned something meaningful about the protein's folded structure.
 
-<Image path={require("./UniRep-helix-sheet-neuron.png")} width="80%" />
+<Image path={require("./images/UniRep-helix-sheet-neuron.png")} width="80%" />
 
 ### Transformer models
 
 In NLP, the attention scores in Transformer models tend to relate to the semantic structure of sentences. Does attention in our protein language models also capture something meaningful?
 
-This paper looked at 5 unsupervised Transformer models on proteins sequences – all trained in the same BERT-inspired way we described.
+Let's look at 5 unsupervised Transformer models on proteins sequences – all trained in the same BERT-inspired way we described. Amino acid pairs that with high attention scores are more often in 3D contact in the folded structure, especially in the deeper layers.
 
-<Image path={require("./attention-contact.png")} />
+<Image path={require("./images/attention-contact.png")} />
+
+Similarly, a lot of attention is directed to [binding sites](https://en.wikipedia.org/wiki/Binding_site) – the functionally most important regions of a protein – throughout the layers.
+
+<Image path={require("./images/attention-binding-site.png")} />
+
+Applying supervised learning to attention scores – instead of output representations – also achieves astonishing performance in contact prediction. Compared to GREMLIN[https://openseq.org/], an MSA-based method similar to the one we talked about in the <Link to="/protein-evolution">previous post</Link>, logistic regression trained on ESM's attention scores yielded better performance after only seeing 20 (!) labeled training examples.

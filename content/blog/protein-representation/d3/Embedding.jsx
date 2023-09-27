@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 import * as d3 from "d3"
+import { useMediaQuery } from "react-responsive"
 
 const colors = [
   "lightblue",
@@ -8,44 +9,36 @@ const colors = [
   "lightskyblue",
   "lightgreen",
 ]
-const embeddings = [
-  { char: "t", embedding: [0.1, -0.2, 0.3, 0.4, -0.5] },
-  { char: "h", embedding: [-0.2, 0.3, -0.4, 0.1, 0.6] },
-  { char: "e", embedding: [0.3, 0.2, -0.1, -0.5, 0.4] },
-  { char: " ", embedding: [0, 0, 0, 0, 0] },
-  { char: "c", embedding: [0.4, -0.3, -0.2, 0.5, -0.1] },
-  { char: "a", embedding: [-0.5, 0.4, 0.2, -0.6, 0.3] },
-  { char: "t", embedding: [0.1, -0.2, 0.3, 0.4, -0.5] },
-  { char: " ", embedding: [0, 0, 0, 0, 0] },
-  { char: "s", embedding: [-0.4, 0.2, -0.5, 0.3, 0.1] },
-  { char: "a", embedding: [0.6, -0.1, 0.3, -0.4, -0.2] },
-  { char: "t", embedding: [0.1, -0.2, 0.3, 0.4, -0.5] },
-]
-const data = embeddings.map((row, i) => ({
-  id: i,
-  backgroundColor: colors[i % colors.length],
-  ...row,
-}))
 
-const CharacterEmbedding = () => {
+const Embedding = ({
+  embeddings,
+  width = 450,
+  height = 250,
+  tokenWidth = 20,
+}) => {
+  const data = embeddings.map((row, i) => ({
+    id: i,
+    backgroundColor: colors[i % colors.length],
+    ...row,
+  }))
+
   const svgRef = useRef()
   const [focusedCharIndex, setFocusedCharIndex] = useState(null)
-
-  const width = 450
+  const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
 
   useEffect(() => {
+    const embeddingLength = data[0].embedding.length
     const svg = d3.select(svgRef.current)
     svg.html("")
 
-    const margin = { top: 20, right: 20, bottom: 20, left: 20 }
+    const margin = 2
 
-    const tokenWidth = 20
     const sentenceXScale = d3
       .scaleLinear()
       .domain([0, data.length])
-      .range([margin.left, margin.left + tokenWidth * data.length])
+      .range([margin, margin + tokenWidth * data.length])
 
-    const characterHeight = 40
+    const tokenHeight = 40
     const charBackgrounds = svg.append("g")
     const chars = svg.append("g")
     charBackgrounds
@@ -54,9 +47,9 @@ const CharacterEmbedding = () => {
       .enter()
       .append("rect")
       .attr("x", (d, i) => sentenceXScale(i))
-      .attr("y", margin.top)
+      .attr("y", margin)
       .attr("width", tokenWidth)
-      .attr("height", characterHeight)
+      .attr("height", tokenHeight)
       .attr("fill", (d, i) => (i === focusedCharIndex ? "lightgrey" : "white"))
       .on("mouseover", (event, d) => {
         setFocusedCharIndex(d.id)
@@ -72,7 +65,7 @@ const CharacterEmbedding = () => {
       .append("text")
       .text(d => d.char)
       .attr("x", (d, i) => sentenceXScale(i + 0.5))
-      .attr("y", margin.top + 25)
+      .attr("y", margin + 25)
       .attr("cursor", "default")
       .attr("text-anchor", "middle")
       .on("mouseover", (event, d) => {
@@ -82,8 +75,16 @@ const CharacterEmbedding = () => {
         setFocusedCharIndex(null)
       })
 
-    const vectorBoxWidth = 50
-    const vectorBoxHeight = 40
+    const vectorBoxWidth = isMobile ? 32 : 50
+    const vectorBoxHeight = isMobile ? 35 : 40
+    const fontSize = isMobile ? 12 : 16
+    const spaceFromSequence = 80
+
+    // Some hacky math for mobile spacing – should probably improve this
+    const offsetXMultiplier = isMobile
+      ? window.innerWidth * (6 / (data.length * 5 * embeddingLength))
+      : 12
+    const offsetYMultiplier = 12
 
     // Container holding the stack of vectors
     const vectorsContainer = svg.append("g")
@@ -98,15 +99,17 @@ const CharacterEmbedding = () => {
         .on("mouseout", () => {
           setFocusedCharIndex(null)
         })
-      const offset = i * 12
+
+      const offsetX = i * offsetXMultiplier
+      const offsetY = i * offsetYMultiplier
 
       // Create background of the vector
       vectorContainer
         .append("g")
         .append("rect")
-        .attr("x", margin.left + offset)
-        .attr("y", margin.top + 100 + offset)
-        .attr("width", vectorBoxWidth * data[0].embedding.length)
+        .attr("x", margin + offsetX)
+        .attr("y", margin + spaceFromSequence + offsetY)
+        .attr("width", vectorBoxWidth * embeddingLength)
         .attr("height", vectorBoxHeight)
         .attr("fill", data[i].backgroundColor)
         .attr("stroke", "black")
@@ -119,8 +122,8 @@ const CharacterEmbedding = () => {
         .data(data[i].embedding)
         .enter()
         .append("rect")
-        .attr("x", (d, i) => margin.left + i * vectorBoxWidth + offset)
-        .attr("y", margin.top + 100 + offset)
+        .attr("x", (d, i) => margin + i * vectorBoxWidth + offsetX)
+        .attr("y", margin + spaceFromSequence + offsetY)
         .attr("width", vectorBoxWidth)
         .attr("height", vectorBoxHeight)
         .attr("fill", data[i].backgroundColor)
@@ -138,10 +141,13 @@ const CharacterEmbedding = () => {
         .attr("text-anchor", "middle")
         .attr(
           "x",
-          (d, i) =>
-            margin.left + i * vectorBoxWidth + offset + vectorBoxWidth / 2
+          (d, i) => margin + i * vectorBoxWidth + offsetX + vectorBoxWidth / 2
         )
-        .attr("y", margin.top + 100 + offset + 25)
+        .attr(
+          "y",
+          margin + spaceFromSequence + offsetY + vectorBoxHeight / 2 + 6
+        )
+        .attr("font-size", fontSize)
     }
 
     if (focusedCharIndex !== null) {
@@ -149,32 +155,34 @@ const CharacterEmbedding = () => {
       svg
         .append("line")
         .attr("x1", sentenceXScale(focusedCharIndex))
-        .attr("y1", margin.top + characterHeight)
-        .attr("x2", margin.left + focusedCharIndex * 12)
-        .attr("y2", margin.top + 100 + focusedCharIndex * 12)
+        .attr("y1", margin + tokenHeight)
+        .attr("x2", margin + focusedCharIndex * offsetXMultiplier)
+        .attr(
+          "y2",
+          margin + spaceFromSequence + focusedCharIndex * offsetYMultiplier
+        )
         .style("stroke", "gray")
         .style("stroke-width", 2)
       svg
         .append("line")
         .attr("x1", sentenceXScale(focusedCharIndex + 1))
-        .attr("y1", margin.top + characterHeight)
+        .attr("y1", margin + tokenHeight)
         .attr(
           "x2",
-          margin.left +
-            focusedCharIndex * 12 +
-            vectorBoxWidth * data[0].embedding.length
+          margin +
+            focusedCharIndex * offsetXMultiplier +
+            vectorBoxWidth * embeddingLength
         )
-        .attr("y2", margin.top + 100 + focusedCharIndex * 12)
+        .attr(
+          "y2",
+          margin + spaceFromSequence + focusedCharIndex * offsetYMultiplier
+        )
         .style("stroke", "gray")
         .style("stroke-width", 2)
     }
-  }, [focusedCharIndex])
+  }, [isMobile, data, focusedCharIndex, tokenWidth])
 
-  return (
-    <div style={{ textAlign: "center" }}>
-      <svg ref={svgRef} width={width} height={320} />
-    </div>
-  )
+  return <svg ref={svgRef} width={isMobile ? 350 : width} height={height} />
 }
 
-export default CharacterEmbedding
+export default Embedding
