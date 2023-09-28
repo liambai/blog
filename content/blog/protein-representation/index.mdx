@@ -9,10 +9,10 @@ import MSACoupling from "../protein-evolution/d3/MSACoupling.jsx"
 import AminoAcidEmbeddingEncoder from "./d3/AminoAcidEmbeddingEncoder.jsx"
 import CharacterEmbedding from "./d3/CharacterEmbedding.jsx"
 import WordEmbedding from "./d3/WordEmbedding.jsx"
+import Figure from "../../../src/components/figure.jsx"
 import Image from "../../../src/components/image.jsx"
 import { Link } from "gatsby"
 import { Reference, ReferenceList } from "./References.jsx"
-import Figure from "../../../src/components/figure.jsx"
 
 In the last decade, [DNA sequencing technology](https://ourworldindata.org/grapher/cost-of-sequencing-a-full-human-genome) propelled biology into a new information age. This came with a happy conundrum: we now have many orders of magnitude more protein sequences than structural or functional data. We uncovered massive tomes written in nature's language – the blueprint of our wondrous biological tapestry – but lack the ability to understand them.
 
@@ -52,7 +52,7 @@ approaches like this:
 
 2. Use the representation vectors as input to some supervised learning model. The information-rich representation has hopefully made this easier that 1) we don't need as much labeled data and 2) the model we use can be simpler, such as linear or logistic [regression](https://en.wikipedia.org/wiki/Regression_analysis).
 
-This is referred to as [**transfer learning**](https://en.wikipedia.org/wiki/Transfer_learning): the knowledge learned by the representation (1.) is later _transferred_ to a supervised task (2.).
+This is referred to as **transfer learning**: the knowledge learned by the representation (1.) is later _transferred_ to a supervised task (2.).
 
 ## What about MSAs?
 
@@ -77,9 +77,7 @@ One way to look at the models in this article is that they are answers to that q
 
 ## Representation learning
 
-The general problem of converting some data into a vector representation is called [representation learning](https://en.wikipedia.org/wiki/Feature_learning), an important technique in **natural language processing (NLP)**. Let's apply it to proteins.
-
-We're looking for a function, an **encoder**, that takes an amino acid sequence and outputs representation vectors.
+The general problem of converting some data into a vector representation is called [representation learning](https://en.wikipedia.org/wiki/Feature_learning), an important technique in **natural language processing (NLP)**. In the context of proteins, we're looking for a function, an **encoder**, that takes an amino acid sequence and outputs representation vectors.
 
 <Figure content={<AminoAcidEmbeddingEncoder />}>
   An encoder converts a sequence into representation vectors. The length of each
@@ -147,8 +145,8 @@ Here's an example of attention scores of a transformer trained on a word-tokeniz
 <Figure
   content={<Image path={require("./images/attention-viz.png")} width="80%" />}
 >
-  Self-attention visualization of a word-tokenized sentence. Deep blue indicates
-  high attention score.
+  Self-attention visualization of a word-tokenized sentence. Deeper blue
+  indicates higher attention score.
 </Figure>
 
 The token "it" attends strongly the token "animal" because of their close relationship – they refer to the same thing – whereas most other tokens are ignored. It is our goal to tease out similar _semantic_ relationships between amino acids.
@@ -226,9 +224,9 @@ Let's look at 5 unsupervised Transformer models on proteins sequences – all tr
 
 <Figure content={<Image path={require("./images/attention-contact.png")} />}>
   The percentage of high-confidence attention scores that correspond to amino
-  acids positions in 3D contact. Deep blue reflects high correlation between
+  acids positions in 3D contact. Deeper blue reflects higher correlation between
   attention scores and contacts. Data is shown for each attention head in each
-  layer, across 5 BERT-like protein language models. Figure from{" "}
+  layer, across 5 BERT-like protein language models. Figure from
   <Reference id={6} />.
 </Figure>
 

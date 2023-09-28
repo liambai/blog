@@ -47,9 +47,11 @@ Knowing $P$ is powerful. It lends us insight into sequences that we've never enc
 <Figure content={<Distributions />}>
   Hover over the bars to see the probabilities. Sequence probabilities are made
   up but follow some expected patterns: sequences that resemble sequences in the
-  MSA have higher probabilities. The sequence space is mind-bendingly vast: the
-  number of possible 10 amino acid sequences is 20^10 (~10 trillion) because
-  there are 20 amino acids; the bar graph is very truncated.
+  MSA have higher probabilities. The set of all possible sequences (the
+  [sequence space](https://en.wikipedia.org/wiki/Sequence_space_(evolution))) is
+  mind-bendingly vast: the number of possible 10 amino acid sequences is 20^10
+  (~10 trillion) because there are 20 amino acids. The bar graph is very
+  truncated.
 </Figure>
 
 ### Counting amino acid frequencies
@@ -66,7 +68,7 @@ To measure this, let's count the frequencies of observing each amino acid at eac
   Hover over the MSA to compute amino acid frequencies at each position.
 </Figure>
 
-If we compile these frequencies into a matrix, we get what is known as a [**position-specific scoring matrix (PSSM)**](https://en.wikipedia.org/wiki/Position_weight_matrix), commonly visualized as a [sequence logo](https://en.wikipedia.org/wiki/Sequence_logo).
+If we compile these frequencies into a matrix, we get what is known as a **position-specific scoring matrix (PSSM)**, commonly visualized as a [sequence logo](https://en.wikipedia.org/wiki/Sequence_logo).
 
 <Figure
   content={<Image path={require("./images/sequence-logo.png")} width="90%" />}
@@ -111,7 +113,7 @@ $$
 
 As it turns out, physicists have studied this function since the 1950s, in a different context: the interacting spins of particles in solids like magnets. The $J_{ij}$ terms capture the energy cost of particles $i$ and $j$ coupling with each other in their respective states: its magnitude is big if they interact, small if they don't; the $h_i$ terms capture the energy cost of each particle being in its own state.
 
-They call this the [**Potts model**](https://en.wikipedia.org/wiki/Potts_model), and a fancy name for the energy function is the [Hamiltonian](<https://en.wikipedia.org/wiki/Hamiltonian_(quantum_mechanics)>). This fascinating field of physics applying these statistical models to explain macroscopic behaviors of matter is called [statistical mechanics](https://en.wikipedia.org/wiki/Statistical_mechanics).
+They call this the **Potts model**, and a fancy name for the energy function is the [Hamiltonian](<https://en.wikipedia.org/wiki/Hamiltonian_(quantum_mechanics)>). This fascinating field of physics applying these statistical models to explain macroscopic behaviors of matter is called [statistical mechanics](https://en.wikipedia.org/wiki/Statistical_mechanics).
 
 <Figure content={<Image path={require("./images/potts.png")} width="50%" />}>
   The Potts model on a square lattice. Black and white dots are in different
@@ -141,7 +143,7 @@ $$
 J_{ij}(A_i, A_j) = - (C^{-1})_{ij}(A_i, A_j)
 $$
 
-The theory behind these steps is involved and beyond our scope, but intuitively, we can think of the matrix inversion as an averaging step that incorporates all pair correlations globally. This method is called [**Direct Coupling Analysis (DCA)**](https://en.wikipedia.org/wiki/Direct_coupling_analysis).
+The theory behind these steps is involved and beyond our scope, but intuitively, we can think of the matrix inversion as an averaging step that incorporates all pair correlations globally. This method is called **Direct Coupling Analysis (DCA)**.
 
 ### The distribution
 
@@ -192,11 +194,11 @@ $$
 where the $J_{ij}$'s are the global interaction terms obtained by mean-field approximation, and the $\tilde{h}$ terms can be calculated by imposing the following constraints:
 
 $$
-\sum_{A_j \in \mathcal X}P_{i j}^{D i r}\left(A_i, A_j\right) = f_i(A_i)
+\sum_{A_j \in \mathcal X}P_{i j}^{D i r}\left(A_i, A_j\right) = f_i(A_i) \tag{1}
 $$
 
 $$
-\sum_{A_i \in \mathcal X}P_{i j}^{D i r}\left(A_i, A_j\right) = f_j(A_j)
+\sum_{A_i \in \mathcal X}P_{i j}^{D i r}\left(A_i, A_j\right) = f_j(A_j) \tag{2}
 $$
 
 These constraints ensure that $P_{i j}^{D i r}$ follows the single amino acid frequencies we observe. For each pair of positions:
