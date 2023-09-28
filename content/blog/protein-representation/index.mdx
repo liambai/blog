@@ -122,7 +122,15 @@ We know the ground truth label from the original sequence, which we can use to g
 
 This lets us take advantage of the wealth of known sequences, each of which is now a labeled training example. In NLP, this approach is called **masked language modeling (MLM)**, a form of **self-supervised learning**.
 
-<Figure content={<Image path={require("./images/MLM.png")} />} />
+<Figure
+  content={
+    <Image path={require("./images/MLM.png")} style={{ marginBottom: 5 }} />
+  }
+>
+  The masked language modelling objective. Hide a token (in this case, R) and
+  ask the encoder model to predict the hidden token. The encoder model is set up
+  to generate representation vectors as a side effect.
+</Figure>
 
 Though we will focus on masked language modeling in this article, another way to construct this self-supervision task is via **causal language modeling**: given some tokens, ask the model to predict the _next_ one. This is the approach used in OpenAI's GPT.
 
@@ -134,7 +142,16 @@ The first protein language encoder model of this kind is [UniRep](https://www.na
 
 More recently, **Transformer models** that rely on a mechanism called **self- attention** have taken the spotlight <Reference id={5} />. [BERT](<https://en.wikipedia.org/wiki/BERT_(language_model)>) stands for Bidirectional Encoder Representations from Transformer and is a state-of-the-art natural language encoder developed at Google <Reference id={2} />. We'll focus on a BERT-like encoder model applied to proteins.
 
-<Figure content={<Image path={require("./images/architecture.png")} />} />
+<Figure
+  content={
+    <Image
+      path={require("./images/architecture.png")}
+      style={{ marginBottom: 5 }}
+    />
+  }
+>
+  A simplified diagram of BERT's architecture.
+</Figure>
 
 BERT consists of 12 encoder blocks, each containing a self-attention layer and a fully-connected layer. On the highest level, they are just a collection of numbers (**parameters**) learned by the model; each edge in the diagram represents a parameter.
 
