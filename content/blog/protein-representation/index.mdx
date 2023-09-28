@@ -9,20 +9,26 @@ import MSACoupling from "../protein-evolution/d3/MSACoupling.jsx"
 import AminoAcidEmbeddingEncoder from "./d3/AminoAcidEmbeddingEncoder.jsx"
 import CharacterEmbedding from "./d3/CharacterEmbedding.jsx"
 import WordEmbedding from "./d3/WordEmbedding.jsx"
-import AminoAcidOneHot from "./d3/AminoAcidOneHot.jsx"
 import Image from "../../../src/components/image.jsx"
 import { Link } from "gatsby"
 import { Reference, ReferenceList } from "./References.jsx"
+import Figure from "../../../src/components/figure.jsx"
 
 In the last decade, [DNA sequencing technology](https://ourworldindata.org/grapher/cost-of-sequencing-a-full-human-genome) propelled biology into a new information age. This came with a happy conundrum: we now have many orders of magnitude more protein sequences than structural or functional data. We uncovered massive tomes written in nature's language – the blueprint of our wondrous biological tapestry – but lack the ability to understand them.
 
-<Image
-  path={require("./images/PDB-sequences-vs-structures.png")}
-  caption="
-      The red and yellow lines represent the number of available sequences in public online databases; the blue line represents the number of available structures, whose increase is unnoticeable in comparison. Figure from {1}.
-   "
-  width="80%"
-/>
+<Figure
+  content={
+    <Image
+      path={require("./images/PDB-sequences-vs-structures.png")}
+      width="80%"
+    />
+  }
+>
+  The red and yellow lines represent the number of available sequences in public
+  online databases; the blue line represents the number of available structures,
+  whose increase is unnoticeable in comparison. Figure from
+  <Reference id={1} />.
+</Figure>
 
 An important piece of the puzzle is the ability to predict the structure and function of a protein from its sequence.
 
@@ -37,7 +43,12 @@ approaches like this:
 
 1. Come up with a vector representation of the protein sequence that captures its important features. The vectors are called **contextualized embeddings**. This is no easy task: it's where the heavy lifting happens and will be the subject of this article.
 
-   <AminoAcidEmbedding caption="Representation vectors are created from the amino acid sequence. Each vector corresponds to an amino acid. The values in the vectors are made up. The length of each vector is typically between several hundred to a few thousand." />
+   <Figure content={<AminoAcidEmbedding />}>
+     Representation vectors are created from the amino acid sequence. Each
+     vector corresponds to an amino acid. The values in the vectors are made up.
+     The length of each vector is typically between several hundred to a few
+     thousand.
+   </Figure>
 
 2. Use the representation vectors as input to some supervised learning model. The information-rich representation has hopefully made this easier that 1) we don't need as much labeled data and 2) the model we use can be simpler, such as linear or logistic [regression](https://en.wikipedia.org/wiki/Regression_analysis).
 
@@ -47,11 +58,12 @@ This is referred to as [**transfer learning**](https://en.wikipedia.org/wiki/Tra
 
 We talked in a <Link to="/protein-evolution">previous post</Link> about ways to leverage the information hidden in Multiple Sequence Alignments (MSAs): the co-evolutionary data of proteins.
 
-<MSACoupling
-  caption="
-    An MSA contains different variants of a sequence. The structure sketches how the amino acid chain might fold in space (try dragging the nodes). Hover over each row in the MSA to see the corresponding amino acid in the folded structure. Hover over the blue link to highlight the contacting positions. 
-  "
-/>
+<Figure content={<MSACoupling />}>
+  An MSA contains different variants of a sequence. The structure sketches how
+  the amino acid chain might fold in space (try dragging the nodes). Hover over
+  each row in the MSA to see the corresponding amino acid in the folded
+  structure. Hover over the blue link to highlight the contacting positions.
+</Figure>
 
 We talked about robust statistical methods that accomplish:
 
@@ -69,21 +81,20 @@ The general problem of converting some data into a vector representation is call
 
 We're looking for a function, an **encoder**, that takes an amino acid sequence and outputs representation vectors.
 
-<AminoAcidEmbeddingEncoder
-  caption="
-      An encoder converts a sequence into representation vectors. The length of each vector is typically between several hundred to a few thousand.
-   "
-/>
+<Figure content={<AminoAcidEmbeddingEncoder />}>
+  An encoder converts a sequence into representation vectors. The length of each
+  vector is typically between several hundred to a few thousand.
+</Figure>
 
 ### Tokens
 
 In NLP lingo, each amino acid is a **token**. An English sentence can be represented in the same way, using characters as tokens.
 
-<CharacterEmbedding />
+<Figure content={<CharacterEmbedding />} />
 
 As an aside, words are also a reasonable choice for tokens in natural language.
 
-<WordEmbedding />
+<Figure content={<WordEmbedding />} />
 
 Current state-of-the-art language models use something in-between the two: _sub-word_ tokens. [tiktoken](https://github.com/openai/tiktoken) is the tokenizer used by OpenAI to break sentences down into lists of sub-word tokens.
 
@@ -113,7 +124,7 @@ We know the ground truth label from the original sequence, which we can use to g
 
 This lets us take advantage of the wealth of known sequences, each of which is now a labeled training example. In NLP, this approach is called **masked language modeling (MLM)**, a form of **self-supervised learning**.
 
-<Image path={require("./images/MLM.png")} />
+<Figure content={<Image path={require("./images/MLM.png")} />} />
 
 Though we will focus on masked language modeling in this article, another way to construct this self-supervision task is via **causal language modeling**: given some tokens, ask the model to predict the _next_ one. This is the approach used in OpenAI's GPT.
 
@@ -125,7 +136,7 @@ The first protein language encoder model of this kind is [UniRep](https://www.na
 
 More recently, **Transformer models** that rely on a mechanism called **self- attention** have taken the spotlight <Reference id={5} />. [BERT](<https://en.wikipedia.org/wiki/BERT_(language_model)>) stands for Bidirectional Encoder Representations from Transformer and is a state-of-the-art natural language encoder developed at Google <Reference id={2} />. We'll focus on a BERT-like encoder model applied to proteins.
 
-<Image path={require("./images/architecture.png")} />
+<Figure content={<Image path={require("./images/architecture.png")} />} />
 
 BERT consists of 12 encoder blocks, each containing a self-attention layer and a fully-connected layer. On the highest level, they are just a collection of numbers (**parameters**) learned by the model; each edge in the diagram represents a parameter.
 
@@ -133,13 +144,12 @@ Roughly speaking, the $\alpha_{ij}$ parameters in the self-attention layer (also
 
 Here's an example of attention scores of a transformer trained on a word-tokenized sentence:
 
-<Image
-  path={require("./images/attention-viz.png")}
-  caption="
-      Self-attention visualization of a word-tokenized sentence. Deep blue indicates high attention score.
-   "
-  width="80%"
-/>
+<Figure
+  content={<Image path={require("./images/attention-viz.png")} width="80%" />}
+>
+  Self-attention visualization of a word-tokenized sentence. Deep blue indicates
+  high attention score.
+</Figure>
 
 The token "it" attends strongly the token "animal" because of their close relationship – they refer to the same thing – whereas most other tokens are ignored. It is our goal to tease out similar _semantic_ relationships between amino acids.
 
@@ -177,20 +187,36 @@ We've been talking a lot about all this "information" learned by our representat
 
 UniRep vectors capture biochemical properties of amino acids and phylogeny in sequences from different organisms.
 
-<Image
-  path={require("./images/UniRep-clustering.png")}
-  caption="(Left) Feed a single amino acid into UniRep and take the output representation vector. Applying [PCA](https://en.wikipedia.org/wiki/Principal_component_analysis) and plotting the representation vector obtained for each amino acid along the top 3 principle components, we see a clustering by biochemical properties. (Right) For an organism, take all of its protein sequences (its proteome), feed each one into UniRep, and average over all of them to obtain a proteome-average representation vector. Applying [t-SNE](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding) to visualize these vectors in 2-dimensions, we see a clustering by phylogeny. Figure from {1}."
-/>
+<Figure content={<Image path={require("./images/UniRep-clustering.png")} />}>
+  (Left) Feed a single amino acid into UniRep and take the output representation
+  vector. Applying
+  [PCA](https://en.wikipedia.org/wiki/Principal_component_analysis) and plotting
+  the representation vector obtained for each amino acid along the top 3
+  principle components, we see a clustering by biochemical properties. (Right)
+  For an organism, take all of its protein sequences (its proteome), feed each
+  one into UniRep, and average over all of them to obtain a proteome-average
+  representation vector. Applying
+  [t-SNE](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding)
+  to visualize these vectors in 2-dimensions, we see a clustering by phylogeny.
+  Figure from <Reference id={1} />.
+</Figure>
 
 More incredibly, one of the neurons in UniRep's LSTM network showed firing patterns highly correlated with the [secondary structure](https://en.wikipedia.org/wiki/Protein_secondary_structure) of the protein: alpha helices and beta sheets. UniRep has clearly learned meaningful signals about the protein's folded structure.
 
-<Image
-  path={require("./images/UniRep-helix-sheet-neuron.png")}
-  caption="
-      The activations of the neuron are overlaid with the 3D structure of the [Lac repressor protein](https://en.wikipedia.org/wiki/Lac_repressor). The neuron has high positive activations at positions that correspond to an alpha helix, and high negative activations at positions that correspond to an beta sheet. Figure from {1}.
-   "
-  width="80%"
-/>
+<Figure
+  content={
+    <Image
+      path={require("./images/UniRep-helix-sheet-neuron.png")}
+      width="80%"
+    />
+  }
+>
+  The activations of the neuron are overlaid with the 3D structure of the [Lac
+  repressor protein](https://en.wikipedia.org/wiki/Lac_repressor). The neuron
+  has high positive activations at positions that correspond to an alpha helix,
+  and high negative activations at positions that correspond to an beta sheet.
+  Figure from <Reference id={1} />.
+</Figure>
 
 ### Transformer models
 
@@ -198,21 +224,23 @@ In NLP, the attention scores in Transformer models tend to relate to the semanti
 
 Let's look at 5 unsupervised Transformer models on proteins sequences – all trained in the same BERT-inspired way we described <Reference id={6} />. Amino acid pairs that with high attention scores are more often in 3D contact in the folded structure, especially in the deeper layers.
 
-<Image
-  path={require("./images/attention-contact.png")}
-  caption="
-      The percentage of high-confidence attention scores that correspond to amino acids positions in 3D contact. Deep blue reflects high correlation between attention scores and contacts. Data is shown for each attention head in each layer, across 5 BERT-like protein language models. Figure from {6}.
-   "
-/>
+<Figure content={<Image path={require("./images/attention-contact.png")} />}>
+  The percentage of high-confidence attention scores that correspond to amino
+  acids positions in 3D contact. Deep blue reflects high correlation between
+  attention scores and contacts. Data is shown for each attention head in each
+  layer, across 5 BERT-like protein language models. Figure from{" "}
+  <Reference id={6} />.
+</Figure>
 
 Similarly, a lot of attention is directed to [binding sites](https://en.wikipedia.org/wiki/Binding_site) – the functionally most important regions of a protein – throughout the layers.
 
-<Image
-  path={require("./images/attention-binding-site.png")}
-  caption="
-      The percentage of high-confidence attention scores that correspond to binding sites. These are positions j part of binding sites that have high α_ij, i.e. that have attention directed to them. Figure from {6}.
-   "
-/>
+<Figure
+  content={<Image path={require("./images/attention-binding-site.png")} />}
+>
+  The percentage of high-confidence attention scores that correspond to binding
+  sites. These are positions j part of binding sites that have high $\alpha_{ij}
+  $, i.e. that have attention directed to them. Figure from <Reference id={6} />.
+</Figure>
 
 Applying supervised learning to attention scores – instead of output representations – also achieves astonishing performance in contact prediction. Compared to [GREMLIN](https://openseq.org/), an MSA-based method similar to the one we talked about in the <Link to="/protein-evolution">previous post</Link>, logistic regression trained on ESM's attention scores yielded better performance after only seeing 20 (!) labeled training examples.
 

@@ -3,7 +3,6 @@ import * as d3 from "d3"
 import { useMediaQuery } from "react-responsive"
 
 import { nodeIds, MSAData } from "./MSA"
-import Viz from "../../../../src/components/viz"
 
 const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
   const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
@@ -91,14 +90,11 @@ const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
         margin: "auto",
         display: "flex",
         flexDirection: "column",
-        marginBottom: -20,
       }}
     >
       <h5 style={{ margin: "auto" }}>MSA</h5>
       <svg ref={headerRef} />
-      <table style={{ tableLayout: "fixed" }} ref={tableRef}>
-        <tbody></tbody>
-      </table>
+      <table style={{ tableLayout: "fixed" }} ref={tableRef} />
     </div>
   )
 }
@@ -236,24 +232,23 @@ const NetworkViz = ({ focusedNodes, setFocusedNodes }) => {
   )
 }
 
-const MSACoupling = ({ caption }) => {
+const MSACoupling = () => {
   const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
   const [focusedNodes, setFocusedNodes] = useState([])
   return (
-    <Viz caption={caption}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: isMobile ? "column-reverse" : "row",
-        }}
-      >
-        <MSAViz focusedNodes={focusedNodes} setFocusedNodes={setFocusedNodes} />
-        <NetworkViz
-          focusedNodes={focusedNodes}
-          setFocusedNodes={setFocusedNodes}
-        />
-      </div>
-    </Viz>
+    <div
+      style={{
+        display: "flex",
+        marginBottom: 10,
+        flexDirection: isMobile ? "column-reverse" : "row",
+      }}
+    >
+      <MSAViz focusedNodes={focusedNodes} setFocusedNodes={setFocusedNodes} />
+      <NetworkViz
+        focusedNodes={focusedNodes}
+        setFocusedNodes={setFocusedNodes}
+      />
+    </div>
   )
 }
 

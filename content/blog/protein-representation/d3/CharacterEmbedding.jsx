@@ -1,7 +1,6 @@
 import React from "react"
 
 import Embedding from "./Embedding"
-import Viz from "../../../../src/components/viz"
 
 const embeddings = [
   { char: "t", embedding: [0.1, -0.2, 0.3, 0.4, -0.5] },
@@ -17,12 +16,8 @@ const embeddings = [
   { char: "t", embedding: [0.1, -0.2, 0.2, 0.3, -0.2] },
 ]
 
-const CharacterEmbedding = ({ caption }) => {
-  return (
-    <Viz caption={caption}>
-      <Embedding embeddings={embeddings} />
-    </Viz>
-  )
+const CharacterEmbedding = () => {
+  return <Embedding embeddings={embeddings} />
 }
 
 export default CharacterEmbedding

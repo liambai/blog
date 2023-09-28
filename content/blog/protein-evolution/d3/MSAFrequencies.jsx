@@ -4,9 +4,8 @@ import { BlockMath } from "react-katex"
 import { useMediaQuery } from "react-responsive"
 
 import { nodeIds, MSA, MSAData } from "./MSA"
-import Viz from "../../../../src/components/viz"
 
-const MSAFrequencies = ({ caption }) => {
+const MSAFrequencies = () => {
   const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
   const width = isMobile ? 300 : 350
   const height = 50
@@ -104,43 +103,39 @@ const MSAFrequencies = ({ caption }) => {
   }
 
   return (
-    <Viz caption={caption}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: isMobile ? "column-reverse" : "row",
+        marginBottom: 10,
+      }}
+    >
       <div
         style={{
+          width: width,
           display: "flex",
-          flexDirection: isMobile ? "column-reverse" : "row",
-          marginBottom: -20,
+          flexDirection: "column",
+          margin: isMobile ? "auto" : 0,
         }}
       >
-        <div
-          style={{
-            width: width,
-            display: "flex",
-            flexDirection: "column",
-            margin: isMobile ? "auto" : 0,
-          }}
-        >
-          <svg ref={headerRef} />
-          <table style={{ tableLayout: "fixed" }} ref={tableRef}>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div
-          style={{
-            margin: "auto",
-            height: isMobile ? 130 : "none",
-          }}
-        >
-          {focusedColumn && (
-            <div>
-              {equations.map(equation => (
-                <BlockMath key={equation}>{equation}</BlockMath>
-              ))}
-            </div>
-          )}
-        </div>
+        <svg ref={headerRef} />
+        <table style={{ tableLayout: "fixed" }} ref={tableRef} />
       </div>
-    </Viz>
+      <div
+        style={{
+          margin: "auto",
+          height: isMobile ? 130 : "none",
+        }}
+      >
+        {focusedColumn && (
+          <div>
+            {equations.map(equation => (
+              <BlockMath key={equation}>{equation}</BlockMath>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   )
 }
 

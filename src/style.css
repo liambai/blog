@@ -217,7 +217,6 @@ blockquote > ol {
 
 table {
   width: 100%;
-  margin-bottom: var(--spacing-8);
   border-collapse: collapse;
   border-spacing: 0.25rem;
 }
@@ -320,7 +319,6 @@ a:focus {
 
 .figure {
   margin: var(--spacing-0) var(--spacing-0) var(--spacing-8) var(--spacing-0);
-  text-align: center;
 }
 
 .math-display {

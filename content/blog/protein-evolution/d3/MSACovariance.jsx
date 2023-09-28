@@ -4,7 +4,6 @@ import { BlockMath } from "react-katex"
 import { useMediaQuery } from "react-responsive"
 
 import { nodeIds, MSA, MSAData } from "./MSA"
-import Viz from "../../../../src/components/viz"
 
 const MSAViz = ({ focusedColumn, setFocusedColumn }) => {
   const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
@@ -112,7 +111,7 @@ const MSAViz = ({ focusedColumn, setFocusedColumn }) => {
       style={{
         display: "flex",
         flexDirection: isMobile ? "column-reverse" : "row",
-        marginBottom: -20,
+        marginBottom: 10,
       }}
     >
       <div
@@ -124,9 +123,7 @@ const MSAViz = ({ focusedColumn, setFocusedColumn }) => {
         }}
       >
         <svg ref={headerRef} />
-        <table style={{ tableLayout: "fixed" }} ref={tableRef}>
-          <tbody></tbody>
-        </table>
+        <table style={{ tableLayout: "fixed" }} ref={tableRef} />
       </div>
       <div style={{ margin: "auto", height: isMobile ? 175 : "none" }}>
         {focusedColumn && (
@@ -141,16 +138,11 @@ const MSAViz = ({ focusedColumn, setFocusedColumn }) => {
   )
 }
 
-const MSACovariance = ({ caption }) => {
+const MSACovariance = () => {
   const [focusedColumn, setFocusedColumn] = useState(null)
 
   return (
-    <Viz caption={caption}>
-      <MSAViz
-        focusedColumn={focusedColumn}
-        setFocusedColumn={setFocusedColumn}
-      />
-    </Viz>
+    <MSAViz focusedColumn={focusedColumn} setFocusedColumn={setFocusedColumn} />
   )
 }
 

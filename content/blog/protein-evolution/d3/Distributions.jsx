@@ -2,8 +2,6 @@ import React, { useEffect, useRef } from "react"
 import * as d3 from "d3"
 import { useMediaQuery } from "react-responsive"
 
-import Viz from "../../../../src/components/viz"
-
 const dieProbs = {
   1: 1 / 6,
   2: 1 / 6,
@@ -14,9 +12,9 @@ const dieProbs = {
 }
 
 const seqProbs = {
-  ATRAALYEDC: 0.1,
-  ATRATLYEDC: 0.12,
-  ATRCTLYEDC: 0.09,
+  LTRAALYEDC: 0.1,
+  LTRATLYEDC: 0.12,
+  LTRCTLYEDC: 0.09,
   TTRCTLTTDT: 0.01,
   TTRCTLYEDC: 0.03,
 }
@@ -140,33 +138,31 @@ const HorizontalPDFGraph = ({
   )
 }
 
-const Distributions = ({ caption }) => {
+const Distributions = () => {
   const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
   return (
-    <Viz caption={caption}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: isMobile ? "column" : "row",
-        }}
-      >
-        <HorizontalPDFGraph
-          probs={dieProbs}
-          title="Die outcomes"
-          width={isMobile ? 300 : 250}
-          leftLabelSpace={isMobile ? 100 : 25}
-          labelLength={25}
-        />
-        <HorizontalPDFGraph
-          probs={seqProbs}
-          title="Sequences in a given family"
-          width={isMobile ? 300 : 400}
-          leftLabelSpace={isMobile ? 100 : 100}
-          labelLength={100}
-          incomplete
-        />
-      </div>
-    </Viz>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: isMobile ? "column" : "row",
+      }}
+    >
+      <HorizontalPDFGraph
+        probs={dieProbs}
+        title="Die outcomes"
+        width={isMobile ? 300 : 250}
+        leftLabelSpace={isMobile ? 100 : 25}
+        labelLength={25}
+      />
+      <HorizontalPDFGraph
+        probs={seqProbs}
+        title="Sequences in a given family"
+        width={isMobile ? 300 : 400}
+        leftLabelSpace={isMobile ? 100 : 100}
+        labelLength={100}
+        incomplete
+      />
+    </div>
   )
 }
 

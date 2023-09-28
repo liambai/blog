@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from "react"
 import * as d3 from "d3"
 
 import Embedding from "./Embedding"
-import Viz from "../../../../src/components/viz"
 
 const embeddings = [
   { char: "L", embedding: [0.1, -0.2, 0.3, 0.4, -0.5] },
@@ -17,7 +16,7 @@ const embeddings = [
   { char: "C", embedding: [0.6, -0.1, 0.3, -0.4, -0.2] },
 ]
 
-const AminoAcidEmbeddingEncoder = ({ caption }) => {
+const AminoAcidEmbeddingEncoder = () => {
   const labelSvgRef = useRef()
   useEffect(() => {
     // Draw the horizontal label
@@ -40,12 +39,10 @@ const AminoAcidEmbeddingEncoder = ({ caption }) => {
   }, [])
 
   return (
-    <Viz caption={caption}>
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <svg ref={labelSvgRef} width={80} height={260} />
-        <Embedding embeddings={embeddings} />
-      </div>
-    </Viz>
+    <div style={{ display: "flex", justifyContent: "center" }}>
+      <svg ref={labelSvgRef} width={80} height={260} />
+      <Embedding embeddings={embeddings} />
+    </div>
   )
 }
 
