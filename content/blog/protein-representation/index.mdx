@@ -20,7 +20,7 @@ In the last decade, [DNA sequencing technology](https://ourworldindata.org/graph
   content={
     <Image
       path={require("./images/PDB-sequences-vs-structures.png")}
-      width="80%"
+      width="70%"
     />
   }
 >
@@ -36,10 +36,9 @@ $$
 \text{sequence} \longrightarrow \text{structure or function}
 $$
 
-Looking at this as a machine learning problem, structural or functional data are **labels**. In **supervised learning**, we show many sequences to our model and iteratively correct its predictions based on how closely they match the corresponding, expected labels.
+In this case, structural or functional data are **labels**. In **supervised learning**, we would show our model many sequences and iteratively correct its predictions based on how closely they match the corresponding, expected labels.
 
-When labels are rare, as in our case with proteins, we need to resort to more **unsupervised**
-approaches like this:
+When labels are rare, as in our case with proteins, we need to rely on more **unsupervised** approaches like this:
 
 1. Come up with a vector representation of the protein sequence that captures its important features. The vectors are called **contextualized embeddings**. This is no easy task: it's where the heavy lifting happens and will be the subject of this article.
 
@@ -65,7 +64,7 @@ We talked in a <Link to="/protein-evolution">previous post</Link> about ways to 
   structure. Hover over the blue link to highlight the contacting positions.
 </Figure>
 
-We talked about robust statistical methods that accomplish:
+We talked about robust statistical models that accomplish:
 
 $$
 \text{sequence} + \text{MSA} \longrightarrow \text{structure or function}
@@ -73,11 +72,11 @@ $$
 
 However, those techniques don't work well on proteins that are rare in nature or designed [_de novo_](https://www.nature.com/articles/nature19946), where we don't have enough co-evolutionary data to construct a good MSA. In those cases, can we still make reasonable predictions based on a _single_ amino acid sequence?
 
-One way to look at the models in this article is that they are answers to that question. They pick up where MSAs fail. Moreover, models that don't rely on MSAs aren't limited to a single protein family: they understand some fundamental properties of _all_ proteins.
+One way to look at the models in this article is that they are answers to that question, picking up where MSAs fail. Moreover, models that don't rely on MSAs aren't limited to a single protein family: they understand some fundamental properties of _all_ proteins. Beyond utility, they offer a window into how proteins work on an abstraction level higher than physics – on the level of manipulatable parts and interactions – akin to [linguistics](https://moalquraishi.wordpress.com/2018/02/15/protein-linguistics/).
 
 ## Representation learning
 
-The general problem of converting some data into a vector representation is called [representation learning](https://en.wikipedia.org/wiki/Feature_learning), an important technique in **natural language processing (NLP)**. In the context of proteins, we're looking for a function, an **encoder**, that takes an amino acid sequence and outputs representation vectors.
+The general problem of converting some data into a vector representation is called [representation learning](https://en.wikipedia.org/wiki/Feature_learning), an important technique in **natural language processing (NLP)**. In the context of proteins, we're looking for a function, an **encoder**, that takes an amino acid sequence and outputs a bunch of representation vectors.
 
 <Figure content={<AminoAcidEmbeddingEncoder />}>
   An encoder converts a sequence into representation vectors. The length of each

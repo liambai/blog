@@ -27,7 +27,7 @@ export default function getReferenceComponents(references) {
         {/* Hidden reference list for littlefoot popovers */}
         <ol>
           {Object.entries(references).map(([id, ref]) => (
-            <li className="footnote" id={`fn:${id}`}>
+            <li key={id} className="footnote" id={`fn:${id}`}>
               <p>
                 {ref.author} <a href={ref.url}>{ref.title}</a>. {ref.journal} (
                 {ref.year}).
