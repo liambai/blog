@@ -33,7 +33,7 @@ A **Multiple Sequence Alignment (MSA)** compiles known variants of a protein –
   "
 />
 
-Here's an example of signals hidden in MSAs: amino acid positions that tend to co-vary in the MSA tend to interact with each other in the folded structure, often via direct 3D contact. We'll make this idea concrete.
+A signal hidden in MSAs: amino acid positions that tend to co-vary in the MSA tend to interact with each other in the folded structure, often via direct 3D contact. In the rest of this article, we'll make this idea concrete.
 
 ## In search of a distribution
 
@@ -68,24 +68,24 @@ If we compile these frequencies into a matrix, we get what is known as a [**posi
 <Image
   path={require("./images/sequence-logo.png")}
   caption="
-    A sequence logo [generated](https://weblogo.berkeley.edu/logo.cgi) from our MSA. The height of each amino acid is an indicator of its degree of evolutionary conservation.
+    A sequence logo [generated](https://weblogo.berkeley.edu/logo.cgi) from our MSA. The height of each amino acid indicates its degree of evolutionary conservation.
   "
   width="90%"
 />
 
-To evaluate some new sequence $A$ of $L$ amino acids, let's look at:
+Given some new sequence $A$ of $L$ amino acids, let's quantify how similar it is to the sequences in our MSA:
 
 $$
 E(A) = \sum_{1 \leq i \leq L} f_i(A_i)
 $$
 
-$E(A)$ should be big when the amino acid frequencies in each position of $A$ matches the frequency patterns observed the in MSA and small otherwise. For example, if $A$ starts with the amino acid L, then $f_1(\text{L}) = 1$ is contributed to the sum; if it starts with any other amino acid, $0$ is contributed.
+$E(A)$ is big when the amino acid frequencies in each position of $A$ matches the frequency patterns observed the in MSA – and small otherwise. For example, if $A$ starts with the amino acid L, then $f_1(\text{L}) = 1$ is contributed to the sum; if it starts with any other amino acid, $0$ is contributed.
 
 $E$ is often called the **energy function**. It's not a probability distribution, but we can easily turn it into one by normalizing its values to sum to $1$ (let's worry about that later).
 
 ### Pairwise frequencies
 
-But what about the co-variation between pairs of positions? As hinted in the introduction, it has important implications for the structure (and hence function) of a protein. Let's also count the co-occurrence frequencies.
+But what about the co-variation between pairs of positions? As hinted in the beginning, it has important implications for the structure (and hence function) of a protein. Let's also count the co-occurrence frequencies.
 
 Let $f_{ij}(A_i, A_j)$ be the frequency of observing amino acid $A_i$ at position $i$ _and_ amino acid $A_j$ at position $j$.
 
@@ -107,9 +107,9 @@ $$
 E(A) = \sum_{1 \leq i \leq j \leq L} J_{i j} (A_i, A_j)+\sum_{1 \leq i \leq L} h_i(A_i)
 $$
 
-Physicists have actually studied this function since the 1950s, in a different context: the interacting spins of particles in solids like magnets. The $J_{ij}$ terms capture the energy cost of particles $i$ and $j$ coupling with each other in their respective states: its magnitude is big if they interact, small if they don't; the $h_i$ terms capture the energy cost of each particle being in its own state.
+As it turns out, physicists have studied this function since the 1950s, in a different context: the interacting spins of particles in solids like magnets. The $J_{ij}$ terms capture the energy cost of particles $i$ and $j$ coupling with each other in their respective states: its magnitude is big if they interact, small if they don't; the $h_i$ terms capture the energy cost of each particle being in its own state.
 
-They call this the [**Potts model**](https://en.wikipedia.org/wiki/Potts_model), and a fancy name for the energy function is the [Hamiltonian](<https://en.wikipedia.org/wiki/Hamiltonian_(quantum_mechanics)>). This fascinating field of physics applying these statistical models to explain macroscopic behaviors of matter is called statistical mechanics.
+They call this the [**Potts model**](https://en.wikipedia.org/wiki/Potts_model), and a fancy name for the energy function is the [Hamiltonian](<https://en.wikipedia.org/wiki/Hamiltonian_(quantum_mechanics)>). This fascinating field of physics applying these statistical models to explain macroscopic behaviors of matter is called [statistical mechanics](https://en.wikipedia.org/wiki/Statistical_mechanics).
 
 <Image
   path={require("./images/potts.png")}
@@ -121,7 +121,7 @@ They call this the [**Potts model**](https://en.wikipedia.org/wiki/Potts_model),
 
 ### Global pairwise terms
 
-Earlier, we considered using $f_{ij}$ as the term capturing pairwise interactions. $f_{ij}$ focuses on what's happening at positions $i$ and $j$ – nothing more. It's a _local_ measurement. Imagine this: positions $i$ and $j$ each independently interact with position $k$, though they do not directly interact with each other. With this **transitive correlation** between $i$ and $j$, the nearsighted $f_{ij}$ would likely overestimate the interaction between them.
+Earlier, we considered using $f_{ij}$ as the term capturing pairwise interactions. $f_{ij}$ focuses on what's happening at positions $i$ and $j$ – nothing more. It's a _local_ measurement. Imagine a case where positions $i$ and $j$ each independently interact with position $k$, though they do not directly interact with each other. With this **transitive correlation** between $i$ and $j$, the nearsighted $f_{ij}$ would likely overestimate the interaction between them.
 
 $$
 i \longrightarrow k \longleftarrow j
@@ -153,7 +153,7 @@ $$
 
 ## Predicting 3D structure
 
-Given an amino acid sequence, what is the 3D structure that it folds into? This is the [protein folding problem](https://rootsofprogress.org/alphafold-protein-folding-explainer) central to biology. In 2021, researchers from DeepMind presented a groundbreaking model using deep learning, [AlphaFold](https://www.nature.com/articles/s41586-021-03819-2) <Reference id={8} />, declaring the problem as solved. The [implications](https://moalquraishi.wordpress.com/2020/12/08/alphafold2-casp14-it-feels-like-ones-child-has-left-home/) are profound. (Although the [EVCouplings](https://evcouplings.org/) approach to the this problem we're about to discuss cannot compete with AlphaFold in accuracy, it is foundational to AlphaFold, which similarly relies heavily on pairwise interaction signals from MSAs.)
+Given an amino acid sequence, what is the 3D structure that it folds into? This is the [protein folding problem](https://rootsofprogress.org/alphafold-protein-folding-explainer) central to biology. In 2021, researchers from DeepMind presented a groundbreaking model using deep learning, [AlphaFold](https://www.nature.com/articles/s41586-021-03819-2) <Reference id={8} />, declaring the problem as solved. The [implications](https://moalquraishi.wordpress.com/2020/12/08/alphafold2-casp14-it-feels-like-ones-child-has-left-home/) are profound. (Although the [EVCouplings](https://evcouplings.org/) approach to the this problem we will discuss cannot compete with AlphaFold in accuracy, it is foundational to AlphaFold, which similarly relies heavily on pairwise interaction signals from MSAs.)
 
 Myriad forces choreograph the folding of a protein. Let's simplify and focus on
 pairs of amino acid positions that interact strongly with each other – and hypothesize that they are in spatial contact. These predicted contacts can act as a set of constraints from which we can then derive the full 3D structure.
@@ -211,7 +211,7 @@ These constraints ensure that $P_{i j}^{D i r}$ follows the single amino acid fr
 Once we have $P_{i j}^{D i r}$, we can average over all possible $A_i$'s and $A_j$'s like we did for mutual information:
 
 $$
-DI_{i j}=\sum_{A_i, A_j \in \mathcal X} P_{i j}^{\text {Dir }}\left(A_i, A_j\right) \ln \left(\frac{P_{i j}^{\text {Dir }}\left(A_i, A_j\right)}{f_i\left(A_i\right) f_j\left(A_j\right)}\right)
+DI_{i j}=\sum_{A_i, A_j \in \mathcal X} P_{i j}^{Dir }\left(A_i, A_j\right) \ln \left(\frac{P_{i j}^{Dir}\left(A_i, A_j\right)}{f_i\left(A_i\right) f_j\left(A_j\right)}\right)
 $$
 
 This measure is called **direct information**, a more globally-aware measure of pairwise interactions. When compared to real contacts in experimentally determined structures, DI performed much better than MI, demonstrating the usefulness of considering the global sequence context <Reference id={1} />.
@@ -226,12 +226,12 @@ This measure is called **direct information**, a more globally-aware measure of 
 
 ### Constructing the structure
 
-Given predicted contacts by DI, we need to carry out a few more computational steps – e.g. [simulated annealing](https://en.wikipedia.org/wiki/Simulated_annealing) – to generate the full predicted 3D structure. Omitting those details: the results are these beautiful predicted structures that often closely match the real structures.
+Given predicted contacts by DI, we need to carry out a few more computational steps – e.g. [simulated annealing](https://en.wikipedia.org/wiki/Simulated_annealing) – to generate the full predicted 3D structure. Omitting those details: the results are these beautiful predicted structures that closely resemble the real structures.
 
 <Image
   path={require("./images/structures.png")}
   caption="
-    Grey structures are real, experimentally observed; red structures are predicted using DI. Root mean square deviation (RMSD) measures the average distance between atoms in the predicted vs. observed structure and is used to score the quality of structure predictions; they are shown on the arrows with the total number of amino acid positions in parentheses. Figure from {1}.
+    Grey structures are real, experimentally observed; red structures are predicted using DI. [Root mean square deviation (RMSD)](https://en.wikipedia.org/wiki/Root-mean-square_deviation_of_atomic_positions) measures the average distance between atoms in the predicted vs. observed structure and is used to score the quality of structure predictions; they are shown on the arrows with the total number of amino acid positions in parentheses. Figure from {1}.
   "
 />
 
@@ -300,7 +300,7 @@ $$
 P(A)=\frac{1}{Z} \exp(E(A)/T)
 $$
 
-Why this works involves a lot of cool math that we won't have time to dive into now. This is the [**Metropolis–Hastings algorithm**](https://en.wikipedia.org/wiki/Metropolis%E2%80%93Hastings_algorithm), belonging to a class of useful tools for approximating complex distributions called [**Markov chain Monte Carlo (MCMC)**](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo).
+Why this works involves a lot of cool math that we won't have time to dive into now. This is the [Metropolis–Hastings algorithm](https://en.wikipedia.org/wiki/Metropolis%E2%80%93Hastings_algorithm), belonging to a class of useful tools for approximating complex distributions called [**Markov chain Monte Carlo (MCMC)**](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo).
 
 In this [paper](https://www.science.org/doi/10.1126/science.aba3304), researchers did exactly this to with the goal of improving a protein called chorismate mutase (CM) <Reference id={4}/>. They used MCMC to draw many sequences from the DCA distribution and then [synthesized](https://en.wikipedia.org/wiki/DNA_synthesis) them for experimental testing.
 

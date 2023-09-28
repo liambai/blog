@@ -1,7 +1,7 @@
 ---
 title: How to represent a protein sequence
 date: "2023-09-28"
-description: Learning protein representations. Transfer learning, protein language models, contextual embeddings, Transformers, masked language modeling, BERT, ESM, attention analysis.
+description: Learning protein representations. Transfer learning, protein language models, contextual embeddings, Transformers, masked language modeling, BERT, UniRep, ESM, attention analysis.
 ---
 
 import AminoAcidEmbedding from "./d3/AminoAcidEmbedding.jsx"
@@ -89,9 +89,7 @@ Current state-of-the-art language models use something in-between the two: _sub-
 
 ### Context matters
 
-If you are familiar with NLP embedding models like [word2vec](https://en.wikipedia.org/wiki/Word2vec), the word _embedding_ might be a bit confusing. Vanilla embeddings – like the simplest [one-hot encodings](https://en.wikipedia.org/wiki/One-hot) or vectors created by word2vec – map each token to a _unique_ vector. They are much easier to create and often serves as _input_ to neural networks, which only understand numbers, not text.
-
-<AminoAcidOneHot />
+If you are familiar with NLP embedding models like [word2vec](https://en.wikipedia.org/wiki/Word2vec), the word _embedding_ might be a bit confusing. Vanilla embeddings – like the simplest [one-hot encodings](https://en.wikipedia.org/wiki/One-hot) or vectors created by word2vec – map each token to a _unique_ vector. They are easy to create and often serve as _input_ to neural networks, which only understand numbers, not text.
 
 In contrast, our _contextualized_ embedding vectors for each token, as the name suggests, incorporates context from its surrounding tokens. Therefore, _two identical tokens don't necessarily have the same embedding vector_. These vectors are the _output_ of our neural networks. (For this reason, I'll refer to these contextualized embedding vectors as representation vectors – or simply representations.)
 
@@ -125,7 +123,7 @@ Though we will focus on masked language modeling in this article, another way to
 
 The first protein language encoder model of this kind is [UniRep](https://www.nature.com/articles/s41592-019-0598-1) (universal representation), which used a technique called [Long Short Term Memory (LSTM)](https://en.wikipedia.org/wiki/Long_short-term_memory) <Reference id={1}/>. (It uses the causal instead of masked language modeling objective, predicting amino acids from left to right.)
 
-More recently, transformer models that rely on a mechanism called **self- attention** have taken the spotlight <Reference id={5} />. [BERT](<https://en.wikipedia.org/wiki/BERT_(language_model)>) stands for Bidirectional Encoder Representations from Transformer and is a class of state-of-the-art natural language encoders developed at Google <Reference id={2} />. We will talk in some detail about a BERT-like encoder model applied to proteins.
+More recently, **Transformer models** that rely on a mechanism called **self- attention** have taken the spotlight <Reference id={5} />. [BERT](<https://en.wikipedia.org/wiki/BERT_(language_model)>) stands for Bidirectional Encoder Representations from Transformer and is a state-of-the-art natural language encoder developed at Google <Reference id={2} />. We will talk in some detail about a BERT-like encoder model applied to proteins.
 
 <Image path={require("./images/architecture.png")} />
 
@@ -165,7 +163,7 @@ Once we have our representation vectors, we can train simple models like logisti
 
 We are omitting a lot of details here. If you are interested in learning more, check out [these](https://www.pnas.org/doi/full/10.1073/pnas.2016239118) [papers](https://www.biorxiv.org/content/10.1101/2020.12.15.422761v1) from the ESM team <Reference id={3} /> <Reference id={4} />.
 
-## A peek into the [black box](https://en.wikipedia.org/wiki/Black_box)
+## A peek into the black box
 
 We've been talking a lot about all this "information" learned by our representation. What exactly does it look like?
 
