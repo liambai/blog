@@ -4,13 +4,6 @@ import * as d3 from "d3"
 import Embedding from "./Embedding"
 import Viz from "../../../../src/components/viz"
 
-const colors = [
-  "lightblue",
-  "lightyellow",
-  "lightcyan",
-  "lightskyblue",
-  "lightgreen",
-]
 const embeddings = [
   { char: "L", embedding: [0.1, -0.2, 0.3, 0.4, -0.5] },
   { char: "T", embedding: [-0.2, 0.3, -0.4, 0.1, 0.6] },
