@@ -15,7 +15,7 @@ import Image from "../../../src/components/image.jsx"
 import { Link } from "gatsby"
 import { Reference, ReferenceList } from "./References.jsx"
 
-In the last decade, [DNA sequencing technology](https://ourworldindata.org/grapher/cost-of-sequencing-a-full-human-genome) propelled biology into a new information age. This came with a happy conundrum: we now have many orders of magnitude more protein sequences than structural or functional data. We uncovered massive tomes written in nature's language – the blueprint of our wondrous biological tapestry – but lack the ability to understand them.
+In the last decade, [innovations in DNA sequencing](https://ourworldindata.org/grapher/cost-of-sequencing-a-full-human-genome) propelled biology into a new information age. This came with a happy conundrum: we now have many orders of magnitude more protein sequences than structural or functional data. We uncovered massive tomes written in nature's language – the blueprint of our wondrous biological tapestry – but lack the ability to understand them.
 
 <Figure
   content={
@@ -257,7 +257,9 @@ Similarly, a lot of attention is directed to [binding sites](https://en.wikipedi
 >
   The percentage of high-confidence attention scores that correspond to binding
   sites. These are positions j part of binding sites that have high $\alpha_{ij}
-  $, i.e. that have attention directed to them. Figure from <Reference id={6} />.
+  $, i.e. positions that have attention directed *to* them. Figure from <Reference
+    id={6}
+  />.
 </Figure>
 
 Applying supervised learning to attention scores – instead of output representations – also achieves astonishing performance in contact prediction. Compared to [GREMLIN](https://openseq.org/), an MSA-based method similar to the one we talked about in the <Link to="/protein-evolution">previous post</Link>, logistic regression trained on ESM's attention scores yielded better performance after only seeing 20 (!) labeled training examples.
