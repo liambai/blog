@@ -1,6 +1,6 @@
 ---
 title: How to represent a protein sequence
-date: "2023-09-28"
+date: "2023-09-30"
 description: Learning protein representations. Transfer learning, protein language models, contextual embeddings, Transformers, masked language modeling, BERT, UniRep, ESM, attention analysis.
 ---
 
@@ -9,6 +9,7 @@ import MSACoupling from "../protein-evolution/d3/MSACoupling.jsx"
 import AminoAcidEmbeddingEncoder from "./d3/AminoAcidEmbeddingEncoder.jsx"
 import CharacterEmbedding from "./d3/CharacterEmbedding.jsx"
 import WordEmbedding from "./d3/WordEmbedding.jsx"
+import AminoAcidEmbeddingAverage from "./d3/AminoAcidEmbeddingAverage.jsx"
 import Figure from "../../../src/components/figure.jsx"
 import Image from "../../../src/components/image.jsx"
 import { Link } from "gatsby"
@@ -101,7 +102,9 @@ If you are familiar with NLP embedding models like [word2vec](https://en.wikiped
 
 In contrast, our _contextualized_ embedding vectors for each token, as the name suggests, incorporates context from its surrounding tokens. Therefore, _two identical tokens don't necessarily have the same contextualized embedding vector_. These vectors are the _output_ of our neural networks. (For this reason, I'll refer to these contextualized embedding vectors as representation vectors – or simply representations.)
 
-If we want one vector that describes the the entire sequence – instead of a vector for each amino acid – we can simply average the values in each vector.
+When we need one vector that describes the entire sequence – instead of a vector for each amino acid – we can simply average the values in each vector.
+
+<Figure content={<AminoAcidEmbeddingAverage />} />
 
 Now, let's work on creating these representation vectors!
 
