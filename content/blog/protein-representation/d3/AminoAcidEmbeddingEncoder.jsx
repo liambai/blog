@@ -21,7 +21,7 @@ const AminoAcidEmbeddingEncoder = () => {
   useEffect(() => {
     // Draw the horizontal label
     const svg = d3.select(labelSvgRef.current)
-    const bracketPath = "M 50 5 L 40 5 L 40 240 L 50 240"
+    const bracketPath = "M 40 5 L 30 5 L 30 240 L 40 240"
     svg
       .append("path")
       .attr("d", bracketPath)
@@ -31,7 +31,7 @@ const AminoAcidEmbeddingEncoder = () => {
     svg
       .append("text")
       .attr("x", 15)
-      .attr("y", 75)
+      .attr("y", 68)
       .text("encoder")
       .attr("font-size", 18)
       .attr("fill", "black")
@@ -40,7 +40,7 @@ const AminoAcidEmbeddingEncoder = () => {
 
   return (
     <div style={{ display: "flex", justifyContent: "center" }}>
-      <svg ref={labelSvgRef} width={80} height={260} />
+      <svg ref={labelSvgRef} width={60} height={260} />
       <Embedding embeddings={embeddings} />
     </div>
   )

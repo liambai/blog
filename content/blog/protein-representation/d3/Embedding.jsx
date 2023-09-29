@@ -75,7 +75,7 @@ const Embedding = ({
         setFocusedCharIndex(null)
       })
 
-    const vectorBoxWidth = isMobile ? 34 : 50
+    const vectorBoxWidth = isMobile ? 32 : 50
     const vectorBoxHeight = isMobile ? 35 : 40
     const fontSize = isMobile ? 12 : 16
     const spaceFromSequence = 80
