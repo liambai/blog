@@ -96,7 +96,7 @@ const AverageVector = () => {
       .attr("x", (d, i) => offsetX + i * vectorBoxWidth + vectorBoxWidth / 2)
       .attr("y", vectorBoxHeight / 2 + 20)
       .attr("font-size", fontSize)
-  }, [width])
+  }, [isMobile, width])
   return <svg ref={svgRef} width={width} height={55}></svg>
 }
 

@@ -15,7 +15,7 @@ module.exports = {
       summary: `who lives and works in Boston trying to build useful things.`,
     },
     description: `Blog about machine learning and proteins.`,
-    siteUrl: `https://gatsbystarterblogsource.gatsbyjs.io/`,
+    siteUrl: `https://liambai.com/`,
     social: {
       twitter: "liambai21",
       linkedin: "liambai",
@@ -106,7 +106,7 @@ module.exports = {
               }
             }`,
             output: "/rss.xml",
-            title: "Gatsby Starter Blog RSS Feed",
+            title: "Liam's Blog RSS Feed",
           },
         ],
       },
@@ -114,8 +114,8 @@ module.exports = {
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
-        name: `Gatsby Starter Blog`,
-        short_name: `Gatsby`,
+        name: `Liam's Blog`,
+        short_name: `Liam`,
         start_url: `/`,
         background_color: `#ffffff`,
         // This will impact how browsers show your PWA/website
