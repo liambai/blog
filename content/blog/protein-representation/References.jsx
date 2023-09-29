@@ -41,6 +41,13 @@ const references = {
     year: 2017,
   },
   6: {
+    title: "Low-N protein engineering with data-efficient deep learning",
+    author: "Biswas, S. et al.",
+    url: "https://www.nature.com/articles/s41592-021-01100-y",
+    journal: "Nat Methods 18, 389–396",
+    year: 2021,
+  },
+  7: {
     title:
       "BERTology Meets Biology: Interpreting Attention in Protein Language Models",
     author: "Vig. J. et al.",

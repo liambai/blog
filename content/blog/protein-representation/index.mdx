@@ -193,9 +193,43 @@ I hoped to convey some basic intuition about self-attention and masked language 
 
 ### Using the representation
 
-Once we have our representation vectors, we can train simple models like logistic regression with our vectors as input. This is the approach used in [ESM](https://github.com/facebookresearch/esm), achieving state-of-the-art performance on predictions of 3D contacts and mutation effects. We can think of the logistic regression model as merely teasing out the information already contained in the input representation, an easy task.
+Once we have our representation vectors, we can train simple models like logistic regression with our vectors as input. This is the approach used in [ESM](https://github.com/facebookresearch/esm), achieving state-of-the-art performance on predictions of 3D contacts and mutation effects <Reference id={3} /> <Reference id={4} />. We can think of the logistic regression model as merely teasing out the information already contained in the input representation, an easy task. (We're omitting a lot of details, but if you're interested, please check out [those](https://www.pnas.org/doi/full/10.1073/pnas.2016239118) [papers](https://www.biorxiv.org/content/10.1101/2020.12.15.422761v1)!)
 
-We are omitting a lot of details here, but if you're interested in learning more, check out [these](https://www.pnas.org/doi/full/10.1073/pnas.2016239118) [papers](https://www.biorxiv.org/content/10.1101/2020.12.15.422761v1) from the ESM team <Reference id={3} /> <Reference id={4} />.
+We saw in the <Link to="/protein-evolution">previous post</Link> that with clever samplings approaches like **Markov Chain Monte Carlo (MCMC)**, a good predictive model can be used to generate new sequences. That's exactly the approach taken by researches from the [Church lab](https://arep.med.harvard.edu/gmc/) leveraging UniRep for protein engineering <Reference id={6} />:
+
+<ol type="a">
+  <li>
+    Start with UniRep, which takes in a protein sequence and outputs a
+    representation vector. UniRep is trained on a large public sequence database
+    called [UniRef50](https://www.uniprot.org/help/uniref).
+  </li>
+  <li>
+    Fine-tune UniRep by further training it on sequences from the target
+    protein's family, enhancing it by incorporating evolutionary signals usually
+    obtained from MSAs.
+  </li>
+  <li>
+    Experimentally test a small number of mutants (tens) and fit a linear
+    regression model on top of UniRep's representation to predict performance
+    given a sequence.
+  </li>
+  <li>
+    Propose various mutants and ask the linear regression model to evaluate
+    them, all [*in silico*](https://en.wikipedia.org/wiki/In_silico). Apply the
+    Metropolis-Hastings acceptance criterion repeatedly to generate a new,
+    optimized sequence. (If this sounds unfamiliar, check out the{" "}
+    <Link to="/protein-evolution">previous post</Link>!)
+  </li>
+</ol>
+
+<Figure
+  content={<Image path={require("./images/UniRep-protein-engineering.png")} />}
+>
+  Protein engineering with UniRep. This process is analogous to to meandering
+  the [sparsely
+  functional](https://en.wikipedia.org/wiki/Sequence_space_(evolution)#Functional_sequences_in_sequence_space)
+  sequence space in a guided way (e). Figure from <Reference id={6} />
+</Figure>
 
 ## A peek into the black box
 
@@ -240,14 +274,14 @@ More incredibly, one of the neurons in UniRep's LSTM network showed firing patte
 
 In NLP, the attention scores in Transformer models tend to relate to the semantic structure of sentences. Does attention in our protein language models also capture something meaningful?
 
-Let's look at 5 unsupervised Transformer models on proteins sequences – all trained in the same BERT-inspired way we described <Reference id={6} />. Amino acid pairs that with high attention scores are more often in 3D contact in the folded structure, especially in the deeper layers.
+Let's look at 5 unsupervised Transformer models on proteins sequences – all trained in the same BERT-inspired way we described <Reference id={7} />. Amino acid pairs that with high attention scores are more often in 3D contact in the folded structure, especially in the deeper layers.
 
 <Figure content={<Image path={require("./images/attention-contact.png")} />}>
   The percentage of high-confidence attention scores that correspond to amino
   acids positions in 3D contact. Deeper blue reflects higher correlation between
   attention scores and contacts. Data is shown for each attention head in each
   layer, across 5 BERT-like protein language models. Figure from
-  <Reference id={6} />.
+  <Reference id={7} />.
 </Figure>
 
 Similarly, a lot of attention is directed to [binding sites](https://en.wikipedia.org/wiki/Binding_site) – the functionally most important regions of a protein – throughout the layers.
@@ -258,7 +292,7 @@ Similarly, a lot of attention is directed to [binding sites](https://en.wikipedi
   The percentage of high-confidence attention scores that correspond to binding
   sites. These are positions j part of binding sites that have high $\alpha_{ij}
   $, i.e. positions that have attention directed *to* them. Figure from <Reference
-    id={6}
+    id={7}
   />.
 </Figure>
 
