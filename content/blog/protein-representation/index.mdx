@@ -41,7 +41,7 @@ In this case, structural or functional data are **labels**. In **supervised lear
 
 When labels are rare, as in our case with proteins, we need to rely on more **unsupervised** approaches like this:
 
-1. Come up with a vector representation of the protein sequence that captures its important features. The vectors are called **contextualized embeddings**. This is no easy task: it's where the heavy lifting happens and will be the subject of this article.
+1. Come up with a vector representation of the protein sequence that captures its important features. The vectors are called **contextualized embeddings**. This is no easy task: it's where the heavy lifting happens and will be the subject of this post.
 
    <Figure content={<AminoAcidEmbedding />}>
      Representation vectors are created from the amino acid sequence. Each
@@ -73,7 +73,7 @@ $$
 
 However, those techniques don't work well on proteins that are rare in nature or designed [_de novo_](https://www.nature.com/articles/nature19946), where we don't have enough co-evolutionary data to construct a good MSA. In those cases, can we still make reasonable predictions based on a _single_ amino acid sequence?
 
-One way to look at the models in this article is that they are answers to that question, picking up where MSAs fail. Moreover, models that don't rely on MSAs aren't limited to a single protein family: they understand some fundamental properties of _all_ proteins. Beyond utility, they offer a window into how proteins work on an abstraction level higher than physics – on the level of manipulatable parts and interactions – akin to [linguistics](https://moalquraishi.wordpress.com/2018/02/15/protein-linguistics/).
+One way to look at the models in this post is that they are answers to that question, picking up where MSAs fail. Moreover, models that don't rely on MSAs aren't limited to a single protein family: they understand some fundamental properties of _all_ proteins. Beyond utility, they offer a window into how proteins work on an abstraction level higher than physics – on the level of manipulatable parts and interactions – akin to [linguistics](https://moalquraishi.wordpress.com/2018/02/15/protein-linguistics/).
 
 ## Representation learning
 
@@ -102,7 +102,7 @@ If you are familiar with NLP embedding models like [word2vec](https://en.wikiped
 
 In contrast, our _contextualized_ embedding vectors for each token, as the name suggests, incorporates context from its surrounding tokens. Therefore, _two identical tokens don't necessarily have the same contextualized embedding vector_. These vectors are the _output_ of our neural networks. (For this reason, I'll refer to these contextualized embedding vectors as representation vectors – or simply representations.)
 
-When we need one vector that describes the entire sequence – instead of a vector for each amino acid – we can simply average the values in each vector.
+As a result of the rich contextual information, when we need one vector that describes the _entire sequence_ – instead of a vector for each amino acid – we can simply average the values in each vector.
 
 <Figure content={<AminoAcidEmbeddingAverage />} />
 
@@ -131,16 +131,17 @@ This lets us take advantage of the wealth of known sequences, each of which is n
 >
   The masked language modelling objective. Hide a token (in this case, R) and
   ask the encoder model to predict the hidden token. The encoder model is set up
-  to generate representation vectors as a side effect.
+  so that, while attempting and learning this prediction task, representation
+  vectors are generated as a side effect.
 </Figure>
 
-Though we will focus on masked language modeling in this article, another way to construct this self-supervision task is via **causal language modeling**: given some tokens, ask the model to predict the _next_ one. This is the approach used in OpenAI's GPT.
+Though we will focus on masked language modeling in this post, another way to construct this self-supervision task is via **causal language modeling**: given some tokens, ask the model to predict the _next_ one. This is the approach used in OpenAI's GPT.
 
 ### The model
 
 (This section requires some basic knowledge of deep learning. If you are new to deep learning, I can't recommend enough Andrej Karpathy's [YouTube series](https://youtu.be/VMj-3S1tku0?si=jd52N4a0ZpWQNUQy) on NLP, which starts from the foundations of neural networks and builds to cutting-edge language models like GPT.)
 
-The first protein language encoder model of this kind is [UniRep](https://www.nature.com/articles/s41592-019-0598-1) (universal representation), which used a technique called [Long Short Term Memory (LSTM)](https://en.wikipedia.org/wiki/Long_short-term_memory) <Reference id={1}/>. (It uses the causal instead of masked language modeling objective, predicting amino acids from left to right.)
+The first protein language encoder of this kind is [UniRep](https://www.nature.com/articles/s41592-019-0598-1) (universal representation), which used a technique called [Long Short Term Memory (LSTM)](https://en.wikipedia.org/wiki/Long_short-term_memory) <Reference id={1}/>. (It uses the causal instead of masked language modeling objective, predicting amino acids from left to right.)
 
 More recently, **Transformer models** that rely on a mechanism called **self- attention** have taken the spotlight <Reference id={5} />. [BERT](<https://en.wikipedia.org/wiki/BERT_(language_model)>) stands for Bidirectional Encoder Representations from Transformer and is a state-of-the-art natural language encoder developed at Google <Reference id={2} />. We'll focus on a BERT-like encoder model applied to proteins.
 
@@ -157,7 +158,7 @@ More recently, **Transformer models** that rely on a mechanism called **self- at
 
 BERT consists of 12 encoder blocks, each containing a self-attention layer and a fully-connected layer. On the highest level, they are just a collection of numbers (**parameters**) learned by the model; each edge in the diagram represents a parameter.
 
-Roughly speaking, the $\alpha_{ij}$ parameters in the self-attention layer (also known as attention scores) capture the _alignment_, or similarity, between two amino acids. If $\alpha_{ij}$ is large, we say that the $j^{th}$ token _attends_ to the $i^{th}$ token. Intuitively, each token can attend to different parts of the sequence, focusing on what's relevant to it and glancing over what's not.
+Roughly speaking, the $\alpha_{ij}$ parameters in the self-attention layer (also known as attention scores) capture the _alignment_, or similarity, between two amino acids. If $\alpha_{ij}$ is large, we say that the $j^{th}$ token _attends_ to the $i^{th}$ token. Intuitively, token $j$ is "interested" in the information contained in token $i$, presumably because they have some relationship. Exactly what this relationship _is_ might not be known, or even _understandable_, by us: such is the power – as well as peril – of the attention mechanism. Throughout the self-attention layer, each token can attend to different parts of the sequence, focusing on what's relevant to it and glancing over what's not.
 
 Here's an example of attention scores of a transformer trained on a word-tokenized sentence:
 
@@ -168,7 +169,7 @@ Here's an example of attention scores of a transformer trained on a word-tokeniz
   indicates higher attention score.
 </Figure>
 
-The token "it" attends strongly the token "animal" because of their close relationship – they refer to the same thing – whereas most other tokens are ignored. It is our goal to tease out similar _semantic_ relationships between amino acids.
+The token "it" attends strongly the token "animal" because of their close relationship – they refer to the same thing – whereas most other tokens are ignored. Our goal is to tease out similar [semantic relationships](https://moalquraishi.wordpress.com/2018/02/15/protein-linguistics/) between amino acids.
 
 The details of how these $\alpha_{ij}$ attention scores are calculated are explained and visualized in Jay Alammar's amazing post
 [The Illustrated Transformer](http://jalammar.github.io/illustrated-transformer/). Here's a helpful [explanation](https://twitter.com/rasbt/status/1629884953965068288) on how they differ from the $w_{ij}$ weights in the fully-connected layer.
@@ -183,7 +184,7 @@ I hoped to convey some basic intuition about self-attention and masked language 
 
 2. The tokens first need to be converted into vectors before they can be processed by the neural net.
 
-   - For this we use a vanilla embedding of amino acids – like [one-hot encoding](https://en.wikipedia.org/wiki/One-hot) – not to be confused with contextualized embeddings that we output.
+   - For this we use a vanilla embedding of amino acids – like [one-hot encoding](https://en.wikipedia.org/wiki/One-hot) – not to be confused with the contextualized embeddings that we output.
    - This input embedding contains a few other pieces of information, such as the [positions](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/) of each amino acid within the sequence.
 
 3. Following the original Transformer, BERT uses [layer normalization](https://arxiv.org/abs/1607.06450), a technique that makes training deep neural nets easier.

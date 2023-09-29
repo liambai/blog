@@ -24,16 +24,15 @@ const Arrow = () => (
     <g>
       <path
         d="M150 1.5v57.88M0 1.54V0"
-        stroke="#3a414a"
+        stroke="black"
         stroke-width="3"
         fill="black"
-        x="100"
       />
       <path
         d="M150 75.15l-4.64-14.27h9.28z"
-        stroke="#3a414a"
+        stroke="black"
         stroke-width="3"
-        fill="#black"
+        fill="black"
       />
       <text x="170" y="40" font-size="14">
         Average
