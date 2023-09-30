@@ -45,9 +45,9 @@ When labels are rare, as in our case with proteins, we need to rely on more **un
 
    <Figure content={<AminoAcidEmbedding />}>
      Representation vectors are created from the amino acid sequence. Each
-     vector corresponds to an amino acid. The values in the vectors are made up.
-     The length of each vector is typically between several hundred to a few
-     thousand.
+     vector corresponds to an amino acid (hover to view). The values in the
+     vectors are made up. The length of each vector is typically between several
+     hundred to a few thousand.
    </Figure>
 
 2. Use the representation vectors as input to some supervised learning model. The information-rich representation has hopefully made this easier that 1) we don't need as much labeled data and 2) the model we use can be simpler, such as linear or logistic [regression](https://en.wikipedia.org/wiki/Regression_analysis).
@@ -80,19 +80,24 @@ One way to look at the models in this post is that they are answers to that ques
 The general problem of converting some data into a vector representation is called [representation learning](https://en.wikipedia.org/wiki/Feature_learning), an important technique in **natural language processing (NLP)**. In the context of proteins, we're looking for a function, an **encoder**, that takes an amino acid sequence and outputs a bunch of representation vectors.
 
 <Figure content={<AminoAcidEmbeddingEncoder />}>
-  An encoder converts a sequence into representation vectors. The length of each
-  vector is typically between several hundred to a few thousand.
+  An encoder converts a sequence into representation vectors (hover to view).
+  The length of each vector is typically between several hundred to a few
+  thousand.
 </Figure>
 
 ### Tokens
 
 In NLP lingo, each amino acid is a **token**. An English sentence can be represented in the same way, using characters as tokens.
 
-<Figure content={<CharacterEmbedding />} />
+<Figure content={<CharacterEmbedding />}>
+  Hover to view the representation vector of each character token.
+</Figure>
 
 As an aside, words are also a reasonable choice for tokens in natural language.
 
-<Figure content={<WordEmbedding />} />
+<Figure content={<WordEmbedding />}>
+  Hover to view the representation vector of each word token.
+</Figure>
 
 Current state-of-the-art language models use something in-between the two: _sub-word_ tokens. [tiktoken](https://github.com/openai/tiktoken) is the tokenizer used by OpenAI to break sentences down into lists of sub-word tokens.
 

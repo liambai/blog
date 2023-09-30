@@ -9,7 +9,7 @@ const embeddings = [
 ]
 
 const WordEmbedding = () => {
-  return <Embedding embeddings={embeddings} height={170} tokenWidth={50} />
+  return <Embedding embeddings={embeddings} height={155} tokenWidth={50} />
 }
 
 export default WordEmbedding
