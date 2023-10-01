@@ -1,0 +1,94 @@
+---
+title: Protein Inception
+date: "2023-10-08"
+description: Protein design. DeepDrem, hallucinations, Markov Chain Monte Carlo (MCMC), ...
+---
+
+import { Link } from "gatsby"
+import Figure from "../../../src/components/figure.jsx"
+import Image from "../../../src/components/image.jsx"
+
+Models that are good at making predictions also possess some generative power. We saw this theme play out in <Link to="/protein-evolution">previous</Link> <Link to="/protein-representation">posts</Link> with a technique called **Markov Chain Monte Carlo (MCMC)**. Here's a quick recap:
+
+Suppose you have a monkey that, when shown an image, gets visibly very excited if the image contains bananas and sad otherwise. And he does this reliably.
+
+<Figure content={<Image path={require("./images/monkey-model.png")} />} />
+
+One obvious task that the monkey can help with is image classification, discriminating images with bananas and ones that without. The monkey is a _discriminative_ model.
+
+Now suppose you want to create some _new_ images of bananas. Let's start with a white-noise image:
+
+<Figure
+  content={
+    <Image
+      path={require("./images/white-noise.png")}
+      width="50%"
+      mobileWidth="60%"
+    />
+  }
+/>
+
+randomly change a couple pixels, and show it to our monkey:
+
+- If he gets more excited, then we've probably done something that made the image more banana-like. Great – let's keep the changes.
+- If he doesn't doesn't get more excited – or god forbid, gets less excited – let's forget about the changes.
+
+Repeat this thousands of times: we'll end up with an image that looks a lot like bananas! This is the essence of MCMC, which lets us turn our monkey into a _generative_ model.
+
+Researchers at Google used a similar technique in a mind-blowing project called [DeepDream](https://en.wikipedia.org/wiki/DeepDream). Instead of monkeys, they used [**convolutional neural networks (CNNs)**](https://en.wikipedia.org/wiki/Convolutional_neural_network).
+
+<Figure content={<Image path={require("./images/deepdream-bananas.png")} />} />
+
+The resulting images have a dream-like quality and are often called **hallucinations**.
+
+Let's replace the banana recognition task with one we're not so good at: predicting the activity of proteins – and designing new ones with desired properties. The ability to do this is revolutionary to industrial biotechnology and therapeutics. In this post, we'll explore how approaches similar to DeepDream can be used to design new proteins.
+
+## The model: trRosetta
+
+**transform-restrained Rosetta (trRosetta)** is a structure prediction model that, like pretty much everything we'll talk about in this post, was developed at the [Baker lab](https://www.bakerlab.org/). trRosetta has 2 steps:
+
+1. Given a [Multiple Sequence Alignment (MSA)](https://en.wikipedia.org/wiki/Multiple_sequence_alignment), use a CNN to predict 6 structure-defining numbers _for each pair of amino acid residues_.
+
+2. Use the 6 numbers produced by the CNN as input to the [Rosetta](https://www.rosettacommons.org/software) structure modeling software to generate 3D structures.
+
+We'll focus on step 1. One of the structure-defining numbers is the distance between the residues, $d$. There's also this angle $\omega$:
+
+<Figure
+  content={
+    <Image
+      path={require("./images/interresidue-distance.png")}
+      width="40%"
+      mobileWidth="60%"
+    />
+  }
+/>
+
+as well as 4 other angles:
+
+<Figure
+  content={
+    <Image
+      path={require("./images/interresidue-angles.png")}
+      width="40%"
+      mobileWidth="60%"
+    />
+  }
+/>
+
+If we know these 6 numbers for each residue pair in the amino acid chain, then we should have a pretty good sense of the 3D structure, making step 2 possible.
+
+Here's the architecture of the trRosetta CNN. For our purposes, understanding the details is not as important, as long as we remember that it takes in an MSA and spits out these distances and orientation angles.
+
+<Figure
+  content={
+    <Image
+      path={require("./images/trRosetta-architecture.png")}
+      width="40%"
+      mobileWidth="60%"
+    />
+  }
+/>
+
+## Hallucinating proteins
+
+## Can we do better than random?
