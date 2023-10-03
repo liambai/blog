@@ -7,6 +7,7 @@ description: Protein design. DeepDrem, hallucinations, Markov Chain Monte Carlo 
 import { Link } from "gatsby"
 import Figure from "../../../src/components/figure.jsx"
 import Image from "../../../src/components/image.jsx"
+import { Note, NoteList } from "./Notes.jsx"
 import { Reference, ReferenceList } from "./References.jsx"
 
 Models that are good at making predictions also possess some generative power. We saw this theme play out in <Link to="/protein-evolution">previous</Link> <Link to="/protein-representation">posts</Link> with a technique called **Markov Chain Monte Carlo (MCMC)**. Here's a quick recap:
@@ -32,7 +33,7 @@ Now suppose you want to create some _new_ images of bananas. We can start with a
 randomly change a couple pixels, and show it to our monkey:
 
 - If he gets more excited, then we've probably done something that made the image more banana-like. Great – let's keep the changes.
-- If he doesn't doesn't get more excited – or god forbid, gets less excited – let's discard the changes.
+- If he doesn't doesn't get more excited – or god forbid, gets less excited – let's discard the changes <Note id={1}/>.
 
 Repeat this thousands of times: we'll end up with an image that looks a lot like bananas! This is the essence of MCMC, which turns our monkey into a **generative model**.
 
@@ -57,7 +58,7 @@ Let's replace the banana recognition task with one we're not so good at: predict
 
 **transform-restrained Rosetta (trRosetta)** is a structure prediction model that, like pretty much everything we'll talk about in this post, was developed at the [Baker lab](https://www.bakerlab.org/). trRosetta has 2 steps:
 
-1. Given a [Multiple Sequence Alignment (MSA)](https://en.wikipedia.org/wiki/Multiple_sequence_alignment), use a CNN to predict 6 structure-defining numbers _for each pair of amino acid residues_.
+1. Given a [Multiple Sequence Alignment (MSA)](https://en.wikipedia.org/wiki/Multiple_sequence_alignment), use a CNN to predict 6 structure-defining numbers _for each pair of residues_ <Note id={2}/>.
 
 2. Use the 6 numbers produced by the CNN as input to the [Rosetta](https://www.rosettacommons.org/software) structure modeling software to generate 3D structures.
 
@@ -281,7 +282,7 @@ MCMC is fundamentally inefficient. We're literally making random changes to see 
 
 There's just the thing in deep neural networks like trRosetta: **gradients**. During training, gradients guide trRosetta in adjusting its parameters to make better structure predictions. (If you're new to deep learning, I highly recommend this [video](https://youtu.be/VMj-3S1tku0?si=QKn0kH44GPjA1eBG) by Andrej Karpathy explaining gradients from the ground up.)
 
-All we need is a loss function: our average KL divergence between $P$ and $Q$ is a natural one. At each step:
+We already have a loss function: our average KL divergence between $P$ and $Q$. At each step:
 
 1. Ask the differentiable trRosetta to compute gradients with respect to the loss.
 2. Use the gradients to propose a mutation instead of using a random one.
@@ -389,3 +390,4 @@ And of course, this is only the tip of the iceberg: the ability to engineer prot
 ## References
 
 <ReferenceList />
+<NoteList />

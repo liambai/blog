@@ -331,7 +331,6 @@ a:focus {
   background: transparent;
   border: none;
   color: hsla(206, 90%, 20%, 0.7);
-  font-size: 13;
   font-family: var(--font-body);
   margin: 0;
   padding: 0;
