@@ -4,7 +4,7 @@ const references = {
   1: {
     title: "Protein 3D structure computed from evolutionary sequence variation",
     author: "Marks, D.S. et al.",
-    url: "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0028766#pone.0028766.s017",
+    url: "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0028766",
     journal: "PLoS One 6, e28766",
     year: 2011,
   },
