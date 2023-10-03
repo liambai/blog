@@ -169,13 +169,11 @@ Let's visualize this. In the two distance maps we showed above, the colors refle
 
 The left distance map is blurry, while the right one is sharp.
 
-If we provide trRosetta a garbage sequence that doesn't even encode a stable protein, no matter how good trRosetta is at its job of predicting distances, the distance map will be blurry. After all, how can trRosetta be sure if you're asking for the impossible? Conversely, if we provide good sequences of stable proteins, trRosetta will produce sharp distance maps.
+If we provide trRosetta a garbage sequence that doesn't even encode a stable protein, no matter how good trRosetta is at its job of predicting distances, the distance map will be blurry. After all, how can trRosetta be sure if we ask for the impossible? Conversely, if we provide good sequences of stable proteins, trRosetta will produce sharp distance maps.
 
 This idea is important because sharpness, like the monkey's excitement for bananas, is a signal that we can lean on to differentiate good sequences from bad ones.
 
 ### Quantifying sharpness
-
-(This section has some mathematical details – feel free to skip. TLDR: there's a way to quantify sharpness.)
 
 Leo Tolstoy famously said:
 
@@ -183,9 +181,9 @@ Leo Tolstoy famously said:
 
 For distances maps produced by trRosetta, it's quite the opposite: all blurry distance maps are alike; each sharp distance map is sharp in its own way. Each functional protein has a unique structure – that determines a specific function – something that trRosetta learns to capture, whereas each nonfunctional sequence is kinda the same to trRosetta: a whole lotta garbage.
 
-Without a canonical example of sharpness, perhaps the best way to quantify it is to come up with some blurry distance map $Q$ to steer away from: a distance map is sharp if it's very _different_ from $Q$.
+Without a canonical example of sharpness, the best way to quantify it is to come up with some blurry distance map $Q$ – a bad example – to steer away from: a distance map is sharp if it's very _different_ from $Q$.
 
-To get $Q$, we can train trRosetta on the same training sequences, except hiding the identity of each amino acid. This retains some rudimentary characteristics of an amino acid chain: each amino acid has distance $0$ to itself (the dark diagonals), residues that are close in sequence are close in space, etc. But it wipes out all information about the interactions between different amino acids.
+To get $Q$, we can train trRosetta on the same data, except with one catch: we hide the identity of each amino acid. This retains some rudimentary characteristics of an amino acid chain: each amino acid has distance $0$ to itself (the dark diagonals), residues that are close in sequence are close in space, etc. But it eliminates all information about the interactions between amino acids enabled by their unique chemistries.
 
 Given some distance map $P$, how do we measure its similarity to our bad example, $Q$? Remember, a distance map is just a collection of probability distributions, one for each residue pair. If we can measure the difference in the probability distributions at each position – $P_{ij}$ and $Q_{ij}$ – we can average over those measurements and get a measurement between $P$ and $Q$:
 
@@ -203,14 +201,166 @@ $$
 
 This $D_{\text{distribution}}$ is called the **Kullback–Leibler (KL) divergence**, which came from [information theory](https://en.wikipedia.org/wiki/Information_theory). It's a common [loss function](https://pytorch.org/docs/stable/generated/torch.nn.KLDivLoss.html) in machine learning. (Note on notation: it's conventional to use double bars like $D_{KL}(P || Q)$ to emphasize the fact that $D_{KL}(P || Q) \neq D_{KL}(Q || P)$, i.e. KL divergence is not a true distance metric.)
 
-To summarize, we have developed a way to quantify the sharpness of a distance map $P$. Rewriting the notation to be consistent with [this paper](https://www.nature.com/articles/s41586-021-04184-w):
+To summarize, we have developed a way to quantify the sharpness of a distance map $P$:
 
 $$
 D_{KL}(P || Q) = \frac{1}{L^2} \sum_{i, j = 1}^L \sum_{x \in \text{bins}} P_{ij}^{(x)} \log \left(\frac{P_{ij}^{(x)}}{Q_{ij}^{(x)}}\right)
 $$
 
-Intuitively, $P$ is sharp if its as far away from $Q$ as possible, as measured by the average KL divergence.
+(Notation is slightly rewritten to be consistent with [this paper](https://www.nature.com/articles/s41586-021-04184-w)). Intuitively, $P$ is sharp if it's as far away from $Q$ as possible, as measured by the average KL divergence.
 
 ## Hallucinating proteins
 
-## Can we do better than random?
+To recap, when fed an amino acid sequence that encode a functional protein, trRosetta produces a sharp distance map, a good foundation for structure prediction.
+
+<Figure
+  content={<Image path={require("./images/hallucination-background.png")} />}
+/>
+
+When fed a random amino acid sequence, trRosetta produces a blurry distance map. But, equipped with a tool to measure sharpness, _we can sharpen the blurry distance map using MCMC_.
+
+<Figure
+  content={<Image path={require("./images/hallucination-MCMC-overview.png")} />}
+/>
+
+Let's start with a random sequence analogous to a white-noise image. At each MCMC step:
+
+1. Make a random mutation in the sequence.
+2. Feed the sequence into trRosetta to produce a distance map $P$.
+3. Compare $P$ to $Q$, the blurry distance map generated by hiding amino acid identities.
+4. Accept the mutation with high probability if it is a move in the right direction: maximizing the average KL divergence between $P$ and $Q$.
+   - this acceptance criterion is called the [Metropolis criterion](https://en.wikipedia.org/wiki/Metropolis%E2%80%93Hastings_algorithm)
+   - an additional parameter, $T$, is introduced as a knob we can use to control acceptance probability
+
+<Figure
+  content={<Image path={require("./images/hallucination-MCMC-details.png")} />}
+/>
+
+As we repeat these steps, the distance maps get progressively sharper, converging on a final, sharp distance map after 40,000 iterations.
+
+<Figure
+  content={
+    <Image path={require("./images/hallucination-MCMC-progression.png")} />
+  }
+/>
+
+Folks at the Baker lab then expressed these hallucinated sequences in _E. coli_ and found that many of them folded into stable structures that closely match trRosetta's predictions.
+
+<Figure
+  content={
+    <Image path={require("./images/hallucination-structure-example.png")} />
+  }
+/>
+
+I find this astonishing. We can create stable proteins that have never existed in nature, guided purely by some information that trRosetta has learned about what a protein _should_ look like.
+
+## Can we do better than MCMC?
+
+MCMC is fundamentally inefficient. We're literally making random changes to see what sticks. Can we make more informed changes, perhaps using some directional nudges from the knowledgeable trRosetta?
+
+There's just the thing in deep neural networks like trRosetta: **gradients**. During training, gradients guide trRosetta in adjusting its parameters to make better structure predictions. (If you're new to deep learning, I highly recommend this [video](https://youtu.be/VMj-3S1tku0?si=QKn0kH44GPjA1eBG) by Andrej Karpathy explaining gradients from the ground up.)
+
+All we need is a loss function: our average KL divergence between $P$ and $Q$ is a natural one. At each step:
+
+1. Ask the differentiable trRosetta to compute gradients with respect to the loss.
+2. Use the gradients to propose a mutation instead of using a random one.
+   - Turning the gradients into a proposed mutation takes a few simple steps (bottom left of the diagram). They are explained in the methods section of [here](https://www.pnas.org/doi/10.1073/pnas.2017228118).
+
+<Figure
+  content={<Image path={require("./images/hallucination-gradients.png")} />}
+/>
+
+(This paper focuses on more constrained version of protein design called **fixed-backbone design**, which seeks an amino acid sequence given a target structure. This is why the loss function, in addition to the KL divergence term, also contains a term measuring the distance from the target structure (right of the diagram). The principles of leveraging gradients to create more informed mutations are the same, regardless of whether we have a target structure.)
+
+Using this gradient-based approach, we can often converge to a sharp sequence map with much fewer steps, usually hundreds instead of tens of thousands.
+
+## Designing useful proteins
+
+So far, we have focused on designing stable proteins that fold into well-predicted structures. Let's extend this approach to designing proteins that have a desired function, such as binding to a therapeutically relevant target protein.
+
+### Functional sites
+
+Most proteins perform their function via a **functional site** formed by a small subset of residues (a **motif**). For example, the functional sites of enzymes, also called **active sites**, bind to their substrates and perform the catalytic function.
+
+<Figure
+  content={
+    <Image
+      path={require("./images/enzyme-active-site.png")}
+      width="60%"
+      mobileWidth="85%"
+    />
+  }
+>
+  https://biocyclopedia.com/index/general_zoology/action_of_enzymes.php
+</Figure>
+
+Since it's really the functional site that matters, a natural problem is: given a desired functional site, can we design a protein that contains it? This is often called **scaffolding** a functional site. Solutions to this problem has wide-ranging implications, from designing new vaccines to interfering with cancer.
+
+<Figure
+  content={
+    <Image
+      path={require("./images/scaffolding-motif.png")}
+      width="40%"
+      mobileWidth="60%"
+    />
+  }
+></Figure>
+
+### Satisfying the motif
+
+To guide MCMC towards sequences containing the desired motif, we can introduce an additional term to our loss function to capture motif satisfaction:
+
+$$
+Loss = Loss_{FH} + Loss_{MS}
+$$
+
+where $Loss_{FH}$, the **free-hallucination loss**, is our average DL divergence from before, nudging the model away from $Q$ to be more generally protein-like; and $Loss_{MS}$ is the new **motif-satisfaction loss**.
+
+Intuitively, this loss needs to be small when the structure predicted by trRosetta clearly contains the desired motif – and big otherwise. For the mathematical details, check out the methods section [here](https://www.biorxiv.org/content/10.1101/2020.11.29.402743v1). We are engaging in a balancing act: we want proteins that contain the functional site (low motif-satisfaction loss) that are also generally good, stable proteins (low free-hallucination loss)!
+
+<Figure
+  content={
+    <Image
+      path={require("./images/motif-satisfaction-overview.png")}
+      width="60%"
+      mobileWidth="85%"
+    />
+  }
+></Figure>
+
+### A case study: SARS-CoV-2
+
+SARS-CoV-2, the virus behind the Covid-19 pandemic, has a clever way of entering our cells. It takes advantage of an innocent, blood-pressure regulating protein in our body called **angiotensin-converting enzyme 2 (ACE2)** that straddles the cell membrane.
+
+<Figure
+  content={
+    <Image path={require("./images/ACE2.png")} width="50%" mobileWidth="75%" />
+  }
+></Figure>
+
+Specifically, it binds to an [alpha helix](https://en.wikipedia.org/wiki/Alpha_helix) in ACE2 that is exposed to the outside. And then enters the cell like this:
+
+<Figure
+  content={<Image path={require("./images/ACE2-attacked.png")} />}
+></Figure>
+
+One way we can disrupt this mechanism is to _design a protein that contains ACE2's interface alpha helix_. Our protein would trick the coronavirus into thinking that it is ACE2 – and bind to it instead – sparing our innocent ACE2's.
+These therapeutic proteins are called **receptor traps**: they trap the receptors on the coronavirus spike protein.
+
+This is exactly our functional site scaffolding problem. Folks at the Baker lab used the composite loss function approach and hallucinated these receptor traps on the right.
+
+<Figure
+  content={<Image path={require("./images/ACE2-designs.png")} width="80%" />}
+></Figure>
+
+I hope I have convinced you that these hallucinations are not only cool but also profoundly impactful. It was only in the past few years that we have acquired the ability to engineer proteins with this level of control, thanks primarily to the groundbreaking work from the Baker lab.
+
+And of course, this is only the tip of the iceberg: the ability to engineer these binders to disrupt disease mechanisms will revolutionize drug discovery and reduce a lot of suffering in the world.
+
+# Final notes
+
+- Throughout this post, we exclusively focused on the distances produced by trRosetta, compiled in distance maps. There are also the 5 angles parameters that work in the exact same way: binned predictions, KL divergence, etc. trRosetta outputs 1 distance map and 5 "angle"-maps, all of which are used to drive the hallucinations.
+
+- trRosetta is no longer the best structure prediction model, a testament to this rapidly moving field. Since 2021, two models have consistently demonstrated superior performance: AlphaFold from DeepMind and RoseTTAFold from the Baker lab.
+  - Both AlphaFold and RoseTTAFold are deep neural networks, so all the ideas discussed in this post still apply.
+  - [This paper](https://onlinelibrary.wiley.com/doi/full/10.1002/pro.4653) applies the same techniques using AlphaFold; many subsequent papers from the Baker lab use RoseTTAFold instead of trRosetta, including the one that designed the SARS-CoV-2 receptor trap.
