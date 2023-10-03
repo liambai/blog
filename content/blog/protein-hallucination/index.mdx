@@ -1,7 +1,7 @@
 ---
 title: Protein Inception
 date: "2023-10-08"
-description: Protein design. DeepDrem, hallucinations, Markov Chain Monte Carlo (MCMC), ...
+description: Protein design by hallucination. DeepDream, Markov Chain Monte Carlo (MCMC), KL divergence, gradient optimization, scaffolding functional sites, SARS-CoV-2 receptor traps.
 ---
 
 import { Link } from "gatsby"
@@ -12,7 +12,7 @@ import { Reference, ReferenceList } from "./References.jsx"
 
 Models that are good at making predictions also possess some generative power. We saw this theme play out in <Link to="/protein-evolution">previous</Link> <Link to="/protein-representation">posts</Link> with a technique called **Markov Chain Monte Carlo (MCMC)**. Here's a quick recap:
 
-Imagine you have a monkey that, when shown an image, always gets visibly excited if the image contains bananas – and sad otherwise.
+Imagine you have a monkey that, when shown an image, gets visibly excited if the image contains bananas – and sad otherwise.
 
 <Figure content={<Image path={require("./images/monkey-model.png")} />} />
 
@@ -353,7 +353,10 @@ Since it's really the functional site that matters, a natural problem is: given 
       mobileWidth="60%"
     />
   }
-></Figure>
+>
+  The green part is the motif we need; the grey part is what we need to design.
+  Figure from <Reference id={5} />.
+</Figure>
 
 ### Satisfying the motif
 
@@ -375,23 +378,27 @@ Intuitively, this loss needs to be small when the structure predicted by trRoset
       mobileWidth="85%"
     />
   }
-></Figure>
+>
+  Figure from <Reference id={5} />.
+</Figure>
 
 ### A case study: SARS-CoV-2
 
-SARS-CoV-2, the virus behind the Covid-19 pandemic, has a clever way of entering our cells. It takes advantage of an innocent, blood-pressure regulating protein in our body called **angiotensin-converting enzyme 2 (ACE2)** that straddles the cell membrane.
+SARS-CoV-2, the virus behind the Covid-19 pandemic, has a clever way of entering our cells. It takes advantage of an innocent, blood-pressure regulating protein in our body called [angiotensin-converting enzyme 2 (ACE2)](https://en.wikipedia.org/wiki/Angiotensin-converting_enzyme_2) that straddles the cell membrane.
 
 <Figure
   content={
     <Image path={require("./images/ACE2.png")} width="50%" mobileWidth="75%" />
   }
-></Figure>
+>
+  Figure from <Reference id={6} />.{" "}
+</Figure>
 
 It anchors itself by binding to an [alpha helix](https://en.wikipedia.org/wiki/Alpha_helix) in ACE2 exposed to the outside, and then enters the cell:
 
-<Figure
-  content={<Image path={require("./images/ACE2-attacked.png")} />}
-></Figure>
+<Figure content={<Image path={require("./images/ACE2-attacked.png")} />}>
+  Figure from <Reference id={6} />.
+</Figure>
 
 One way we can disrupt this mechanism is to _design a protein that contains ACE2's interface alpha helix_. Our protein would trick the coronavirus into thinking that it is ACE2 – and bind to it instead – sparing our innocent ACE2's.
 These therapeutic proteins are called **receptor traps**: they trap the receptors on the coronavirus spike protein.
@@ -400,7 +407,9 @@ This is exactly our functional site scaffolding problem. Folks at the Baker lab 
 
 <Figure
   content={<Image path={require("./images/ACE2-designs.png")} width="80%" />}
-></Figure>
+>
+  Figure from <Reference id={4} />.
+</Figure>
 
 I hope I have convinced you that these hallucinations are not only cool but also profoundly useful. It was only in the past few years that we have acquired the ability to engineer proteins with this level of control, thanks primarily to groundbreaking work from the Baker lab.
 

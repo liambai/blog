@@ -34,7 +34,7 @@ const references = {
   5: {
     title: "Scaffolding protein functional sites using deep learning",
     author: "Wang, J. et al",
-    url: "https://www.science.org/doi/full/10.1126/science.abn2100?af=R",
+    url: "https://www.science.org/doi/full/10.1126/science.abn2100",
     journal: "Science 377,387-394",
     year: 2022,
   },
