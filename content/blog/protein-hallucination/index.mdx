@@ -56,7 +56,7 @@ Let's replace the banana recognition task with one we're not so good at: predict
 
 ### Overview
 
-**transform-restrained Rosetta (trRosetta)** is a structure prediction model that, like pretty much everything we'll talk about in this post, was developed at the [Baker lab](https://www.bakerlab.org/). trRosetta has 2 steps:
+**transform-restrained Rosetta (trRosetta)** is a structure prediction model that, like almost everything we'll talk about in this post, was developed at the [Baker lab](https://www.bakerlab.org/). trRosetta has 2 steps:
 
 1. Given a [Multiple Sequence Alignment (MSA)](https://en.wikipedia.org/wiki/Multiple_sequence_alignment), use a CNN to predict 6 structure-defining numbers _for each pair of residues_ <Note id={2}/>.
 
@@ -75,10 +75,10 @@ Let's focus on step 1. One structure-defining number produced by trRosetta is th
 >
   C$\alpha$ (alpha-carbon), is the first carbon in the amino acid's [side
   chain](https://en.wikipedia.org/wiki/Side_chain); C$\beta$ (beta-carbon) is
-  the second. Extremely simplistically, if we imagine a finger as a side chain,
-  C$\alpha$ is at the base, C$\beta$ is closer to the tip. $d$ is the
-  C$\beta$-C$\beta$ distance. Figure from
-  <Reference id={1} />.
+  the second. Simplistically, imagine your index fingers as side chains:
+  C$\alpha$'s are the bases of your fingers, C$\beta$'s are the fingertips, and
+  $d$, the C$\beta$-C$\beta$ distance, is the distance between your fingertips.
+  Figure from <Reference id={1} />.
 </Figure>
 
 as well as 4 other angles:
@@ -95,11 +95,11 @@ as well as 4 other angles:
   Figure from <Reference id={1} />.
 </Figure>
 
-If we know these 6 numbers for each residue pair in folded 3D structure, then we should have a pretty good sense of what the structure looks like, setting a good foundation for step 2.
+If we know these 6 numbers for each residue pair in folded 3D structure, then we should have a decent sense of what the structure looks like – a good foundation for step 2.
 
 ### The architecture
 
-Here's the architecture of the trRosetta CNN. For our purposes, understanding the inner workings is not important, and we can just keep in mind the big picture: the network takes in an MSA and spits out these interresidue distances and orientation angles.
+Here's the architecture of the trRosetta CNN. For our purposes, understanding the inner workings is not as important; we can just keep in mind the big picture: the network takes in an MSA and spits out these interresidue distances and orientation angles.
 
 <Figure
   content={
@@ -187,7 +187,9 @@ Let's visualize this. In the two distance maps we showed above, the colors refle
       mobileWidth="80%"
     />
   }
-/>
+>
+  Figure from <Reference id={2} />
+</Figure>
 
 The left distance map is blurry, while the right one is sharp.
 
@@ -203,9 +205,9 @@ Leo Tolstoy famously said:
 
 For distances maps produced by trRosetta, it's quite the opposite: all blurry distance maps are alike; each sharp distance map is sharp in its own way. Each functional protein has a unique structure – that determines a specific function – something that trRosetta learns to capture, whereas each nonfunctional sequence is kinda the same to trRosetta: a whole lotta garbage.
 
-Without a canonical example of sharpness, the best way to quantify it is to come up with some blurry distance map $Q$ – a bad example – to steer away from: a distance map is sharp if it's very _different_ from $Q$.
+Without a canonical example of sharpness, we can quantify it by coming up with a canonical blurry distance map $Q$ – a bad example – to steer away from: a distance map is sharp if it's very _different_ from $Q$ <Reference id={2}/>.
 
-To get $Q$, we can train trRosetta on the same data, except with one catch: we hide the identity of each amino acid. This retains some rudimentary characteristics of an amino acid chain, e.g. residues that are close in sequence are close in space. But it eliminates all information about the interactions between amino acids enabled by their unique chemistries.
+We can get $Q$ from a **background network**, which is the same as trRosetta with one important catch: the identity of each amino acid is hidden in the training data. The background network retains some rudimentary information about the amino acid chain, e.g. residues that are close in sequence are close in space. But it cannot learn anything about the interactions between amino acids that come from their unique chemistries.
 
 Given some distance map $P$, how do we measure its similarity to our bad example, $Q$? Remember, a distance map is just a collection of probability distributions, one for each residue pair. If we can measure the difference in the probability distributions at each position – $P_{ij}$ and $Q_{ij}$ – we can average over those measurements and get a measurement between $P$ and $Q$:
 
@@ -221,7 +223,7 @@ $$
 D_{\text{distribution}}(P_{ij}, Q_{ij}) = \sum_{x \in \text{bins}} P_{ij}^{(x)} \log \left(\frac{P_{ij}^{(x)}}{Q_{ij}^{(x)}}\right)
 $$
 
-This $D_{\text{distribution}}$ is called the **Kullback–Leibler (KL) divergence**, which came from [information theory](https://en.wikipedia.org/wiki/Information_theory). It's a common [loss function](https://pytorch.org/docs/stable/generated/torch.nn.KLDivLoss.html) in machine learning. (Note on notation: it's conventional to use double bars like $D_{KL}(P || Q)$ to emphasize the fact that $D_{KL}(P || Q) \neq D_{KL}(Q || P)$, i.e. KL divergence is not a true distance metric.)
+This is the **Kullback–Leibler (KL) divergence**, which came from [information theory](https://en.wikipedia.org/wiki/Information_theory). It's a common [loss function](https://pytorch.org/docs/stable/generated/torch.nn.KLDivLoss.html) in machine learning. (Note on notation: it's conventional to use double bars like $D_{KL}(P || Q)$ to emphasize the fact that $D_{KL}(P || Q) \neq D_{KL}(Q || P)$, i.e. KL divergence is not a true distance metric.)
 
 To summarize, we have developed a way to quantify the sharpness of a distance map $P$:
 
@@ -229,21 +231,25 @@ $$
 D_{KL}(P || Q) = \frac{1}{L^2} \sum_{i, j = 1}^L \sum_{x \in \text{bins}} P_{ij}^{(x)} \log \left(\frac{P_{ij}^{(x)}}{Q_{ij}^{(x)}}\right)
 $$
 
-(Notation is slightly rewritten to be consistent with [this paper](https://www.nature.com/articles/s41586-021-04184-w)). Intuitively, $P$ is sharp if it's as far away from $Q$ as possible, as measured by the average KL divergence.
+(Notation is slightly rewritten to be consistent with <Reference id={2}/>) Intuitively, $P$ is sharp if it's as far away from $Q$ as possible, as measured by the average KL divergence.
 
 ## Hallucinating proteins
 
-To recap, when fed an amino acid sequence that encode a functional protein, trRosetta produces a sharp distance map, a good foundation for structure prediction.
+To recap, when fed an amino acid sequence that encodes a functional protein, trRosetta produces a sharp distance map, a good foundation for structure prediction.
 
 <Figure
   content={<Image path={require("./images/hallucination-background.png")} />}
-/>
+>
+  Figure from <Reference id={2} />.
+</Figure>
 
-When fed a random amino acid sequence, trRosetta produces a blurry distance map. But, equipped with a tool to measure sharpness, _we can sharpen the blurry distance map using MCMC_.
+When fed a random amino acid sequence, trRosetta produces a blurry distance map. But, equipped with a tool to measure sharpness, _we can sharpen the blurry distance map using MCMC_ <Reference id={2}/>.
 
 <Figure
   content={<Image path={require("./images/hallucination-MCMC-overview.png")} />}
-/>
+>
+  Figure from <Reference id={2} />.
+</Figure>
 
 Let's start with a random sequence analogous to a white-noise image. At each MCMC step:
 
@@ -256,7 +262,9 @@ Let's start with a random sequence analogous to a white-noise image. At each MCM
 
 <Figure
   content={<Image path={require("./images/hallucination-MCMC-details.png")} />}
-/>
+>
+  Figure from <Reference id={2} />.
+</Figure>
 
 As we repeat these steps, the distance maps get progressively sharper, converging on a final, sharp distance map after 40,000 iterations.
 
@@ -264,15 +272,27 @@ As we repeat these steps, the distance maps get progressively sharper, convergin
   content={
     <Image path={require("./images/hallucination-MCMC-progression.png")} />
   }
-/>
+>
+  Each row represents a Monte Carlo trajectory, the evolutionary path from a
+  random protein to a hallucinated protein. Distance maps get progressively
+  sharper along the trajectory. Final predicted structures are shown on the
+  right. Figure from
+  <Reference id={2} />.
+</Figure>
 
-When expressed in _E. coli_, many of these these hallucinated sequences folded into stable structures that closely match trRosetta's predictions.
+When expressed in _E. coli_, many of these these hallucinated sequences fold into stable structures that closely match trRosetta's predictions.
 
 <Figure
   content={
     <Image path={require("./images/hallucination-structure-example.png")} />
   }
-/>
+>
+  For one of the hallucinated sequences, we compare trRosetta's predicted
+  structure to the experimental structure obtained via [X-ray
+  crystallography](https://en.wikipedia.org/wiki/X-ray_crystallography) after
+  expressing the sequence in *E. coli.* The ribbon diagram on the right shows
+  the two overlaid on top of each other. Figure from <Reference id={2} />.
+</Figure>
 
 I find this astonishing. We can create stable proteins that have never existed in nature, guided purely by some information that trRosetta has learned about what a protein _should_ look like.
 
@@ -280,19 +300,25 @@ I find this astonishing. We can create stable proteins that have never existed i
 
 MCMC is fundamentally inefficient. We're literally making random changes to see what sticks. Can we make more informed changes, perhaps using some directional nudges from the knowledgeable trRosetta?
 
-There's just the thing in deep neural networks like trRosetta: **gradients**. During training, gradients guide trRosetta in adjusting its parameters to make better structure predictions. (If you're new to deep learning, I highly recommend this [video](https://youtu.be/VMj-3S1tku0?si=QKn0kH44GPjA1eBG) by Andrej Karpathy explaining gradients from the ground up.)
+There's just the thing in deep neural networks like trRosetta: **gradients** <Reference id={3}/>. During training, gradients guide trRosetta in adjusting its parameters to make better structure predictions <Note id={3}/>.
 
 We already have a loss function: our average KL divergence between $P$ and $Q$. At each step:
 
 1. Ask the differentiable trRosetta to compute gradients with respect to the loss.
 2. Use the gradients to propose a mutation instead of using a random one.
-   - Turning the gradients into a proposed mutation takes a few simple steps (bottom left of the diagram). They are explained in the methods section of [here](https://www.pnas.org/doi/10.1073/pnas.2017228118).
+   - Turning the gradients into a proposed mutation takes a few simple steps (bottom left of the diagram). They are explained in the methods section [here](https://www.pnas.org/doi/10.1073/pnas.2017228118).
 
 <Figure
   content={<Image path={require("./images/hallucination-gradients.png")} />}
-/>
-
-(This paper focuses on more constrained version of protein design called **fixed-backbone design**, which seeks an amino acid sequence given a target structure. This is why the loss function, in addition to the KL divergence term, also contains a term measuring the distance from the target structure (right of the diagram). The principles of leveraging gradients to create more informed mutations are the same, regardless of whether we have a target structure.)
+>
+  The figure describes a more constrained version of protein design called
+  **fixed-backbone design**, which seeks an amino acid sequence given a target
+  structure <Reference id={3} />. This is why the loss function, in addition to
+  the KL divergence term, also contains a term measuring similarity to the
+  target structure (right). Nonetheless, the principles of leveraging gradients
+  to create more informed mutations are the same, regardless of whether we have
+  a target structure. Figure from <Reference id={3} />.
+</Figure>
 
 Using this gradient-based approach, we can often converge to a sharp sequence map with much fewer steps, usually hundreds instead of tens of thousands.
 
@@ -302,7 +328,7 @@ So far, we have focused on designing stable proteins that fold into well-predict
 
 ### Functional sites
 
-Most proteins perform their function via a **functional site** formed by a small subset of residues (a **motif**). For example, the functional sites of enzymes, also called **active sites**, bind to their substrates and perform the catalytic function.
+Most proteins perform their function via a **functional site** formed by a small subset of residues called a **motif**. For example, the functional sites of enzymes bind to their substrates and perform the catalytic function <Note id={4}/>.
 
 <Figure
   content={
@@ -313,10 +339,11 @@ Most proteins perform their function via a **functional site** formed by a small
     />
   }
 >
-  https://biocyclopedia.com/index/general_zoology/action_of_enzymes.php
+  The functional sites of enzymes are called **active sites**. Figure from
+  [https://biocyclopedia.com/index/general_zoology/action_of_enzymes.php](https://biocyclopedia.com/index/general_zoology/action_of_enzymes.php).
 </Figure>
 
-Since it's really the functional site that matters, a natural problem is: given a desired functional site, can we design a protein that contains it? This is often called **scaffolding** a functional site. Solutions to this problem has wide-ranging implications, from designing new vaccines to interfering with cancer.
+Since it's really the functional site that matters, a natural problem is: given a desired functional site, can we design a protein that contains it? This is often called **scaffolding** a functional site. Solutions to this problem has wide-ranging implications, from designing new vaccines to interfering with cancer <Reference id={5}/>.
 
 <Figure
   content={

@@ -1,8 +1,45 @@
+import React from "react"
 import getNoteComponents from "../../../src/components/notes"
 
 const notes = {
-  1: "In Metropolis-Hastings, we still accept some percentage of the time, proportional to how bad the move was.",
-  2: "residue, meaning unit, refers to a position in the amino acid chain.",
+  1: (
+    <>
+      <span>In </span>
+      <a href="https://en.wikipedia.org/wiki/Metropolis%E2%80%93Hastings_algorithm">
+        Metropolis-Hastings
+      </a>
+      <span>
+        , we still accept this change some percentage of the time, proportional
+        to how counterproductive it was.
+      </span>
+    </>
+  ),
+  2: "Residue, meaning unit, refers to a position in the amino acid chain.",
+  3: (
+    <>
+      <span>If you're new to deep learning, I highly recommend this </span>
+      <a href="https://youtu.be/VMj-3S1tku0?si=QKn0kH44GPjA1eBG">video</a>
+      <span> by Andrej Karpathy explaining gradients from the ground up.</span>
+    </>
+  ),
+  4: (
+    <>
+      <span>
+        Enzymes are proteins that catalyze a reaction by binding to the
+        reactant, called{" "}
+      </span>
+      <b>substrate</b>
+      <span>
+        . Enzyme are indispensible to our bodily functions: as you read this, an
+        enzyme called{" "}
+      </span>
+      <a href="https://en.wikipedia.org/wiki/PDE6">PDE6 </a>
+      <span>
+        catalyzes the reactions that covert the light hitting your retina to
+        signals to your brain.
+      </span>
+    </>
+  ),
 }
 
 export const { Note, NoteList } = getNoteComponents(notes)
