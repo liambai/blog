@@ -32,9 +32,9 @@ Now suppose you want to create some _new_ images of bananas. We can start with a
 randomly change a couple pixels, and show it to our monkey:
 
 - If he gets more excited, then we've probably done something that made the image more banana-like. Great – let's keep the changes.
-- If he doesn't doesn't get more excited – or god forbid, gets less excited – let's forget about the changes.
+- If he doesn't doesn't get more excited – or god forbid, gets less excited – let's discard the changes.
 
-Repeat this thousands of times: we'll end up with an image that looks a lot like bananas! This is the essence of MCMC, which lets us turn our monkey into a **generative model**.
+Repeat this thousands of times: we'll end up with an image that looks a lot like bananas! This is the essence of MCMC, which turns our monkey into a **generative model**.
 
 Researchers at Google used a similar technique in a cool project called [DeepDream](https://en.wikipedia.org/wiki/DeepDream). Instead of monkeys, they used [**convolutional neural networks (CNNs)**](https://en.wikipedia.org/wiki/Convolutional_neural_network).
 
@@ -49,7 +49,7 @@ Researchers at Google used a similar technique in a cool project called [DeepDre
 
 The resulting images have a dream-like quality and are often called **hallucinations**.
 
-Let's replace the banana recognition task with one we're not so good at: predicting the activity of proteins – and creating new ones with desired properties. The ability to do this is revolutionary to industrial biotechnology and therapeutics. In this post, we'll explore how approaches similar to DeepDream can be used to design new proteins.
+Let's replace the banana recognition task with one we're not so good at: predicting the fitness of proteins – and creating new ones with desired properties. The ability to do this is revolutionary to industrial biotechnology and therapeutics. In this post, we'll explore how approaches similar to DeepDream can be used to design new proteins.
 
 ## The model: trRosetta
 
@@ -72,7 +72,12 @@ Let's focus on step 1. One structure-defining number produced by trRosetta is th
     />
   }
 >
-  Figure from <Reference id={1} />.
+  C$\alpha$ (alpha-carbon), is the first carbon in the amino acid's [side
+  chain](https://en.wikipedia.org/wiki/Side_chain); C$\beta$ (beta-carbon) is
+  the second. Extremely simplistically, if we imagine a finger as a side chain,
+  C$\alpha$ is at the base, C$\beta$ is closer to the tip. $d$ is the
+  C$\beta$-C$\beta$ distance. Figure from
+  <Reference id={1} />.
 </Figure>
 
 as well as 4 other angles:
@@ -89,7 +94,7 @@ as well as 4 other angles:
   Figure from <Reference id={1} />.
 </Figure>
 
-If we know these 6 numbers for each residue pair in the amino acid chain, then we should have a pretty good sense of the 3D structure, providing a good foundation for step 2.
+If we know these 6 numbers for each residue pair in folded 3D structure, then we should have a pretty good sense of what the structure looks like, setting a good foundation for step 2.
 
 ### The architecture
 
