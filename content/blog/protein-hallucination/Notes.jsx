@@ -40,6 +40,21 @@ const notes = {
       </span>
     </>
   ),
+  5: (
+    <>
+      <span>
+        We omitted an important detail: how do we choose which residues should
+        constitute the motif? The cited{" "}
+      </span>
+      <a href="https://www.biorxiv.org/content/10.1101/2020.11.29.402743v1">
+        paper{" "}
+      </a>
+      <span>
+        tried two approaches, which are described in a section called 'Motif
+        placement algorithms'.
+      </span>
+    </>
+  ),
 }
 
 export const { Note, NoteList } = getNoteComponents(notes)
