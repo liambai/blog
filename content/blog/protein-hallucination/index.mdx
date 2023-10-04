@@ -16,7 +16,7 @@ Imagine you have a monkey that, when shown an image, gets visibly excited if the
 
 <Figure content={<Image path={require("./images/monkey-model.png")} />} />
 
-An obvious task the monkey can help with is image classification, discriminating images with bananas and ones without. The monkey is a **discriminative model**.
+An obvious task the monkey can help with is image classification, discriminating images containing bananas from ones that don't. The monkey is a **discriminative model**.
 
 Now suppose you want to create some _new_ images of bananas. We can start with a white-noise image:
 
@@ -43,7 +43,7 @@ Researchers at Google used a similar technique in a cool project called [DeepDre
   "Optimize with prior" refers to the fact that to make this work well, we
   usually need to constrain our generated images to have some features of
   natural images: for example, neighboring pixels should be correlated. Figure
-  from the [blog
+  from this [blog
   post](https://blog.research.google/2015/06/inceptionism-going-deeper-into-neural.html)
   on DeepDream.
 </Figure>
