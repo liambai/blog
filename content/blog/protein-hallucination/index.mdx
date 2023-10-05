@@ -7,6 +7,7 @@ description: Protein design by hallucination. DeepDream, Markov Chain Monte Carl
 import { Link } from "gatsby"
 import Figure from "../../../src/components/figure.jsx"
 import Image from "../../../src/components/image.jsx"
+import LongRangeContacts from "./d3/LongRangeContacts.jsx"
 import { Note, NoteList } from "./Notes.jsx"
 import { Reference, ReferenceList } from "./References.jsx"
 
@@ -16,7 +17,7 @@ Imagine you have a monkey that, when shown an image, gets visibly excited if the
 
 <Figure content={<Image path={require("./images/monkey-model.png")} />} />
 
-An obvious task the monkey can help with is image classification, discriminating images containing bananas from ones that don't. The monkey is a **discriminative model**.
+An obvious task the monkey can help with is image classification: discriminate images containing bananas from ones that don't. The monkey is a **discriminative model**.
 
 Now suppose you want to create some _new_ images of bananas. We can start with a white-noise image:
 
@@ -56,7 +57,7 @@ Let's replace the banana recognition task with one we're not so good at: predict
 
 ### Overview
 
-**transform-restrained Rosetta (trRosetta)** is a structure prediction model that, like almost everything we'll talk about in this post, was developed at the [Baker lab](https://www.bakerlab.org/). trRosetta has 2 steps:
+**transform-restrained Rosetta (trRosetta)** is a structure prediction model that, like almost everything we'll talk about in this post, was developed at the [Baker lab](https://www.bakerlab.org/) <Reference id={1} />. trRosetta has 2 steps:
 
 1. Given a [Multiple Sequence Alignment (MSA)](https://en.wikipedia.org/wiki/Multiple_sequence_alignment), use a CNN to predict 6 structure-defining numbers _for each pair of residues_ <Note id={2}/>.
 
@@ -99,7 +100,7 @@ If we know these 6 numbers for each residue pair in folded 3D structure, then we
 
 ### The architecture
 
-Here's the architecture of the trRosetta CNN. For our purposes, understanding the inner workings is not as important; we can just keep in mind the big picture: the network takes in an MSA and spits out these interresidue distances and orientation angles.
+Here's the architecture of the trRosetta CNN. For our purposes, understanding the inner workings is not as important. The big picture: the network takes in an MSA and spits out these interresidue distances and orientation angles.
 
 <Figure
   content={
@@ -111,13 +112,13 @@ Here's the architecture of the trRosetta CNN. For our purposes, understanding th
   }
 >
   trRosetta uses a deep residual CNN. For more details, check out the [trRosetta
-  paper](https://www.pnas.org/doi/10.1073/pnas.1914677117). Figure from{" "}
+  paper](https://www.pnas.org/doi/10.1073/pnas.1914677117). Figure from
   <Reference id={1} />.
 </Figure>
 
 ### Distance maps
 
-We can represent the interresidue distances predicted by the network in a matrix called the **distance map**:
+Let's ignore the angles for now and focus on distance. The interresidue distances predicted by the network are presented in a matrix called the **distance map**:
 
 <Figure
   content={
@@ -129,53 +130,76 @@ We can represent the interresidue distances predicted by the network in a matrix
   }
 />
 
-Around the diagonal of the matrix are residues that are close in position, which are of course close in 3D space, hence the dark diagonal line. (Only the residues that are far apart in sequence but close in 3D are interesting and structure-defining.)
+Around the diagonal of the matrix are residues that are close in position – which are of course close in 3D space – explaining the dark diagonal line. (Only the residues that are far apart in sequence but close in 3D are interesting and structure-defining)
 
-Neural networks output probabilities, not definitive answers. For example, language models like GPT – tasked with predicting the next word given some previous words as context – outputs a probability distribution over the set of all possible words (the vocabulary); in an additional final step, the word with the highest probability is chosen to be the prediction. In our case, trRosetta outputs probabilities for different distance bins, like this:
+<Figure content={<LongRangeContacts />}>
+  In this simplified visualization of an amino acid chain's folded structure,
+  the fact that residues 2 and 3 are close together is obvious and
+  uninteresting, but the fact that 2 and 8 are close together – due to some
+  residue-residue interaction represented by the blue link – is important for
+  structure.
+</Figure>
 
-<table style={{width: 300, margin: "auto"}}>
-  <tr>
-    <th style={{textAlign: "left"}}>Distance bin</th>
-    <th style={{textAlign: "left"}}>Probability</th>
-  </tr>
-  <tr>
-    <td>0 - 0.5 $\text{\r{A}}$</td>
-    <td>0.0001</td>
-  </tr>
-  <tr>
-    <td>0.5 - 1 $\text{\r{A}}$</td>
-    <td>0.0002</td>
-  </tr>
-  <tr>
-    <td>...</td>
-    <td>...</td>
-  </tr>
-  <tr>
-    <td>5 - 5.5 $\text{\r{A}}$</td>
-    <td>0.01</td>
-  </tr>
-  <tr>
-    <td>5.5 - 6.0$\text{\r{A}}$</td>
-    <td>0.74</td>
-  </tr>
-  <tr>
-    <td>6.0 - 6.5$\text{\r{A}}$</td>
-    <td>0.12</td>
-  </tr>
-  <tr>
-    <td>...</td>
-    <td>...</td>
-  </tr>
-  <tr>
-    <td>19.5 - 20 $\text{\r{A}}$</td>
-    <td>0</td>
-  </tr>
-</table>
+Neural networks output probabilities. For example, language models like GPT – tasked with predicting the next word given some previous words as context – outputs a probability distribution over the set of all possible words (the vocabulary); in an additional final step, the word with the highest probability is chosen to be the prediction. In our case, trRosetta outputs probabilities for different distance bins, like this:
+
+<Figure
+  content={
+    <table
+      style={{
+        width: 300,
+        margin: "auto",
+        textAlign: "left",
+        marginBottom: 10,
+      }}
+    >
+      <tr>
+        <th>Distance bin</th>
+        <th>Probability</th>
+      </tr>
+      <tr>
+        <td>0 - 0.5 Å</td>
+        <td>0.0001</td>
+      </tr>
+      <tr>
+        <td>0.5 - 1 Å</td>
+        <td>0.0002</td>
+      </tr>
+      <tr>
+        <td>...</td>
+        <td>...</td>
+      </tr>
+      <tr>
+        <td>5 - 5.5 Å</td>
+        <td>0.01</td>
+      </tr>
+      <tr>
+        <td>5.5 - 6.0Å</td>
+        <td>0.74</td>
+      </tr>
+      <tr>
+        <td>6.0 - 6.5Å</td>
+        <td>0.12</td>
+      </tr>
+      <tr>
+        <td>...</td>
+        <td>...</td>
+      </tr>
+      <tr>
+        <td>19.5 - 20 Å</td>
+        <td>0</td>
+      </tr>
+    </table>
+  }
+>
+  An angstrom (Å) is $10^{-10}$ m, a common unit for measuring atomic distance.
+  Each distance bin spans 5 Å and is assigned a probability by trRosetta.
+</Figure>
+
 <br />
 
-In this example, it's pretty clear that trRosetta thinks the distance between these two residues should be around 6.0$\text{\r{A}}$, which we can use as our prediction. Because trRosetta is so confident, we say that the distance map is _sharp_.
+In this example, it's pretty clear that trRosetta believes the distance between these two residues to be around 6 Å, which we can use as our prediction. Because trRosetta is so confident, we say that the distance map is _sharp_.
 
-But trRosetta is not always so confident. If the probability distribution is more uniform, it wouldn't be so clear which distance bin is best. In those cases, the distance map is _blurry_.
+But trRosetta is not always so confident. If the probability distribution is more uniform, it wouldn't be so clear which distance bin is best. In those cases, we say the distance map is _blurry_.
 
 Let's visualize this. In the two distance maps we showed above, the colors reflect, for each residue pair, the sum of trRosetta's predicted probabilities for the bins in the $ <10 \text{\r{A}}$ range, i.e. how likely trRosetta thinks it is for the residues to end up close together in the 3D structure.
 
@@ -203,11 +227,11 @@ Leo Tolstoy famously said:
 
 > All happy families are alike; each unhappy family is unhappy in its own way.
 
-For distances maps produced by trRosetta, it's quite the opposite: all blurry distance maps are alike; each sharp distance map is sharp in its own way. Each functional protein has a unique structure – that determines a specific function – something that trRosetta learns to capture, whereas each nonfunctional sequence is kinda the same to trRosetta: a whole lotta garbage.
+For distances maps produced by trRosetta, it's kinda the opposite: all blurry distance maps are alike; each sharp distance map is sharp in its own way. Each functional protein has a unique structure – that determines a specific function – something that trRosetta learns to capture, whereas each nonfunctional sequence is kinda the same to trRosetta: a whole lotta garbage.
 
-Without a canonical example of sharpness, we can quantify it by coming up with a canonical blurry distance map $Q$ – a bad example – to steer away from: a distance map is sharp if it's very _different_ from $Q$ <Reference id={2}/>.
+Let's quantify sharpness by coming up with a canonical blurry distance map $Q$ – a bad example – to steer away from: a distance map $P$ is sharp if it's very _different_ from $Q$ <Reference id={2}/>.
 
-We can get $Q$ from a **background network**, which is the same as trRosetta with one important catch: the identity of each amino acid is hidden in the training data. The background network retains some rudimentary information about the amino acid chain, e.g. residues that are close in sequence are close in space. But it cannot learn anything about the interactions between amino acids that come from their unique chemistries.
+We can get $Q$ from a **background network**, which is the same as trRosetta with one important catch: the identity of each amino acid is hidden in the training data. The background network retains some rudimentary information about the amino acid chain, e.g. residues that are close in sequence are close in space. But it cannot learn anything about the interactions between amino acids driven by their unique chemistries.
 
 Given some distance map $P$, how do we measure its similarity to our bad example, $Q$? Remember, a distance map is just a collection of probability distributions, one for each residue pair. If we can measure the difference in the probability distributions at each position – $P_{ij}$ and $Q_{ij}$ – we can average over those measurements and get a measurement between $P$ and $Q$:
 
@@ -223,15 +247,15 @@ $$
 D_{\text{distribution}}(P_{ij}, Q_{ij}) = \sum_{x \in \text{bins}} P_{ij}^{(x)} \log \left(\frac{P_{ij}^{(x)}}{Q_{ij}^{(x)}}\right)
 $$
 
-This is the **Kullback–Leibler (KL) divergence**, which came from [information theory](https://en.wikipedia.org/wiki/Information_theory). It's a common [loss function](https://pytorch.org/docs/stable/generated/torch.nn.KLDivLoss.html) in machine learning. (Note on notation: it's conventional to use double bars like $D_{KL}(P || Q)$ to emphasize the fact that $D_{KL}(P || Q) \neq D_{KL}(Q || P)$, i.e. KL divergence is not a true distance metric.)
+This is the **Kullback–Leibler (KL) divergence**, which came from [information theory](https://en.wikipedia.org/wiki/Information_theory). It's a common [loss function](https://pytorch.org/docs/stable/generated/torch.nn.KLDivLoss.html) in machine learning.
 
-To summarize, we have developed a way to quantify the sharpness of a distance map $P$:
+To summarize, we have developed a way to quantify the sharpness of a distance map $P$ <Note id={3} />:
 
 $$
 D_{KL}(P || Q) = \frac{1}{L^2} \sum_{i, j = 1}^L \sum_{x \in \text{bins}} P_{ij}^{(x)} \log \left(\frac{P_{ij}^{(x)}}{Q_{ij}^{(x)}}\right)
 $$
 
-(Notation is slightly rewritten to be consistent with <Reference id={2}/>) Intuitively, $P$ is sharp if it's as far away from $Q$ as possible, as measured by the average KL divergence.
+Intuitively, $P$ is sharp if it's as far away from $Q$ as possible, as measured by the average KL divergence.
 
 ## Hallucinating proteins
 
@@ -257,8 +281,8 @@ Let's start with a random sequence analogous to a white-noise image. At each MCM
 2. Feed the sequence into trRosetta to produce a distance map $P$.
 3. Compare $P$ to $Q$, the blurry distance map generated by hiding amino acid identities.
 4. Accept the mutation with high probability if it is a move in the right direction: maximizing the average KL divergence between $P$ and $Q$.
-   - this acceptance criterion is called the [Metropolis criterion](https://en.wikipedia.org/wiki/Metropolis%E2%80%93Hastings_algorithm)
-   - an additional parameter, $T$, is introduced as a knob we can use to control acceptance probability
+   - this acceptance criterion is called the [Metropolis criterion](https://en.wikipedia.org/wiki/Metropolis%E2%80%93Hastings_algorithm).
+   - an additional parameter, $T$, is introduced as a knob we can use to control acceptance probability.
 
 <Figure
   content={<Image path={require("./images/hallucination-MCMC-details.png")} />}
@@ -287,7 +311,7 @@ When expressed in _E. coli_, many of these these hallucinated sequences fold int
     <Image path={require("./images/hallucination-structure-example.png")} />
   }
 >
-  For one of the hallucinated sequences, we compare trRosetta's predicted
+  Here's one of the hallucinated sequences. We compare trRosetta's predicted
   structure to the experimental structure obtained via [X-ray
   crystallography](https://en.wikipedia.org/wiki/X-ray_crystallography) after
   expressing the sequence in *E. coli.* The ribbon diagram on the right shows
@@ -300,7 +324,7 @@ I find this astonishing. We can create stable proteins that have never existed i
 
 MCMC is fundamentally inefficient. We're literally making random changes to see what sticks. Can we make more informed changes, perhaps using some directional nudges from the knowledgeable trRosetta?
 
-There's just the thing in deep neural networks like trRosetta: **gradients** <Reference id={3}/>. During training, gradients guide trRosetta in adjusting its parameters to make better structure predictions <Note id={3}/>.
+There's just the thing in deep neural networks like trRosetta: **gradients** <Reference id={3}/>. During training, gradients guide trRosetta in adjusting its parameters to make better structure predictions <Note id={4}/>.
 
 We already have a loss function: our average KL divergence between $P$ and $Q$. At each step:
 
@@ -324,11 +348,11 @@ Using this gradient-based approach, we can often converge to a sharp sequence ma
 
 ## Designing useful proteins
 
-So far, we have focused on designing stable proteins that fold into well-predicted structures. Let's extend this approach to designing proteins that have a desired function, such as binding to a therapeutically relevant target protein.
+So far, we have focused on creating stable proteins that fold into well-predicted structures. Let's take it one step further and design some proteins that have a desired function, such as binding to a therapeutically relevant target protein.
 
 ### Functional sites
 
-Most proteins perform their function via a **functional site** formed by a small subset of residues called a **motif**. For example, the functional sites of enzymes bind to their substrates and perform the catalytic function <Note id={4}/>.
+Most proteins perform their function via a **functional site** formed by a small subset of residues called a **motif**. For example, the functional sites of enzymes bind to their substrates and perform the catalytic function <Note id={5}/>.
 
 <Figure
   content={
@@ -343,7 +367,7 @@ Most proteins perform their function via a **functional site** formed by a small
   [https://biocyclopedia.com/index/general_zoology/action_of_enzymes.php](https://biocyclopedia.com/index/general_zoology/action_of_enzymes.php).
 </Figure>
 
-Since it's really the functional site that matters, a natural problem is: given a desired functional site, can we design a protein that contains it? This is often called **scaffolding** a functional site. Solutions to this problem has wide-ranging implications, from designing new vaccines to interfering with cancer <Reference id={5}/>.
+Since it's really the functional site that matters, a natural problem is: given a desired functional site, can we design a protein that contains it? This is called **scaffolding** a functional site. Solutions to this problem has wide-ranging implications, from designing new vaccines to interfering with cancer <Reference id={5}/>.
 
 <Figure
   content={
@@ -381,7 +405,7 @@ Intuitively, this loss needs to be small when the structure predicted by trRoset
 >
   We take trRosetta's predicted distance maps and look at them in two ways: 1.
   look at the residues that correspond to the motif: do they do a good job
-  recreating the motif? (motif-satisfaction) <Note id={5} />; 2. look at the
+  recreating the motif? (motif-satisfaction) <Note id={6} />; 2. look at the
   rest of the residues: do they look protein-like? (free-hallucination). Figure
   from <Reference id={4} />.
 </Figure>
@@ -406,7 +430,7 @@ It anchors itself by binding to an [alpha helix](https://en.wikipedia.org/wiki/A
   its viral DNA into the cell :( Figure from <Reference id={6} />.
 </Figure>
 
-One way we can disrupt this mechanism is to _design a protein that contains ACE2's interface alpha helix_. Our protein would trick the coronavirus into thinking that it is ACE2 – and bind to it instead – sparing our innocent ACE2's.
+One way we can disrupt this mechanism is to _design a protein that contains ACE2's interface alpha helix_. Our protein would trick the coronavirus into thinking that it _is_ ACE2 and bind to it, sparing our innocent ACE2's.
 These therapeutic proteins are called **receptor traps**: they trap the receptors on the coronavirus spike protein.
 
 This is exactly our functional site scaffolding problem. Folks at the Baker lab used the composite loss function to hallucinated these receptor traps containing the interface helix (shown on the right).
@@ -427,10 +451,10 @@ And of course, this is only the tip of the iceberg: the ability to engineer prot
 
 - Throughout this post, we exclusively focused on the distances produced by trRosetta, compiled in distance maps. There are also the 5 angles parameters that work in the exact same way: binned predictions, KL divergence, etc. trRosetta outputs 1 distance map and 5 "angle"-maps, all of which are used to drive the hallucinations.
 
-- trRosetta is no longer the best structure prediction model, a testament to this rapidly moving field. Since 2021, two models have consistently demonstrated superior performance: AlphaFold from DeepMind and RoseTTAFold from the Baker lab.
+- trRosetta is no longer the best structure prediction model, a testament to this rapidly moving field. Since 2021, two models have consistently demonstrated superior performance: [AlphaFold](https://www.nature.com/articles/s41586-021-03819-2) from DeepMind and [RoseTTAFold](https://www.science.org/doi/10.1126/science.abj8754) from the Baker lab.
 
   - Both AlphaFold and RoseTTAFold are deep neural networks, so all the ideas discussed in this post still apply.
-  - [This paper](https://onlinelibrary.wiley.com/doi/full/10.1002/pro.4653) applies the same techniques using AlphaFold; many subsequent papers from the Baker lab use RoseTTAFold instead of trRosetta, including the one that designed the SARS-CoV-2 receptor trap.
+  - [This paper](https://onlinelibrary.wiley.com/doi/full/10.1002/pro.4653) applies the same techniques using AlphaFold; many subsequent papers from the Baker lab use RoseTTAFold instead of trRosetta, including the one that designed the SARS-CoV-2 receptor trap <Reference id={5}/>.
 
 - Have I mentioned the Baker lab yet? If you are new to all this, check out David Baker's [TED talk](https://youtu.be/PJLT0cAPNfs?si=JzIRveKAq1kLt2Bk) on power of designing proteins.
 
