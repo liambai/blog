@@ -34,7 +34,7 @@ Now suppose you want to create some _new_ images of bananas. We can start with a
 randomly change a couple pixels, and show it to our monkey:
 
 - If he gets more excited, then we've probably done something that made the image more banana-like. Great – let's keep the changes.
-- If he doesn't doesn't get more excited – or god forbid, gets less excited – let's discard the changes <Note id={1}/>.
+- If he doesn't doesn't get more excited – or God forbid, gets less excited – let's discard the changes <Note id={1}/>.
 
 Repeat this thousands of times: we'll end up with an image that looks a lot like bananas! This is the essence of MCMC, which turns our monkey into a **generative model**.
 
@@ -130,14 +130,14 @@ Let's ignore the angles for now and focus on distance. The interresidue distance
   }
 />
 
-Around the diagonal of the matrix are residues that are close in position – which are of course close in 3D space – explaining the dark diagonal line. (Only the residues that are far apart in sequence but close in 3D are interesting and structure-defining)
+Surrounding the diagonal of the matrix are residues that are close in sequence position – which are of course close in 3D space – explaining the dark diagonal line. (Only the residues that are far apart in sequence but close in 3D are interesting and structure-defining.)
 
 <Figure content={<LongRangeContacts />}>
   In this simplified visualization of an amino acid chain's folded structure,
-  the fact that residues 2 and 3 are close together is obvious and
-  uninteresting, but the fact that 2 and 8 are close together – due to some
-  residue-residue interaction represented by the blue link – is important for
-  structure.
+  the fact that residues 2 and 3 (close to the diagonal of the matrix) are close
+  in space is obvious and uninteresting, but the fact that 2 and 8 (far from the
+  diagonal of the matrix) are close in space – due to some interresidue
+  interaction represented by the blue link – is important for structure.
 </Figure>
 
 Neural networks output probabilities. For example, language models like GPT – tasked with predicting the next word given some previous words as context – outputs a probability distribution over the set of all possible words (the vocabulary); in an additional final step, the word with the highest probability is chosen to be the prediction. In our case, trRosetta outputs probabilities for different distance bins, like this:
@@ -212,7 +212,7 @@ Let's visualize this. In the two distance maps we showed above, the colors refle
     />
   }
 >
-  Figure from <Reference id={2} />
+  Figure from <Reference id={2} />.
 </Figure>
 
 The left distance map is blurry, while the right one is sharp.
