@@ -1,0 +1,134 @@
+---
+title: Learning from proteins, variationally
+date: "2023-10-14"
+description: Prediction protein function using deep learning. Latent variable models, Variational Autoencoders (VAEs).
+---
+
+import Figure from "../../../src/components/figure.jsx"
+import Image from "../../../src/components/image.jsx"
+import { Link } from "gatsby"
+import MSACoupling from "../protein-evolution/d3/MSACoupling.jsx"
+
+## We are all latent variable models
+
+Here's one way to look at learning. We interact with the world through observing (hearing, seeing) and acting (speaking, doing). We encode our observations about the world into some _representation_ in our brain – and refine it as we observe more. Our actions reflect this representation.
+
+<Figure
+  content={<Image path={require("./images/representation.png")} width="50%" />}
+></Figure>
+
+### Encoder-decoder
+
+Imitation is an effective way to learn that engages both observation and action. For example, babies repeat the words of their parents. As they mistakes and get corrected, they hone the way they represent the words they hear (the **encoder**) as well as the way they create their own words from that representation (the **decoder**).
+
+<Figure
+  content={
+    <Image path={require("./images/encoder-decoder-baby.png")} width="50%" />
+  }
+></Figure>
+
+Crudely casting this in machine learning terms, the representation is a vector $\mathbf{z}$ called a **latent variable**, which lives in the **latent space**. The baby is a **latent variable model** engaged in a task called **reconstruction**. (N1: $\mathbf{z}$ usually has fewer dimensions than the input, so the encoding process can be viewed as a form of compression.)
+
+A note on notation: when talking about distributions, I sometimes get confused between what's fixed and what's a variable in a distribution. I want to clarify by making fixed things **bold**. For example, $\mathbf{z} = [0.12, -0.25, -0.05, 0.33, 0.02]$ is a fixed vector, $p(x|\mathbf{z})$ is a conditional distribution over all possible values of $x$, i.e. it's a function of $x$.
+
+Given observation $\mathbf{x}$, the encoder is a distribution $q(z|\mathbf{x})$ over the latent space; knowing $\mathbf{x} = \text{``Dog"}$, the encoder tells us which latent variables are probable. To obtain some $\mathbf{z}$, we sample from $q(z|\mathbf{x})$.
+
+Similarly, given some latent variable $\mathbf{z}$, the decoder is a distribution $p(x|\mathbf{z})$. When sampled from, the decoder produces a reconstructed $\mathbf{\tilde{x}}$.
+
+<Figure
+  content={
+    <Image path={require("./images/encoder-decoder-details.png")} width="50%" />
+  }
+></Figure>
+
+### Knowing when to say "good job!"
+
+A good model (baby) at reconstruction gets it exactly right with high probability. Given some input $\mathbf{x}$, let's pick some random $\mathbf{z_{rand}}$ and look at $p(\mathbf{x}|\mathbf{z_{rand}})$ – the probability of reconstructing the input perfectly – if it's high, we can tell the model that it did a good job.
+
+But that's not really fair: what if we picked a $\mathbf{z_{rand}}$ that the encoder would never choose? After all, the decoder only sees the latent variables produced by the encoder. Ideally, we want to assign more weight to $\mathbf{z}$'s that the encoder is more likely to produce.
+
+$$
+P_{\text{perfect reconstruction}}(\mathbf{x}) = \sum_{\mathbf{z} \in \text{latent space}} q(\mathbf{z}|\mathbf{x}) p(\mathbf{x} | \mathbf{z})
+$$
+
+The weighted average is also known as an expectation over $q(z|\mathbf{x})$, and for mathematical convenience we use log probability:
+
+$$
+P_{\text{perfect reconstruction}}(\mathbf{x}) = \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})}[\log p(\mathbf{x} | \mathbf{z})]
+$$
+
+If $P_{\text{perfect reconstruction}}(\mathbf{x})$ is high, we can tell our model that it did a good job.
+
+### But... please don't just memorize
+
+If use use neural networks as both the encoder and the decoder, our model is called a **variational autoencoder**.
+
+Neural networks tend to **overfit**. Imagine if our encoder learns to represent give each input it saw during training its unique corner in the latent space, and the decoder cooperates on this obvious signal.
+
+$$
+\mathbf{x} = \text{``Dog"} \xrightarrow{encoder} \mathbf{z} = [1, 0, 0, 0, 0] \xrightarrow{decoder} \mathbf{\tilde{x}} = \text{``Dog"}
+$$
+
+$$
+\mathbf{x} = \text{``Doggy"} \xrightarrow{encoder} \mathbf{z} = [0, 1, 0, 0, 0] \xrightarrow{decoder} \mathbf{\tilde{x}} = \text{``Doggy"}
+$$
+
+We would get perfect reconstruction! But this is not what we want. The model failed to capture the close relationship between "Dog" and "Doggy". A good, generalizable model should treat them similarly by assigning them similar latent variables. In other words, we don't want our model to merely memorize and regurgitate the inputs.
+
+Although a baby's brain is exceptionally good at dealing with this problem, neural networks need helping hand. Let's guide the distribution of the latent variable to be something nice, like a [standard normal](https://en.wikipedia.org/wiki/Normal_distribution#Standard_normal_distribution).
+
+$$
+p(z) = Normal(0, 1)
+$$
+
+We talked previously about [KL divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence), a similarity measure between probability distributions: $D_{KL}(q(z | \mathbf{x}) || p(z))$ tells us how far the encoder has strayed from the standard normal. Let's write down the intuition that we want the model to 1) reconstruct well and 2) have an encoder distribution close to standard normal:
+
+$$
+ELBO(\mathbf{x}) = \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})}[\log p(\mathbf{x} | \mathbf{z})] - D_{KL}(q(\mathbf{z} | \mathbf{x}) || p(\mathbf{z}))
+$$
+
+This quantity is called **Evidence Lower BOund (ELBO)**, (we'll explain the name later!). This is the quantity we want to _maximize_. Incorporating a the KL divergence term to prevent overfitting is called **regularization**. In machine learning, we're used to _minimizing_ a function called loss:
+
+$$
+Loss(\mathbf{x}) = - ELBO(\mathbf{x})
+$$
+
+Forcing $p(z)$ to be standard normal might seem strange. Don't we want the distribution of $z$ to be something informative learned by the model? I think about it like this: the encoder and decoder are complex functions with many parameters (they're neural networks!) and _they have all the power_. With a sufficiently complex function, $p(z) = Normal(0,1)$ can be transformed into _anything you want_.
+
+<Figure
+  content={
+    <Image path={require("./images/standard-normal-transformation.png")} />
+  }
+></Figure>
+
+So far, we talked about variational autoencoders purely through a machine learning lens. These models are actually deeply rooted in a field of statistics called [variational inference](https://en.wikipedia.org/wiki/Variational_Bayesian_methods). We didn't do the beautiful math justice. Since we have a working machine learning model, let's jump into the application first, and we'll explore the statistical roots at the end.
+
+## Predicting mutation effects using protein evolution
+
+In a <Link to="/protein-evolution">previous post</Link>, we talked about ways to extract the information hidden in [Multiple Sequence Alignments (MSAs)](https://en.wikipedia.org/wiki/Multiple_sequence_alignment): the co-evolutionary data of proteins. For example, amino acid positions that co-vary in the MSA tend to be tend to interact with each other in the folded structure, often via direct 3D contact.
+
+<Figure content={<MSACoupling />}>
+  An MSA contains different variants of a sequence. The structure sketches how
+  the amino acid chain might fold in space (try dragging the nodes). Hover over
+  each row in the MSA to see the corresponding amino acid in the folded
+  structure. Hover over the blue link to highlight the contacting positions.
+</Figure>
+
+We considered models that look at each position (sitewise) and models that additionally consider all possible pairs of positions ([pairwise](https://en.wikipedia.org/wiki/Potts_model)). But what about the interactions between 3 positions (third-order interactions)? Or even more? Those interactions are commonplace in natural proteins but are unfortunately computationally unfeasible.
+
+Let's imagine there being some latent variable vector $\mathbf{z}$ that explains _all_ interactions – including higher-order ones.
+
+<Figure content={<Image path={require("./images/MSA-latent.png")} />}></Figure>
+
+Like the mysterious representation hidden in the baby's brain, we don't need to understand exactly _how_ it encodes these higher-order interactions; we let the neural networks, guided by the reconstruction task, figure it out.
+
+<Figure
+  content={
+    <Image
+      path={require("./images/DeepSequence-architecture.png")}
+      width="90%"
+    />
+  }
+></Figure>
+
+In [this work](https://www.nature.com/articles/s41592-018-0138-4), researchers from the [Marks lab](https://www.deboramarkslab.com/) did exactly this to create a model called [DeepSequence](https://github.com/debbiemarkslab/DeepSequence). The used a neural network with 2 fully connected layers for both the encoder and the decoder.
