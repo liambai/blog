@@ -22,7 +22,7 @@ const references = {
       "Biological structure and function emerge from scaling unsupervised learning to 250 million protein sequences",
     author: "Rives, A. et al.",
     url: "https://www.pnas.org/doi/full/10.1073/pnas.2016239118",
-    journal: "PNAS 118:e2016239118",
+    journal: "Proc. Natl. Acad. Sci.",
     year: 2021,
   },
   4: {

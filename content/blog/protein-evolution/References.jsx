@@ -13,7 +13,7 @@ const references = {
       "Direct-coupling analysis of residue coevolution captures native contacts across many protein families",
     author: "Weigt, M et al.",
     url: "https://www.pnas.org/doi/10.1073/pnas.1111471108",
-    journal: "Proc. Natl. Acad. Sci. U.S.A. 108, E1293–E1301",
+    journal: "Proc. Natl. Acad. Sci.",
     year: 2011,
   },
   3: {
@@ -71,7 +71,7 @@ const references = {
       "Biological structure and function emerge from scaling unsupervised learning to 250 million protein sequences",
     author: "Rives, A. et al.",
     url: "https://www.pnas.org/doi/full/10.1073/pnas.2016239118",
-    journal: "PNAS 118:e2016239118",
+    journal: "Proc. Natl. Acad. Sci.",
     year: 2021,
   },
 }
