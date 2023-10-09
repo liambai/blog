@@ -1,7 +1,7 @@
 ---
-title: Learning from proteins, variationally
+title: Latent variable models for proteins
 date: "2023-10-14"
-description: Prediction protein function using deep learning. Latent variable models, Variational Autoencoders (VAEs).
+description: Prediction protein function using deep generative models. Latent variable models, Variational Autoencoders (VAEs), Evidence Lower Bound (ELBO), mutation effect prediction.
 ---
 
 import Figure from "../../../src/components/figure.jsx"
@@ -103,7 +103,9 @@ Forcing $p(z)$ to be standard normal might seem strange. Don't we want the distr
 
 So far, we talked about variational autoencoders purely through a machine learning lens. These models are actually deeply rooted in a field of statistics called [variational inference](https://en.wikipedia.org/wiki/Variational_Bayesian_methods). We didn't do the beautiful math justice. Since we have a working machine learning model, let's jump into the application first, and we'll explore the statistical roots at the end.
 
-## Predicting mutation effects using protein evolution
+## Modelling protein sequences
+
+### Pairwise models are limiting
 
 In a <Link to="/protein-evolution">previous post</Link>, we talked about ways to extract the information hidden in [Multiple Sequence Alignments (MSAs)](https://en.wikipedia.org/wiki/Multiple_sequence_alignment): the co-evolutionary data of proteins. For example, amino acid positions that co-vary in the MSA tend to be tend to interact with each other in the folded structure, often via direct 3D contact.
 
@@ -116,11 +118,17 @@ In a <Link to="/protein-evolution">previous post</Link>, we talked about ways to
 
 We considered models that look at each position (sitewise) and models that additionally consider all possible pairs of positions ([pairwise](https://en.wikipedia.org/wiki/Potts_model)). But what about the interactions between 3 positions (third-order interactions)? Or even more? Those interactions are commonplace in natural proteins but are unfortunately computationally unfeasible.
 
+### DeepSequence: the variational encoder for proteins
+
 Let's imagine there being some latent variable vector $\mathbf{z}$ that explains _all_ interactions – including higher-order ones.
 
 <Figure content={<Image path={require("./images/MSA-latent.png")} />}></Figure>
 
 Like the mysterious representation hidden in the baby's brain, we don't need to understand exactly _how_ it encodes these higher-order interactions; we let the neural networks, guided by the reconstruction task, figure it out.
+
+In [this work](https://www.nature.com/articles/s41592-018-0138-4), researchers from the [Marks lab](https://www.deboramarkslab.com/) did exactly this to create a model called [DeepSequence](https://github.com/debbiemarkslab/DeepSequence). The used a neural network with 2 fully connected layers for both the encoder and the decoder.
+
+During training, we feed sequences in the MSA into DeepSequence and use backpropagation to update encoder and decoder parameters (blue arrow). During inference – i.e. when given an unknown input sequence – we pass it through the encoder-decoder in the same way and produce a probability for the input sequence (green arrow).
 
 <Figure
   content={
@@ -131,4 +139,4 @@ Like the mysterious representation hidden in the baby's brain, we don't need to 
   }
 ></Figure>
 
-In [this work](https://www.nature.com/articles/s41592-018-0138-4), researchers from the [Marks lab](https://www.deboramarkslab.com/) did exactly this to create a model called [DeepSequence](https://github.com/debbiemarkslab/DeepSequence). The used a neural network with 2 fully connected layers for both the encoder and the decoder.
+Given an unknown input sequence $\mathbf{x}$, $p(\mathbf{x})$ describes how likely it is for $\mathbf{x}$ to be a functional protein given the evolutionary sequences in our MSA – it's a useful predictor of fitness. (If this sounds unfamiliar, check out <Link to="/protein-evolution">this post</Link> that applies pairwise models in the same way.)
