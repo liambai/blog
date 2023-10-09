@@ -1,6 +1,6 @@
 ---
 title: Protein Inception
-date: "2023-10-08"
+date: "2023-10-09"
 description: Protein design by hallucination. DeepDream, Markov Chain Monte Carlo (MCMC), KL divergence, gradient optimization, scaffolding functional sites, SARS-CoV-2 receptor traps.
 ---
 
@@ -44,7 +44,7 @@ Researchers at Google used a similar technique in a cool project called [DeepDre
   "Optimize with prior" refers to the fact that to make this work well, we
   usually need to constrain our generated images to have some features of
   natural images: for example, neighboring pixels should be correlated. Figure
-  from this [blog
+  from and more details in this [blog
   post](https://blog.research.google/2015/06/inceptionism-going-deeper-into-neural.html)
   on DeepDream.
 </Figure>
@@ -134,10 +134,11 @@ Surrounding the diagonal of the matrix are residues that are close in sequence p
 
 <Figure content={<LongRangeContacts />}>
   In this simplified visualization of an amino acid chain's folded structure,
-  the fact that residues 2 and 3 (close to the diagonal of the matrix) are close
-  in space is obvious and uninteresting, but the fact that 2 and 8 (far from the
-  diagonal of the matrix) are close in space – due to some interresidue
-  interaction represented by the blue link – is important for structure.
+  the fact that residues 2 and 3 (close in sequence, on diagonal of matrix) are
+  close in space is obvious and uninteresting, but the fact that 2 and 8 (far in
+  sequence, off diagonal of matrix) are close in space – due to some
+  interresidue interaction represented by the blue link – is important for
+  structure.
 </Figure>
 
 Neural networks output probabilities. For example, language models like GPT – tasked with predicting the next word given some previous words as context – outputs a probability distribution over the set of all possible words (the vocabulary); in an additional final step, the word with the highest probability is chosen to be the prediction. In our case, trRosetta outputs probabilities for different distance bins, like this:
@@ -231,9 +232,9 @@ For distances maps produced by trRosetta, it's kinda the opposite: all blurry di
 
 Let's quantify sharpness by coming up with a canonical blurry distance map $Q$ – a bad example – to steer away from: a distance map $P$ is sharp if it's very _different_ from $Q$ <Reference id={2}/>.
 
-We can get $Q$ from a **background network**, which is the same as trRosetta with one important catch: the identity of each amino acid is hidden in the training data. The background network retains some rudimentary information about the amino acid chain, e.g. residues that are close in sequence are close in space. But it cannot learn anything about the interactions between amino acids driven by their unique chemistries.
+We can get $Q$ from a **background network**, which is the same as trRosetta with one important catch: the identity of each residue is hidden in the training data. The background network retains some rudimentary information about the amino acid chain, e.g. residues that are close in sequence are close in space. But it cannot learn anything about the interactions between amino acids determined by their unique chemistries.
 
-Given some distance map $P$, how do we measure its similarity to our bad example, $Q$? Remember, a distance map is just a collection of probability distributions, one for each residue pair. If we can measure the difference in the probability distributions at each position – $P_{ij}$ and $Q_{ij}$ – we can average over those measurements and get a measurement between $P$ and $Q$:
+Given some distance map $P$, how do we measure its similarity to our bad example, $Q$? Remember, a distance map is just a collection of probability distributions, one for each residue pair. If we can measure the difference in the probability distributions at each position – $P_{ij}$ vs. $Q_{ij}$ – we can average over those measurements and get a measurement between $P$ and $Q$:
 
 $$
 D_{\text{map}}(P, Q) = \frac{1}{L^2} \sum_{i, j = 1}^L D_{\text{distribution}}(P_{ij}, Q_{ij})
@@ -247,6 +248,8 @@ $$
 D_{\text{distribution}}(P_{ij}, Q_{ij}) = \sum_{x \in \text{bins}} P_{ij}^{(x)} \log \left(\frac{P_{ij}^{(x)}}{Q_{ij}^{(x)}}\right)
 $$
 
+where $P_{ij}^{(x)}$ is the predicted probability of the distance between the residues $i$ and $j$ falling into bin $x$.
+
 This is the **Kullback–Leibler (KL) divergence**, which came from [information theory](https://en.wikipedia.org/wiki/Information_theory). It's a common [loss function](https://pytorch.org/docs/stable/generated/torch.nn.KLDivLoss.html) in machine learning.
 
 To summarize, we have developed a way to quantify the sharpness of a distance map $P$ <Note id={3} />:
@@ -255,7 +258,7 @@ $$
 D_{KL}(P || Q) = \frac{1}{L^2} \sum_{i, j = 1}^L \sum_{x \in \text{bins}} P_{ij}^{(x)} \log \left(\frac{P_{ij}^{(x)}}{Q_{ij}^{(x)}}\right)
 $$
 
-Intuitively, $P$ is sharp if it's as far away from $Q$ as possible, as measured by the average KL divergence.
+$P$ is sharp if it's as far away from $Q$ as possible, as measured by the average KL divergence.
 
 ## Hallucinating proteins
 
@@ -322,7 +325,7 @@ I find this astonishing. We can create stable proteins that have never existed i
 
 ## Can we do better than MCMC?
 
-MCMC is fundamentally inefficient. We're literally making random changes to see what sticks. Can we make more informed changes, perhaps using some directional nudges from the knowledgeable trRosetta?
+MCMC is fundamentally inefficient. We're literally making random changes to see what sticks. Can we make more informed changes, perhaps using some directional hints from the knowledgeable trRosetta?
 
 There's just the thing in deep neural networks like trRosetta: **gradients** <Reference id={3}/>. During training, gradients guide trRosetta in adjusting its parameters to make better structure predictions <Note id={4}/>.
 
@@ -384,7 +387,7 @@ Since it's really the functional site that matters, a natural problem is: given 
 
 ### Satisfying the motif
 
-To guide MCMC towards sequences containing the desired motif, we can introduce an additional term to our loss function to capture motif satisfaction:
+To guide MCMC towards sequences containing the desired motif, we can introduce an additional term to our loss function to capture _motif satisfaction_:
 
 $$
 Loss = Loss_{FH} + Loss_{MS}
@@ -392,7 +395,7 @@ $$
 
 where $Loss_{FH}$, the **free-hallucination loss**, is our average DL divergence from before, nudging the model away from $Q$ to be more generally protein-like; and $Loss_{MS}$ is the new **motif-satisfaction loss**.
 
-Intuitively, this loss needs to be small when the structure predicted by trRosetta clearly contains the desired motif – and big otherwise. For the mathematical details, check out the methods section [here](https://www.biorxiv.org/content/10.1101/2020.11.29.402743v1). We are engaging in a balancing act: we want proteins that contain the functional site (low motif-satisfaction loss) that are also generally good, stable proteins (low free-hallucination loss)!
+Intuitively, this loss needs to be small when the structure predicted by trRosetta clearly contains the desired motif – and big otherwise (for the mathematical details, check out the methods section [here](https://www.biorxiv.org/content/10.1101/2020.11.29.402743v1)). We are engaging in a balancing act: we want proteins that contain the functional site (low motif-satisfaction loss) that are also generally good, stable proteins (low free-hallucination loss)!
 
 <Figure
   content={
@@ -430,7 +433,7 @@ It anchors itself by binding to an [alpha helix](https://en.wikipedia.org/wiki/A
   its viral DNA into the cell :( Figure from <Reference id={6} />.
 </Figure>
 
-One way we can disrupt this mechanism is to _design a protein that contains ACE2's interface alpha helix_. Our protein would trick the coronavirus into thinking that it _is_ ACE2 and bind to it, sparing our innocent ACE2's.
+One way we can disrupt this mechanism is to _design a protein that contains ACE2's interface alpha helix_. Our protein would trick the coronavirus into thinking that _it_ is ACE2 and bind to it, sparing our innocent ACE2's.
 These therapeutic proteins are called **receptor traps**: they trap the receptors on the coronavirus spike protein.
 
 This is exactly our functional site scaffolding problem. Folks at the Baker lab used the composite loss function to hallucinated these receptor traps containing the interface helix (shown on the right).
@@ -443,13 +446,11 @@ This is exactly our functional site scaffolding problem. Folks at the Baker lab 
   binds to the helix. Figure from <Reference id={5} />.
 </Figure>
 
-I hope I have convinced you that these hallucinations are not only cool but also profoundly useful. It was only in the past few years that we have acquired the ability to engineer proteins with this level of control, thanks primarily to groundbreaking work from the Baker lab.
-
-And of course, this is only the tip of the iceberg: the ability to engineer proteins that disrupt disease mechanisms will revolutionize drug discovery and reduce a lot of suffering in the world.
+I hope I have convinced you that these hallucinations are not only cool but also profoundly useful. And of course, this is only the tip of the iceberg: the ability to engineer proteins that disrupt disease mechanisms will revolutionize drug discovery and reduce a lot of suffering in the world.
 
 ## Final notes
 
-- Throughout this post, we exclusively focused on the distances produced by trRosetta, compiled in distance maps. There are also the 5 angles parameters that work in the exact same way: binned predictions, KL divergence, etc. trRosetta outputs 1 distance map and 5 "angle"-maps, all of which are used to drive the hallucinations.
+- Throughout this post, we exclusively focused on the distances produced by trRosetta, represented in distance maps. There are also the 5 angles parameters that work in the exact same way: binned predictions, KL divergence, etc. trRosetta outputs 1 distance map and 5 "angle"-maps, all of which are used to drive the hallucinations.
 
 - trRosetta is no longer the best structure prediction model, a testament to this rapidly moving field. Since 2021, two models have consistently demonstrated superior performance: [AlphaFold](https://www.nature.com/articles/s41586-021-03819-2) from DeepMind and [RoseTTAFold](https://www.science.org/doi/10.1126/science.abj8754) from the Baker lab.
 

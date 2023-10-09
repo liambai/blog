@@ -24,7 +24,7 @@ const notes = {
       </a>
       <span> It's conventional to use double bars like </span>
       <InlineMath>{"D_{KL}(P || Q) "}</InlineMath>
-      <span> to emphasize the fact that</span>
+      <span> to emphasize the fact that </span>
       <InlineMath>{"D_{KL}(P || Q) \\neq D_{KL}(Q || P)"}</InlineMath>
       <span>, i.e. KL divergence is not a distance metric.</span>
     </>
@@ -58,7 +58,7 @@ const notes = {
   6: (
     <>
       <span>
-        We omitted an important detail: how do we choose which residues should
+        We left out an important detail: how do we choose which residues should
         constitute the motif? The cited{" "}
       </span>
       <a href="https://www.biorxiv.org/content/10.1101/2020.11.29.402743v1">
