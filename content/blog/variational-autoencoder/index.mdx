@@ -119,7 +119,7 @@ In a <Link to="/protein-evolution">previous post</Link>, we talked about ways to
 
 We considered models that look at each position (position-wise) and models that additionally consider all possible pairs of positions ([pair-wise](https://en.wikipedia.org/wiki/Potts_model)). But what about the interactions between 3 positions (third-order interactions)? Or even more? Those interactions are commonplace in natural proteins but are unfortunately computationally unfeasible.
 
-### DeepSequence: the variational encoder for proteins
+### Variational encoders for proteins
 
 Let's imagine there being some latent variable vector $\mathbf{z}$ that explains _all_ interactions – including higher-order ones.
 
@@ -127,7 +127,7 @@ Let's imagine there being some latent variable vector $\mathbf{z}$ that explains
 
 Like the mysterious representation hidden in the baby's brain, we don't need to understand exactly _how_ it encodes these higher-order interactions; we let the neural networks, guided by the reconstruction task, figure it out.
 
-In [this work](https://www.nature.com/articles/s41592-018-0138-4), researchers from the [Marks lab](https://www.deboramarkslab.com/) did exactly this to create a model called [DeepSequence](https://github.com/debbiemarkslab/DeepSequence). The used a neural network with 2 fully connected layers for both the encoder and the decoder.
+In [this work](https://www.nature.com/articles/s41592-018-0138-4), researchers from the [Marks lab](https://www.deboramarkslab.com/) did exactly this to create a VAE model called [DeepSequence](https://github.com/debbiemarkslab/DeepSequence). The used a neural network with 2 fully connected layers for both the encoder and the decoder.
 
 During training, we feed sequences in the MSA into DeepSequence and use backpropagation to update encoder and decoder parameters (blue arrow). During inference – i.e. when given an unknown input sequence – we pass it through the encoder-decoder in the same way and produce a probability for the input sequence (green arrow).
 
@@ -158,7 +158,7 @@ measures the improvement of the mutant over the wild-type.
 
 ### Disease variants
 
-As we talked about in a <Link to="/protein-evolution">previous post</Link>, we can compute this log ratio for each possible amino acid substitution at each position to produce a map that informs us of the consequences:
+We can compute this log ratio for each possible amino acid substitution at each position to produce a heatmap that illustrates their consequences:
 
 <Figure
   content={<Image path={require("./images/mutation-effect-heatmap.png")} />}
@@ -168,7 +168,7 @@ Predicting the pathogenicity of human protein variants like this can be an impor
 
 1. we are deeply ignorant about the proteins in our bodies and how their malfunctions cause disease.
 
-2. unsupervised computational approaches like the one we discussed can make a huge impact.
+2. unsupervised computational approaches like VAEs can make a huge impact.
 
 [ClinVar](https://www.ncbi.nlm.nih.gov/clinvar/intro/) is a public archive that sheds light in this darkness. It collects experimental data on the impacts of mutations in proteins important to human health. Predictions from a VAE-based approach called [EVE](https://github.com/OATML/EVE) agrees strongly with labels from ClinVar.
 
@@ -177,7 +177,7 @@ Predicting the pathogenicity of human protein variants like this can be an impor
   concordance with ClinVar. On the y-axis, [Deep Mutational Scanning
   (DMS)](https://www.nature.com/articles/nmeth.3027) is an experimental method
   for screening a large set of variants for a specific function, another source
-  of experimental labels. When evalutated on the concordance with DMS data, EVE
+  of experimental labels. When evaluated on the concordance with DMS data, EVE
   similarly outperforms others models.
 </Figure>
 
@@ -185,7 +185,13 @@ I find the VAE model's strong predictive power incredible. After all, the model 
 
 ### The power of latent variables
 
-When compared to independent position-wise models, the latent variable model is significantly more accurate for all possible mutations. The sites at which their accuracy improved the most are ones that cooperate with several other sites.
+When compared to independent position-wise models, the latent variable model is significantly more accurate for all possible mutations.
+
+<Figure
+  content={<Image path={require("./images/DeepSequence-vs-others.png")} />}
+></Figure>
+
+The sites at which their accuracy improved the most are ones that cooperate with several other sites.
 
 <Figure
   content={<Image path={require("./images/DeepSequence-vs-independent.png")} />}
@@ -195,7 +201,7 @@ This demonstrates the flexibility of the latent variable model that can capture 
 
 Here's one way to look at these results. MSAs contains a wealth of information, some of which we can understand through simple statistics: position-wise frequencies, pair-wise frequencies, etc. (what we did in a <Link to="/protein-evolution">previous post</Link>). Those models are interpretable but limiting – they fail at teasing out more complex, higher-order signals.
 
-Enter neural networks, which are much better than us at recognizing those signals hidden in MSAs. It knowns _where to look_, _what to look at_ – beyond our simple statistics. This comes at the cost of interpretability. The comparison between our VAE model and statistical models like <Link to="/protein-evolution">Direct Coupling Analysis (DCA)</Link> exemplifies these two paradigms.
+Enter neural networks, which are much better than us at recognizing those signals hidden in MSAs. They known _where to look_, _what to look at_ – beyond our simple statistics. This comes at the cost of interpretability. The comparison between our VAE model and statistical models like <Link to="/protein-evolution">Direct Coupling Analysis (DCA)</Link> exemplifies these two paradigms.
 
 ## The statistics behind VAEs
 
