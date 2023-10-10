@@ -1,13 +1,14 @@
 ---
-title: Latent variable models for proteins
+title: "A practical introduction to variational autoencoders"
 date: "2023-10-14"
-description: Prediction protein function using deep generative models. Latent variable models, Variational Autoencoders (VAEs), Evidence Lower Bound (ELBO), mutation effect prediction.
+description: Predicting protein function using deep generative models. Latent variable models, Variational Autoencoders (VAEs), Evidence Lower Bound (ELBO), mutation effect prediction.
 ---
 
 import Figure from "../../../src/components/figure.jsx"
 import Image from "../../../src/components/image.jsx"
 import { Link } from "gatsby"
 import MSACoupling from "../protein-evolution/d3/MSACoupling.jsx"
+import { Note, NoteList } from "./Notes.jsx"
 
 ## We are all latent variable models
 
@@ -27,7 +28,7 @@ Imitation is an effective way to learn that engages both observation and action.
   }
 ></Figure>
 
-Crudely casting this in machine learning terms, the representation is a vector $\mathbf{z}$ called a **latent variable**, which lives in the **latent space**. The baby is a **latent variable model** engaged in a task called **reconstruction**. (N1: $\mathbf{z}$ usually has fewer dimensions than the input, so the encoding process can be viewed as a form of compression.)
+Crudely casting this in machine learning terms, the representation is a vector $\mathbf{z}$ called a **latent variable**, which lives in the **latent space**. The baby is a **latent variable model** engaged in a task called **reconstruction**. <Note id={1} />
 
 A note on notation: when talking about distributions, I sometimes get confused between what's fixed and what's a variable in a distribution. I want to clarify by making fixed things **bold**. For example, $\mathbf{z} = [0.12, -0.25, -0.05, 0.33, 0.02]$ is a fixed vector, $p(x|\mathbf{z})$ is a conditional distribution over all possible values of $x$, i.e. it's a function of $x$.
 
@@ -61,7 +62,7 @@ If $P_{\text{perfect reconstruction}}(\mathbf{x})$ is high, we can tell our mode
 
 ### But... please don't just memorize
 
-If use use neural networks as both the encoder and the decoder, our model is called a **variational autoencoder**.
+If use use neural networks as both the encoder and the decoder, our model is called a **variational autoencoder (VAE)**.
 
 Neural networks tend to **overfit**. Imagine if our encoder learns to represent give each input it saw during training its unique corner in the latent space, and the decoder cooperates on this obvious signal.
 
@@ -103,9 +104,9 @@ Forcing $p(z)$ to be standard normal might seem strange. Don't we want the distr
 
 So far, we talked about variational autoencoders purely through a machine learning lens. These models are actually deeply rooted in a field of statistics called [variational inference](https://en.wikipedia.org/wiki/Variational_Bayesian_methods). We didn't do the beautiful math justice. Since we have a working machine learning model, let's jump into the application first, and we'll explore the statistical roots at the end.
 
-## Modelling protein sequences
+## Modeling protein sequences
 
-### Pairwise models are limiting
+### Pair-wise models are limiting
 
 In a <Link to="/protein-evolution">previous post</Link>, we talked about ways to extract the information hidden in [Multiple Sequence Alignments (MSAs)](https://en.wikipedia.org/wiki/Multiple_sequence_alignment): the co-evolutionary data of proteins. For example, amino acid positions that co-vary in the MSA tend to be tend to interact with each other in the folded structure, often via direct 3D contact.
 
@@ -116,7 +117,7 @@ In a <Link to="/protein-evolution">previous post</Link>, we talked about ways to
   structure. Hover over the blue link to highlight the contacting positions.
 </Figure>
 
-We considered models that look at each position (sitewise) and models that additionally consider all possible pairs of positions ([pairwise](https://en.wikipedia.org/wiki/Potts_model)). But what about the interactions between 3 positions (third-order interactions)? Or even more? Those interactions are commonplace in natural proteins but are unfortunately computationally unfeasible.
+We considered models that look at each position (position-wise) and models that additionally consider all possible pairs of positions ([pair-wise](https://en.wikipedia.org/wiki/Potts_model)). But what about the interactions between 3 positions (third-order interactions)? Or even more? Those interactions are commonplace in natural proteins but are unfortunately computationally unfeasible.
 
 ### DeepSequence: the variational encoder for proteins
 
@@ -139,4 +140,63 @@ During training, we feed sequences in the MSA into DeepSequence and use backprop
   }
 ></Figure>
 
-Given an unknown input sequence $\mathbf{x}$, $p(\mathbf{x})$ describes how likely it is for $\mathbf{x}$ to be a functional protein given the evolutionary sequences in our MSA – it's a useful predictor of fitness. (If this sounds unfamiliar, check out <Link to="/protein-evolution">this post</Link> that applies pairwise models in the same way.)
+Given an unknown input sequence $\mathbf{x}$, $p(\mathbf{x})$ describes how likely it is for $\mathbf{x}$ to be a functional protein given the evolutionary sequences in our MSA. $p(\mathbf{x})$ is a predictor of fitness with a range of applications, from improving protein function to from interpreting human disease variants.
+
+## Predicting mutation effects
+
+Given a wild-type sequence $\mathbf{x}^{\text{(Wild-type)}}$ and a mutant sequence $\mathbf{x}^{\text{(Mutant)}}$, the log ratio
+
+$$
+\log\frac{p(\mathbf{x}^{\text{(Mutant)}})}{p(\mathbf{x}^{\text{(Wild-type)}})}
+$$
+
+measures the improvement of the mutant over the wild-type.
+
+- Model assigns $\mathbf{x}^{\text{(Mutant)}}$ a higher probability than $\mathbf{x}^{\text{(Wild-type)}}$ $\rightarrow$ the mutation is likely beneficial $\rightarrow$ positive log ratio.
+
+- Model assigns $\mathbf{x}^{\text{(Mutant)}}$ a lower probability than $\mathbf{x}^{\text{(Wild-type)}}$ $\rightarrow$ the mutation is likely harmful $\rightarrow$ negative log ratio.
+
+### Disease variants
+
+As we talked about in a <Link to="/protein-evolution">previous post</Link>, we can compute this log ratio for each possible amino acid substitution at each position to produce a map that informs us of the consequences:
+
+<Figure
+  content={<Image path={require("./images/mutation-effect-heatmap.png")} />}
+></Figure>
+
+Predicting the pathogenicity of human protein variants like this can be an important guide for clinical decisions. Most of the variants of human proteins related to disease (98% of [genomAD](https://gnomad.broadinstitute.org/)!) have unknown consequences, a testament to <Link to="/protein-representation">the difficulty of obtaining functional data relative to sequence data</Link>. This means:
+
+1. we are deeply ignorant about the proteins in our bodies and how their malfunctions cause disease.
+
+2. unsupervised computational approaches like the one we discussed can make a huge impact.
+
+[ClinVar](https://www.ncbi.nlm.nih.gov/clinvar/intro/) is a public archive that sheds light in this darkness. It collects experimental data on the impacts of mutations in proteins important to human health. Predictions from a VAE-based approach called [EVE](https://github.com/OATML/EVE) agrees strongly with labels from ClinVar.
+
+<Figure content={<Image path={require("./images/EVE-ClinVar.png")} />}>
+  EVE outperforms other computational approaches of variant effect prediction in
+  concordance with ClinVar. On the y-axis, [Deep Mutational Scanning
+  (DMS)](https://www.nature.com/articles/nmeth.3027) is an experimental method
+  for screening a large set of variants for a specific function, another source
+  of experimental labels. When evalutated on the concordance with DMS data, EVE
+  similarly outperforms others models.
+</Figure>
+
+I find the VAE model's strong predictive power incredible. After all, the model is completely unsupervised: it has never seen _any_ labeled data of variant phenotype. It learns purely through studying the evolutionary sequence in the protein's family.
+
+### The power of latent variables
+
+When compared to independent position-wise models, the latent variable model is significantly more accurate for all possible mutations. The sites at which their accuracy improved the most are ones that cooperate with several other sites.
+
+<Figure
+  content={<Image path={require("./images/DeepSequence-vs-independent.png")} />}
+></Figure>
+
+This demonstrates the flexibility of the latent variable model that can capture higher-order interactions.
+
+Here's one way to look at these results. MSAs contains a wealth of information, some of which we can understand through simple statistics: position-wise frequencies, pair-wise frequencies, etc. (what we did in a <Link to="/protein-evolution">previous post</Link>). Those models are interpretable but limiting – they fail at teasing out more complex, higher-order signals.
+
+Enter neural networks, which are much better than us at recognizing those signals hidden in MSAs. It knowns _where to look_, _what to look at_ – beyond our simple statistics. This comes at the cost of interpretability. The comparison between our VAE model and statistical models like <Link to="/protein-evolution">Direct Coupling Analysis (DCA)</Link> exemplifies these two paradigms.
+
+## The statistics behind VAEs
+
+<NoteList />
