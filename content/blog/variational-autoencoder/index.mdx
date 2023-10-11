@@ -10,6 +10,7 @@ import { Link } from "gatsby"
 import MSACoupling from "../protein-evolution/d3/MSACoupling.jsx"
 import { Note, NoteList } from "./Notes.jsx"
 import DistributionUpdate from "./d3/DistributionUpdate.jsx"
+import Slider from "./d3/ELBOSlider.jsx"
 
 ## We are all latent variable models
 
@@ -127,7 +128,7 @@ $$
 
 This formula is obvious from a math-symbols perspective but I've always found it hard to understand what it actually means. Let's try to understand it intuitively within our context.
 
-### Bayesian inference
+### Bayesian updates
 
 $p(\mathbf{x})$, called the **evidence**, is the probability of observing $\mathbf{x}$ averaged over all possible latent variables $\mathbf{z}$:
 
@@ -179,7 +180,7 @@ Similarly, this 1) assigns a lower probability to a $\mathbf{z}$ that led to an 
 
 That's the essence of the update rule: it's all in the fraction $\frac{p(\mathbf{x}|\mathbf{z})}{p(\mathbf{x})}$.
 
-### Encoding the posterior
+### Approximating the posterior
 
 As we mentioned, the evidence $p(\mathbf{x})$ is impossible to compute it's a sum over all possible latent variables. This means that we can't actually compute the posterior distributions for the update – we need to approximate it.
 
@@ -189,7 +190,11 @@ $$
 D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))
 $$
 
-Let's expand it out (these calculations are mostly uninteresting applications of definitions and log rules – feel free to skip!):
+If the KL divergence is $0$, then we have perfectly approximated the posterior.
+
+### Deriving ELBO
+
+If you're not interested in the mathematical details, this section can be skipped entirely. TLDR: expanding out $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ yields the equation at the end of the section, the foundational equation of variational inference.
 
 By definition of KL divergence and log rules:
 
@@ -205,14 +210,15 @@ Apply Bayes rule and log rules:
 $$
 \begin{align*}
 D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x})) &= \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log q(\mathbf{z} | \mathbf{x}) - \log \frac{p(\mathbf{x} | \mathbf{z})p(\mathbf{z})}{p(\mathbf{x})} \right] \\
-&= \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log q(\mathbf{z} | \mathbf{x}) - \log p(\mathbf{x} | \mathbf{z}) - \log p(\mathbf{z}) - \log p(\mathbf{x})\right] \\
+&= \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log q(\mathbf{z} | \mathbf{x}) - (\log p(\mathbf{x} | \mathbf{z}) + \log p(\mathbf{z}) - \log p(\mathbf{x}))\right] \\
+&= \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log q(\mathbf{z} | \mathbf{x}) - \log p(\mathbf{x} | \mathbf{z}) - \log p(\mathbf{z}) + \log p(\mathbf{x})\right] \\
 \end{align*}
 $$
 
 Move $\log p(\mathbf{x})$ out of the expectation because it doesn't depend on $\mathbf{z}$:
 
 $$
-D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x})) = \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log q(\mathbf{z} | \mathbf{x}) - \log p(\mathbf{x} | \mathbf{z}) - \log p(\mathbf{z})\right] - \log p(\mathbf{x})
+D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x})) = \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log q(\mathbf{z} | \mathbf{x}) - \log p(\mathbf{x} | \mathbf{z}) - \log p(\mathbf{z})\right] + \log p(\mathbf{x})
 $$
 
 Separate terms into 2 expectations and group with log rules:
@@ -229,6 +235,10 @@ $$
 
 This is the central equation in variational inference. The right hand side is exactly what we have called the evidence lower-bound (ELBO).
 
+### Interpreting ELBO
+
+We derived
+
 $$
 \log p(\mathbf{x}) - D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x})) = ELBO(\mathbf{x})
 $$
@@ -236,6 +246,8 @@ $$
 Now the name makes sense: since $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ is always positive (a property of KL divergences), $ELBO(\mathbf{x})$ is a _lower bound_ on the (log) evidence, $\log p(\mathbf{x})$.
 
 Imagine $\log p(\mathbf{x})$ as fixed. Our goal of minimizing $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ is equivalent to maximizing $ELBO(\mathbf{x})$.
+
+<Figure content={<Slider />}></Figure>
 
 ## Modeling protein sequences
 
