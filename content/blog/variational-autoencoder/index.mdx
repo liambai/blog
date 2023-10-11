@@ -9,6 +9,7 @@ import Image from "../../../src/components/image.jsx"
 import { Link } from "gatsby"
 import MSACoupling from "../protein-evolution/d3/MSACoupling.jsx"
 import { Note, NoteList } from "./Notes.jsx"
+import DistributionUpdate from "./d3/DistributionUpdate.jsx"
 
 ## We are all latent variable models
 
@@ -102,7 +103,139 @@ Forcing $p(z)$ to be standard normal might seem strange. Don't we want the distr
   }
 ></Figure>
 
-So far, we talked about variational autoencoders purely through a machine learning lens. These models are actually deeply rooted in a field of statistics called [variational inference](https://en.wikipedia.org/wiki/Variational_Bayesian_methods). We didn't do the beautiful math justice. Since we have a working machine learning model, let's jump into the application first, and we'll explore the statistical roots at the end.
+So far, we talked about variational autoencoders purely through a machine learning lens. Some of the formulations might feel a bit unnatural, e.g. why regularize by enforcing the latent distribution to be standard normal?
+
+These models are actually deeply rooted in a field of statistics called [variational inference](https://en.wikipedia.org/wiki/Variational_Bayesian_methods) that justified all the decisions we've made. In the next section, we'll do the beautiful math a bit of justice; but since we already have a working machine learning model, feel free skip it if you are more interested in how VAEs are applied.
+
+## Why are VAEs the way that they are?
+
+(Feel free to skip this section...)
+
+Here's another way to look at the reconstruction task. Every time the baby hears and repeats a word, he updates his internal view of the world. We model this view as a distribution over the latent space, $p(z)$. Learning is nothing but _a series of these updates_.
+
+Given some word $\mathbf{x} = ``Dog"$, the baby performs the update:
+
+$$
+p(z) \leftarrow p(z | \mathbf{x})
+$$
+
+$p(z)$ is the **prior distribution** (before the update) and $p(z | \mathbf{x})$ is the **posterior distribution** (after the update). This is often called a **Bayesian inference** because we use **Bayes rule** to perform the updates:
+
+$$
+p(z | \mathbf{x}) = \frac{p(\mathbf{x} | z) p(z)}{p(\mathbf{x})}
+$$
+
+This formula is obvious from a math-symbols perspective but I've always found it hard to understand what it actually means. Let's try to understand it intuitively within our context.
+
+### Bayesian inference
+
+$p(\mathbf{x})$, called the **evidence**, is the probability of observing $\mathbf{x}$ averaged over all possible latent variables $\mathbf{z}$:
+
+$$
+p(\mathbf{x}) = \sum_{\mathbf{z} \in \text{latent space}} p(\mathbf{z})p(\mathbf{x} | \mathbf{z})
+$$
+
+When the latent space is massive, as in our case, this quantity is infeasible to compute.
+
+Let's look at Bayes rule purely through the lens of the distribution update: $p(z) \leftarrow p(z | \mathbf{x})$.
+
+1. I have some preconception, $p(z)$
+2. I see some $\mathbf{x}$ (e.g. "Dog")
+3. Now I have some updated mental model, $p(z | \mathbf{x})$
+
+Concretely, we have a long vector $p(z)$ with a probability value for each possible $\mathbf{z}$ in the latent space. At each update step, we update _every_ value in $p(z)$.
+
+<Figure content={<DistributionUpdate />}></Figure>
+
+How should we do this update? In other words, how should each new observation $\mathbf{x}$ affect my mental model? Of course, that depends on $\mathbf{x}$.
+
+We have an averaged opinion among all the latent variables on how likely $\mathbf{x}$ is: $p(\mathbf{x})$. Let's take some random $\mathbf{z}$. Suppose $\mathbf{z}$ leads me to think that $\mathbf{x}$ is likely, say 60%, while the averaged opinion is only 20%. Since we did actually observe $\mathbf{x}$, $\mathbf{z}$ outperformed the average on this observation. Let's promote it by bumping its assigned probability, proportional to how much it outperformed. Formally, $p(\mathbf{x} | \mathbf{z}) = 0.6$ and $p(\mathbf{x}) = 0.2$:
+
+$$
+\frac{p(\mathbf{x}|\mathbf{z})}{p(\mathbf{x})} = \frac{0.6}{0.2} = 3
+$$
+
+The posterior we will use to update $p(\mathbf{z})$ is:
+
+$$
+p(\mathbf{z} | \mathbf{x}) = 3 * p(\mathbf{z})
+$$
+
+This has the effect of 1) assigning a higher probability to a $\mathbf{z}$ that led to an accurate prediction and 2) bringing up $p(\mathbf{x})$, the averaged opinion on how likely $\mathbf{x}$ is.
+
+Conversely, if $\mathbf{z}$ leads me to think that $\mathbf{x}$ is unlikely, say 20%, while the averaged opinion is 60%, then $\mathbf{z}$ underperformed the average on this observation. Let's demote it by decreasing its assigned probability, proportional to how much it underperformed. $p(\mathbf{x} | \mathbf{z}) = 0.2$ and $p(\mathbf{x}) = 0.6$:
+
+$$
+\frac{p(\mathbf{x}|\mathbf{z})}{p(\mathbf{x})} = \frac{0.2}{0.6} = 1/3
+$$
+
+The posterior we will use to update $p(\mathbf{z})$ is:
+
+$$
+p(\mathbf{z} | \mathbf{x}) = 1/3 * p(\mathbf{z})
+$$
+
+Similarly, this 1) assigns a lower probability to a $\mathbf{z}$ that led to an inaccurate prediction and 2) brings up $p(\mathbf{x})$, the averaged opinion on how likely $\mathbf{x}$ is.
+
+That's the essence of the update rule: it's all in the fraction $\frac{p(\mathbf{x}|\mathbf{z})}{p(\mathbf{x})}$.
+
+### Encoding the posterior
+
+As we mentioned, the evidence $p(\mathbf{x})$ is impossible to compute it's a sum over all possible latent variables. This means that we can't actually compute the posterior distributions for the update – we need to approximate it.
+
+Let's use some distribution $q(z | \mathbf{x})$ to approximate $p(z | \mathbf{x})$. _This is our encoder._ We want $q(z | \mathbf{x})$ to be as similar to $p(z | \mathbf{x})$ as possible, which we can enforce by minimizing their KL divergence:
+
+$$
+D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))
+$$
+
+Let's expand it out (these calculations are mostly uninteresting applications of definitions and log rules – feel free to skip!):
+
+By definition of KL divergence and log rules:
+
+$$
+\begin{align*}
+D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x})) &= \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})}\left[\log \frac{q(\mathbf{z} | \mathbf{x})}{p(\mathbf{z} | \mathbf{x})}\right]\\
+&= \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log q(\mathbf{z} | \mathbf{x}) - \log p(\mathbf{z} | \mathbf{x}) \right]
+\end{align*}
+$$
+
+Apply Bayes rule and log rules:
+
+$$
+\begin{align*}
+D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x})) &= \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log q(\mathbf{z} | \mathbf{x}) - \log \frac{p(\mathbf{x} | \mathbf{z})p(\mathbf{z})}{p(\mathbf{x})} \right] \\
+&= \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log q(\mathbf{z} | \mathbf{x}) - \log p(\mathbf{x} | \mathbf{z}) - \log p(\mathbf{z}) - \log p(\mathbf{x})\right] \\
+\end{align*}
+$$
+
+Move $\log p(\mathbf{x})$ out of the expectation because it doesn't depend on $\mathbf{z}$:
+
+$$
+D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x})) = \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log q(\mathbf{z} | \mathbf{x}) - \log p(\mathbf{x} | \mathbf{z}) - \log p(\mathbf{z})\right] - \log p(\mathbf{x})
+$$
+
+Separate terms into 2 expectations and group with log rules:
+
+$$
+D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x})) = \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[ \log \frac{q(\mathbf{z} | \mathbf{x})}{p(\mathbf{z})} \right] - \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log p(\mathbf{x} | \mathbf{z})\right] +  \log p(\mathbf{x})
+$$
+
+The first term is a KL divergence $D_{KL}(q(\mathbf{z} | \mathbf{x}) || p(\mathbf{z}))$. Rewriting and rearranging:
+
+$$
+\log p(\mathbf{x}) - D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x})) = \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log p(\mathbf{x} | \mathbf{z})\right] - D_{KL}(q(\mathbf{z} | \mathbf{x}) || p(\mathbf{z}))
+$$
+
+This is the central equation in variational inference. The right hand side is exactly what we have called the evidence lower-bound (ELBO).
+
+$$
+\log p(\mathbf{x}) - D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x})) = ELBO(\mathbf{x})
+$$
+
+Now the name makes sense: since $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ is always positive (a property of KL divergences), $ELBO(\mathbf{x})$ is a _lower bound_ on the (log) evidence, $\log p(\mathbf{x})$.
+
+Imagine $\log p(\mathbf{x})$ as fixed. Our goal of minimizing $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ is equivalent to maximizing $ELBO(\mathbf{x})$.
 
 ## Modeling protein sequences
 
@@ -147,7 +280,10 @@ Given an unknown input sequence $\mathbf{x}$, $p(\mathbf{x})$ describes how like
 Given a wild-type sequence $\mathbf{x}^{\text{(Wild-type)}}$ and a mutant sequence $\mathbf{x}^{\text{(Mutant)}}$, the log ratio
 
 $$
+
 \log\frac{p(\mathbf{x}^{\text{(Mutant)}})}{p(\mathbf{x}^{\text{(Wild-type)}})}
+
+
 $$
 
 measures the improvement of the mutant over the wild-type.
@@ -203,6 +339,5 @@ Here's one way to look at these results. MSAs contains a wealth of information, 
 
 Enter neural networks, which are much better than us at recognizing those signals hidden in MSAs. They known _where to look_, _what to look at_ – beyond our simple statistics. This comes at the cost of interpretability. The comparison between our VAE model and statistical models like <Link to="/protein-evolution">Direct Coupling Analysis (DCA)</Link> exemplifies these two paradigms.
 
-## The statistics behind VAEs
-
 <NoteList />
+$$
