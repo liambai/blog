@@ -109,11 +109,9 @@ Forcing $p(z)$ to be standard normal might seem strange. Don't we want the distr
 
 So far, we talked about variational autoencoders purely through the lens of machine learning. Some of the formulations might feel unnatural, e.g. why do we regularize in this weird way?
 
-Variational autoencoders are actually deeply rooted in a field of statistics called [variational inference](https://en.wikipedia.org/wiki/Variational_Bayesian_methods), which provides the first principles behind our decisions. That is the subject of the next section. However, since we already have a working machine learning model, feel free skip it if you are more interested in how VAEs are applied.
+Variational autoencoders are actually deeply rooted in a field of statistics called [variational inference](https://en.wikipedia.org/wiki/Variational_Bayesian_methods), which provides the first principles behind our decisions. That is the subject of the next section. However, since we already have a working machine learning model, feel free to [skip it](#modeling-protein-sequences) if you are more interested in how VAEs are applied.
 
 ## Why are VAEs the way that they are?
-
-(Feel free to skip this section...)
 
 Here's another way to look at the reconstruction task. Every time the baby hears and repeats a word, he updates his internal view of the world. We model this view as a distribution over the latent space, $p(z)$. Learning is nothing but _a series of these updates_.
 
@@ -187,7 +185,7 @@ That's the essence of the update rule: it's controlled by the fraction $\frac{p(
 
 As we mentioned, the evidence $p(\mathbf{x})$ is impossible to compute because it is a sum over all possible latent variables. This means that we can't actually compute the posterior distributions for the update – we need to approximate it.
 
-The two most popular methods for doing this approximation are Markov Chain Monte Carlo (MCMC) and variational inference. We talked about MCMC previously in <Link to="/protein-hallucination">various</Link> <Link to="/protein-evolution">contexts</Link>. It uses a trial-and-error approach to generate samples from the complex distribution, from which we can approximate the underlying distribution.
+The two most popular methods for doing this approximation are Markov Chain Monte Carlo (MCMC) and variational inference. We talked about MCMC previously in [various](/protein-hallucination) [contexts](/protein-evolution/#generating-new-sequences). It uses a trial-and-error approach to generate samples from the complex distribution, from which we can approximate the underlying distribution.
 
 Variational inference, in contrast, looks at a collection of distributions. For example, we assume the observations follows a normal distribution and consider all distributions we get by varying the the mean and variance.
 
@@ -256,11 +254,11 @@ $$
 
 Now the name makes sense. Since $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ is always positive (N: a property of KL divergences), $ELBO(\mathbf{x})$ is a _lower bound_ on the (log) evidence, $\log p(\mathbf{x})$.
 
-Given some fixed $\log p(\mathbf{x})$, our goal of minimizing $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ is equivalent to maximizing $ELBO(\mathbf{x})$.
+Our goal of minimizing $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ is equivalent to maximizing $ELBO(\mathbf{x})$.
 
 <Figure content={<Slider />}></Figure>
 
-## Modeling protein sequences
+<h2 id="modeling-protein-sequences">Modeling protein sequences</h2>
 
 ### Pair-wise models are limiting
 
