@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react"
 import * as d3 from "d3"
 import { sliderBottom } from "d3-simple-slider"
-import { BlockMath } from "react-katex"
 
 const Slider = () => {
   const sliderRef = useRef()
@@ -25,7 +24,7 @@ const Slider = () => {
       .attr("transform", "translate(30,30)")
 
     g.call(slider)
-  }, [])
+  }, [slider])
 
   const ELBOLineRef = useRef()
   const ELBOLabelRef = useRef()
