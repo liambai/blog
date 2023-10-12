@@ -57,6 +57,7 @@ module.exports = {
           },
           `gatsby-remark-prismjs`,
           `gatsby-remark-katex`,
+          `gatsby-remark-autolink-headers`,
         ],
       },
     },

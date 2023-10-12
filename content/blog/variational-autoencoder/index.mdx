@@ -258,7 +258,7 @@ Our goal of minimizing $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ is equiv
 
 <Figure content={<Slider />}></Figure>
 
-<h2 id="modeling-protein-sequences">Modeling protein sequences</h2>
+## Modeling protein sequences
 
 ### Pair-wise models are limiting
 
@@ -273,7 +273,7 @@ In a <Link to="/protein-evolution">previous post</Link>, we talked about ways to
 
 We considered models that look at each position (position-wise) and models that additionally consider all possible pairs of positions ([pair-wise](https://en.wikipedia.org/wiki/Potts_model)). But what about the interactions between 3 positions (third-order interactions)? Or even more? Those interactions are commonplace in natural proteins but are unfortunately computationally unfeasible.
 
-### Variational encoders for proteins
+### Variational autoencoders for proteins
 
 Let's imagine there being some latent variable vector $\mathbf{z}$ that explains _all_ interactions – including higher-order ones.
 
