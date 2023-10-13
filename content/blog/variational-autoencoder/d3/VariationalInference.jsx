@@ -18,7 +18,7 @@ for (let i = 0; i < 25; i++) {
 }
 
 function VariationalInference() {
-  const width = 300
+  const width = 320
   const height = 160
 
   const plotRef = useRef()
@@ -94,54 +94,57 @@ function VariationalInference() {
   }, [xScale])
 
   const meanSliderRef = useRef()
-  const meanSlider = sliderBottom()
-    .min(-5)
-    .max(5)
-    .step(0.5)
-    .width(250)
-    .default(0)
-    .on("onchange", x => {
-      setMean(x)
-    })
 
   useEffect(() => {
+    const meanSlider = sliderBottom()
+      .min(-5)
+      .max(5)
+      .step(0.5)
+      .width(240)
+      .default(0)
+      .on("onchange", x => {
+        setMean(x)
+      })
     const g = d3
       .select(meanSliderRef.current)
       .append("g")
       .attr("transform", "translate(30,30)")
 
     g.call(meanSlider)
-  }, [meanSlider])
+  }, [])
 
   const varianceSliderRef = useRef()
-  const varianceSlider = sliderBottom()
-    .min(0)
-    .max(5)
-    .step(0.5)
-    .width(250)
-    .default(1)
-    .on("onchange", x => {
-      setVariance(x)
-    })
-
   useEffect(() => {
+    const varianceSlider = sliderBottom()
+      .min(0)
+      .max(5)
+      .step(0.5)
+      .width(240)
+      .default(1)
+      .on("onchange", x => {
+        setVariance(x)
+      })
     const g = d3
       .select(varianceSliderRef.current)
       .append("g")
       .attr("transform", "translate(30,30)")
 
     g.call(varianceSlider)
-  }, [varianceSlider])
+  }, [])
 
   return (
     <div
-      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
     >
       <svg ref={plotRef} />
-      <span style={{ fontSize: 13, marginBottom: -15 }}>Mean</span>
+      <span style={{ fontSize: 13, marginBottom: -15 }}>mean</span>
       <svg ref={meanSliderRef} style={{ height: 65 }} />
       <span style={{ fontSize: 13, marginTop: 20, marginBottom: -15 }}>
-        Variance
+        variance
       </span>
       <svg ref={varianceSliderRef} style={{ height: 65 }} />
     </div>

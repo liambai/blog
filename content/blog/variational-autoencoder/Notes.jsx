@@ -12,7 +12,7 @@ const notes = {
       </span>
     </>
   ),
-  2: "For mathematical convenience, we use log probability instead.",
+  2: "We use log probability for mathematical convenience.",
   3: (
     <>
       <InlineMath>{"p(x,z) = p(z|x)p(x) = p(x|z)p(z)"}</InlineMath>

@@ -1,7 +1,7 @@
 ---
 title: "A practical introduction to variational autoencoders"
 date: "2023-10-14"
-description: Predicting protein function using deep generative models. Latent variable models, variational autoencoders (VAEs), Bayesian inference, evidence lower bound (ELBO), mutation effect prediction.
+description: Predicting protein function using deep generative models. Latent variable models, reconstruction, variational autoencoders (VAEs), Bayesian inference, evidence lower bound (ELBO), mutation effect prediction.
 ---
 
 import Figure from "../../../src/components/figure.jsx"
@@ -23,7 +23,7 @@ Here's one way to look at learning. We interact with the world through observing
 
 ### Encoder-decoder
 
-Imitation is an effective way to learn that engages both observation and action. For example, babies repeat the words of their parents. As they make mistakes and get corrected, they hone the way they represent the words they hear (the **encoder**) as well as the way they create their own words from that representation (the **decoder**).
+Imitation is an effective way to learn that engages both observation and action. For example, babies repeat the words of their parents. As they make mistakes and get corrected, they hone their internal representation of the words they hear (the **encoder**) as well as the way they create their own words from that representation (the **decoder**).
 
 <Figure
   content={
@@ -33,9 +33,9 @@ Imitation is an effective way to learn that engages both observation and action.
 
 Crudely casting this in machine learning terms, the representation is a vector $\mathbf{z}$ called a **latent variable**, which lives in the **latent space**. The baby is a **latent variable model** engaged in a task called **reconstruction**. <Note id={1} />
 
-A note on notation: when talking about distributions, it's usually implied from context whether something is fixed or a variable in a distribution. I find this confusing and want to clarify by making fixed things **bold**. For example, $\mathbf{z} = [0.12, -0.25, -0.05, 0.33, 0.02]$ is a fixed vector, $p(x|\mathbf{z})$ is a conditional distribution over possible values of $x$, i.e. it's a function of $x$.
+A note on notation: when talking about distributions, I find it helpful to make explicit whether something is fixed or a variable in a distribution. I will make fixed things **bold**. For example, $\mathbf{z} = [0.12, -0.25, -0.05, 0.33, 0.02]$ is a fixed vector, $p(x|\mathbf{z})$ is a conditional distribution over possible values of $x$. $p(\mathbf{x})$ is a number between $0$ and $1$ (a probability) while $p(x)$ is a distribution, i.e. a function of $x$.
 
-Given observation $\mathbf{x}$, the encoder is a distribution $q(z|\mathbf{x})$ over the latent space; knowing $\mathbf{x} = \text{``Dog"}$, the encoder tells us which latent variables are probable. To obtain some $\mathbf{z}$, we sample from $q(z|\mathbf{x})$.
+Given observation $\mathbf{x}$, the encoder is a distribution $q(z|\mathbf{x})$ over the latent space: knowing $\mathbf{x} = \text{``Dog"}$, the encoder tells us which latent variables are probable. To obtain some $\mathbf{z}$, we sample from $q(z|\mathbf{x})$.
 
 Similarly, given some latent variable $\mathbf{z}$, the decoder is a distribution $p(x|\mathbf{z})$. When sampled from, the decoder produces a reconstructed $\mathbf{\tilde{x}}$.
 
@@ -47,7 +47,7 @@ Similarly, given some latent variable $\mathbf{z}$, the decoder is a distributio
 
 ### Knowing when to say "good job!"
 
-A good model (baby) at reconstruction gets it exactly right with high probability. Given some input $\mathbf{x}$, let's pick some random $\mathbf{z_{rand}}$ and look at $p(\mathbf{x}|\mathbf{z_{rand}})$ – the probability of reconstructing the input perfectly – if it's high, we can tell the model that it did a good job.
+A good model (baby) at reconstruction gets it exactly right with high probability. Given some input $\mathbf{x}$, let's pick some random $\mathbf{z_{rand}}$ and look at $p(\mathbf{x}|\mathbf{z_{rand}})$: the probability of reconstructing the input perfectly. We want this number to be big.
 
 But that's not really fair: what if we picked a $\mathbf{z_{rand}}$ that the encoder would never choose? After all, the decoder only sees the latent variables produced by the encoder. Ideally, we want to assign more weight to $\mathbf{z}$'s that the encoder is more likely to produce.
 
@@ -91,15 +91,15 @@ $$
 ELBO(\mathbf{x}) = \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})}[\log p(\mathbf{x} | \mathbf{z})] - D_{KL}(q(\mathbf{z} | \mathbf{x}) || p(\mathbf{z}))
 $$
 
-This is the **Evidence Lower BOund (ELBO)**, (we'll explain the name later!), a quantity we want to _maximize_. We can view the KL divergence term as a penalization for complex, nonstandard encoder distributions. This technique to prevent overfitting is called **regularization**.
+This is the **Evidence Lower BOund (ELBO)** – we'll explain the name later! – a quantity we want to _maximize_. We can view the KL divergence term as a penalization for complex, nonstandard encoder distributions. This technique to prevent overfitting is called **regularization**.
 
-In machine learning, we're used to _minimizing_. We can define a simple loss function whose minimization is equivalent to maximizing ELBO:
+In machine learning, we're used to _minimizing_. We can define a loss function whose minimization is equivalent to maximizing ELBO:
 
 $$
 Loss(\mathbf{x}) = - ELBO(\mathbf{x})
 $$
 
-Forcing $p(z)$ to be standard normal might seem strange. Don't we want the distribution of $z$ to be something informative learned by the model? Think about it like this: the encoder and decoder are complex functions with many parameters (they're neural networks!) and _they have all the power_. With a sufficiently complex function, $p(z) = Normal(0,1)$ can be transformed into _anything you want_.
+Forcing $p(z)$ to be standard normal might seem strange. Don't we want the distribution of $z$ to be something informative learned by the model? Think about it like this: the encoder and decoder are complex functions with many parameters (they're neural networks!) and _they have all the power_. With a sufficiently complex function, $p(z) = Normal(0,1)$ can be transformed into _anything you want_. The art is in this transformation.
 
 <Figure
   content={
@@ -109,11 +109,11 @@ Forcing $p(z)$ to be standard normal might seem strange. Don't we want the distr
 
 So far, we talked about variational autoencoders purely through the lens of machine learning. Some of the formulations might feel unnatural, e.g. why do we regularize in this weird way?
 
-Variational autoencoders are actually deeply rooted in a field of statistics called [variational inference](https://en.wikipedia.org/wiki/Variational_Bayesian_methods), which provides the first principles behind our decisions. That is the subject of the next section. However, since we already have a working machine learning model, feel free to [skip it](#modeling-protein-sequences) if you are more interested in how VAEs are applied.
+Variational autoencoders are actually deeply rooted in a field of statistics called [**variational inference**](https://en.wikipedia.org/wiki/Variational_Bayesian_methods), which provides the first principles behind our decisions. That is the subject of the next section. However, since we already have a working machine learning model, feel free to [skip it](#modeling-protein-sequences) if you are more interested in how VAEs are applied.
 
 ## Why are VAEs the way that they are?
 
-Here's another way to look at the reconstruction task. Every time the baby hears and repeats a word, he updates his internal view of the world. We model this view as a distribution over the latent space, $p(z)$. Learning is nothing but _a series of these updates_.
+Here's another way to look at the reconstruction problem. Every time the baby hears and repeats a word, he makes some _update_ to his internal view of the world: a distribution over the latent space, $p(z)$. Learning is nothing but _a series of these updates_.
 
 Given some word $\mathbf{x} = ``Dog"$, the baby performs the update:
 
@@ -121,13 +121,13 @@ $$
 p(z) \leftarrow p(z | \mathbf{x})
 $$
 
-$p(z)$ is the **prior distribution** (before the update) and $p(z | \mathbf{x})$ is the **posterior distribution** (after the update). This is often called **Bayesian inference** because we use **Bayes rule** to compute the posterior:
+$p(z)$ is the **prior distribution** (before the update) and $p(z | \mathbf{x})$ is the **posterior distribution** (after the update). With each observation, the baby computes the posterior and uses it as the prior for the next observation. This is often called **Bayesian inference** because we use **Bayes rule** to compute the posterior:
 
 $$
 p(z | \mathbf{x}) = \frac{p(\mathbf{x} | z) p(z)}{p(\mathbf{x})}
 $$
 
-This formula is obvious from a math-symbols perspective <Note id={3}/> but I've always found it hard to understand what it actually means. Let's try to understand it intuitively within our setup.
+This formula seems obvious from the manipulation of math-symbols <Note id={3}/>, but I've always found it hard to understand what it actually means. Let's try to understand it intuitively within our setup.
 
 ### Bayesian updates
 
@@ -145,13 +145,13 @@ Let's look at Bayes rule purely through the lens of the distribution update: $p(
 2. I see some $\mathbf{x}$ (e.g. "Dog")
 3. Now I have some updated mental model, $p(z | \mathbf{x})$
 
-Concretely, we have a long vector $p(z)$ with a probability value for each possible $\mathbf{z}$ in the latent space. At each update step, we update _every_ value in $p(z)$.
+Concretely, we have a long vector $p(z)$ with a probability value for each possible $\mathbf{z}$ in the latent space. With each observation, we update _every_ value in $p(z)$.
 
 <Figure content={<DistributionUpdate />}></Figure>
 
 How should each new observation $\mathbf{x}$ affect my mental model? At the very least, we should somehow increase $p(\mathbf{x})$, the probability we assign to observing $\mathbf{x}$, since we literally just observed it!
 
-$p(\mathbf{x})$ is an averaged opinion across all the latent variables on how likely $\mathbf{x}$ is. Let's take some random $\mathbf{z}$. Suppose $\mathbf{z}$ leads me to think that $\mathbf{x}$ is likely, say 60%, while the averaged opinion is only 20%. Given that we just observed $\mathbf{x}$, $\mathbf{z}$ outperformed the average. Let's promote it by bumping its assigned probability, proportional to how much it outperformed. Formally, $p(\mathbf{x} | \mathbf{z}) = 0.6$ and $p(\mathbf{x}) = 0.2$:
+$p(\mathbf{x})$ is an averaged opinion across all the latent variables on how likely $\mathbf{x}$ is. Let's take some random $\mathbf{z}$. Suppose $\mathbf{z}$ leads me to think that $\mathbf{x}$ is likely, say 60%, while the averaged opinion is only 20%. Given that we just observed $\mathbf{x}$, $\mathbf{z}$ did better than the average. Let's promote it by bumping its assigned probability. Formally, $p(\mathbf{x} | \mathbf{z}) = 0.6$ and $p(\mathbf{x}) = 0.2$:
 
 $$
 \frac{p(\mathbf{x}|\mathbf{z})}{p(\mathbf{x})} = \frac{0.6}{0.2} = 3
@@ -165,35 +165,29 @@ $$
 
 This has the effect of 1) assigning a higher probability to a $\mathbf{z}$ that led to an accurate prediction and 2) bringing up $p(\mathbf{x})$, the averaged opinion on how likely $\mathbf{x}$ is.
 
-Conversely, if $\mathbf{z}$ leads me to think that $\mathbf{x}$ is unlikely, say 20%, while the averaged opinion is 60%, then $\mathbf{z}$ underperformed the average. Let's decrease its assigned probability. $p(\mathbf{x} | \mathbf{z}) = 0.2$ and $p(\mathbf{x}) = 0.6$:
+Conversely, if $\mathbf{z}$ leads me to think that $\mathbf{x}$ is unlikely, say 20%, while the averaged opinion is 60%, then $\mathbf{z}$ did worse than the average. Let's decrease its assigned probability. $p(\mathbf{x} | \mathbf{z}) = 0.2$ and $p(\mathbf{x}) = 0.6$:
 
 $$
-\frac{p(\mathbf{x}|\mathbf{z})}{p(\mathbf{x})} = \frac{0.2}{0.6} = 1/3
-$$
-
-The posterior we will use to update $p(\mathbf{z})$ is:
-
-$$
-p(\mathbf{z} | \mathbf{x}) = 1/3 * p(\mathbf{z})
+\frac{p(\mathbf{x}|\mathbf{z})}{p(\mathbf{x})} = \frac{0.2}{0.6} = 1/3 \implies p(\mathbf{z} | \mathbf{x}) = 1/3 * p(\mathbf{z})
 $$
 
 Similarly, this 1) assigns a lower probability to a $\mathbf{z}$ that led to an inaccurate prediction and 2) brings up $p(\mathbf{x})$, the averaged opinion on how likely $\mathbf{x}$ is.
 
-That's the essence of the update rule: it's controlled by the fraction $\frac{p(\mathbf{x}|\mathbf{z})}{p(\mathbf{x})}$.
+That's the essence of the update rule: it's all controlled by the fraction $\frac{p(\mathbf{x}|\mathbf{z})}{p(\mathbf{x})}$.
 
 ### Approximating the posterior
 
-As we mentioned, the evidence $p(\mathbf{x})$ is impossible to compute because it is a sum over all possible latent variables. This means that we can't actually compute the posterior distributions for the update – we need to approximate it.
+As we mentioned, the evidence $p(\mathbf{x})$ is impossible to compute because it is a sum over all possible latent variables. Since $p(\mathbf{x})$ is the denominator of the Bayesian update, this means that we can't actually compute the posterior distribution – we need to approximate it.
 
-The two most popular methods for doing this approximation are Markov Chain Monte Carlo (MCMC) and variational inference. We talked about MCMC previously in [various](/protein-hallucination) [contexts](/protein-evolution/#generating-new-sequences). It uses a trial-and-error approach to generate samples from the complex distribution, from which we can approximate the underlying distribution.
+The two most popular methods for approximating complex distributions are [Markov Chain Monte Carlo (MCMC)](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo) and **variational inference**. We talked about MCMC previously [in](/protein-evolution/#generating-new-sequences) [various](/protein-representation/#using-the-representation) [contexts](/protein-hallucination). It uses a trial-and-error approach to generate samples, from which we can approximate the underlying complex distribution.
 
-Variational inference, in contrast, looks at a collection of distributions. For example, we assume the observations follows a normal distribution and consider all distributions we get by varying the the mean and variance.
+in contrast, variational inference looks at a collection of distributions. For example, we assume the observations follow a normal distribution and consider all distributions we get by varying the the mean and variance.
 
 <Figure content={<VariationalInference />}></Figure>
 
-Variational inference is a principled way to _vary_ these parameters of the distribution (hence the name!) and find a setting of them that best explains the observations. (N: In the variational autoencoder, these parameters of the parameters of the neural network.)
+Variational inference is a principled way to _vary_ these parameters of the distribution (hence the name!) and find a setting of them that best explains the observations.
 
-In our case, we try to use some distribution $q(z | \mathbf{x})$ to approximate $p(z | \mathbf{x})$. We want $q(z | \mathbf{x})$ to be as similar to $p(z | \mathbf{x})$ as possible, which we can enforce by minimizing the KL divergence between them:
+In our case, let's try to use some distribution $q(z | \mathbf{x})$ to approximate $p(z | \mathbf{x})$. We want $q(z | \mathbf{x})$ to be as similar to $p(z | \mathbf{x})$ as possible, which we can enforce by minimizing the KL divergence between them:
 
 $$
 D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))
@@ -203,7 +197,7 @@ If the KL divergence is $0$, then $q(z | \mathbf{x})$ perfectly approximates the
 
 ### Deriving the Evidence Lower Bound (ELBO)
 
-If you're not interested in the mathematical details, this section can be safely skipped entirely. TLDR: expanding out $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ yields the equation at the end of the section, the foundational equation of variational inference.
+If you're not interested in the mathematical details, this section can be safely [skipped](http://localhost:8000/variational-autoencoder/#what-does-elbo-mean) entirely. TLDR: expanding out $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ yields the equation at the end of the section, the foundational equation of variational inference.
 
 By definition of KL divergence and log rules:
 
@@ -236,27 +230,41 @@ $$
 D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x})) = \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[ \log \frac{q(\mathbf{z} | \mathbf{x})}{p(\mathbf{z})} \right] - \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log p(\mathbf{x} | \mathbf{z})\right] +  \log p(\mathbf{x})
 $$
 
-The first expectation is a KL divergence: $D_{KL}(q(\mathbf{z} | \mathbf{x}) || p(\mathbf{z}))$. Rewriting and rearranging:
+The first expectation is a KL divergence: $D_{KL}(q(z | \mathbf{x}) || p(z))$. Rewriting and rearranging:
 
 $$
-\log p(\mathbf{x}) - D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x})) = \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log p(\mathbf{x} | \mathbf{z})\right] - D_{KL}(q(\mathbf{z} | \mathbf{x}) || p(\mathbf{z}))
+\log p(\mathbf{x}) - D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x})) = \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log p(\mathbf{x} | \mathbf{z})\right] - D_{KL}(q(z | \mathbf{x}) || p(z))
 $$
 
 This is the central equation in variational inference. The right hand side is exactly what we have called the _evidence lower bound (ELBO)_.
 
 ### What does ELBO mean?
 
-From expanding $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ above, we got:
+From expanding $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$, we got:
 
 $$
 \log p(\mathbf{x}) - D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x})) = ELBO(\mathbf{x})
 $$
 
-Now the name makes sense. Since $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ is always positive (N: a property of KL divergences), $ELBO(\mathbf{x})$ is a _lower bound_ on the (log) evidence, $\log p(\mathbf{x})$.
-
-Our goal of minimizing $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ is equivalent to maximizing $ELBO(\mathbf{x})$.
+Now the name makes sense. Since $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ is always positive (N: a property of KL divergences), $ELBO(\mathbf{x})$ is a _lower bound_ on the (log-)evidence, $\log p(\mathbf{x})$.
 
 <Figure content={<Slider />}></Figure>
+
+Let's think about the left hand side of the equation. Maximizing ELBO has 2 effects:
+
+1. increase $\log p(\mathbf{x})$. This is our basic intuition: since we just observed $\mathbf{x}$, $p(\mathbf{x})$ should go up!
+
+2. minimize $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$, which satisfies our goal of approximating the posterior.
+
+### Connections with encoder-decoder
+
+We have now derived VAEs from two angles: machine learning (encoder-decoder, reconstruction loss, regularization) and variational inference (Bayesian updates, evidence maximization, posterior approximation). They are two sides of the same coin. Let's explore the connections:
+
+- In variational inference, we used the distribution $q(z | \mathbf{x})$ to approximate the posterior $p(z | \mathbf{x})$. This _is_ the encoder. The flexibility of a neural network encoder lets us approximate the complex posterior well.
+
+- $p(x | \mathbf{z})$ is the decoder. The average (log-)probability of perfect reconstruction under our encoder-decoder model, $\mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log p(\mathbf{x} | \mathbf{z})\right]$, falls out, perhaps unsurprisingly, as a good proxy for the intractable evidence, $\log p(\mathbf{x})$, that we want to maximize.
+
+- In variational inference, p(z) is the our prior. Before any observation, believing $p(z) \sim Normal(0, 1)$ seems reasonable. It's a starting point.
 
 ## Modeling protein sequences
 
@@ -301,10 +309,7 @@ Given an unknown input sequence $\mathbf{x}$, $p(\mathbf{x})$ describes how like
 Given a wild-type sequence $\mathbf{x}^{\text{(Wild-type)}}$ and a mutant sequence $\mathbf{x}^{\text{(Mutant)}}$, the log ratio
 
 $$
-
 \log\frac{p(\mathbf{x}^{\text{(Mutant)}})}{p(\mathbf{x}^{\text{(Wild-type)}})}
-
-
 $$
 
 measures the improvement of the mutant over the wild-type.
