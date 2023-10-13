@@ -127,31 +127,37 @@ $$
 p(z | \mathbf{x}) = \frac{p(\mathbf{x} | z) p(z)}{p(\mathbf{x})}
 $$
 
-This formula seems obvious from the manipulation of math-symbols <Note id={3}/>, but I've always found it hard to understand what it actually means. Let's try to understand it intuitively within our setup.
+This formula seems obvious from the manipulation of math-symbols <Note id={3}/>, but I've always found it hard to understand what it actually means. In the rest of this section, I will try to provide an intuitive explanation.
 
-### Bayesian updates
+### The evidence
 
-$p(\mathbf{x})$, called the **evidence**, is the probability of observing $\mathbf{x}$ averaged over all possible latent variables $\mathbf{z}$:
+One quick aside before we dive in. $p(\mathbf{x})$, called the **evidence**, is a weighted average of probabilities conditional on all possible latent variables $\mathbf{z}$:
 
 $$
 p(\mathbf{x}) = \sum_{\mathbf{z} \in \text{latent space}} p(\mathbf{z})p(\mathbf{x} | \mathbf{z})
 $$
 
+$p(\mathbf{x})$ is an averaged opinion across all $\mathbf{z}$'s that represents our best guess at how probable $\mathbf{x}$ is.
+
 When the latent space is massive, as in our case, this quantity is infeasible to compute.
+
+### Bayesian updates
 
 Let's look at Bayes rule purely through the lens of the distribution update: $p(z) \leftarrow p(z | \mathbf{x})$.
 
-1. I have some preconception, $p(z)$
+1. I have some preconception (prior), $p(z)$
 2. I see some $\mathbf{x}$ (e.g. "Dog")
-3. Now I have some updated mental model, $p(z | \mathbf{x})$
+3. Now I have some updated mental model (posterior), $p(z | \mathbf{x})$
 
-Concretely, we have a long vector $p(z)$ with a probability value for each possible $\mathbf{z}$ in the latent space. With each observation, we update _every_ value in $p(z)$.
+How should the new observation $\mathbf{x}$ influence my mental model? At the very least, we should increase $p(\mathbf{x})$, the probability we assign to observing $\mathbf{x}$, _since we literally just observed it!_
+
+Under the hood, we have a long vector $p(z)$ with a probability value for each possible $\mathbf{z}$ in the latent space. With each observation, we update _every_ value in $p(z)$.
 
 <Figure content={<DistributionUpdate />}></Figure>
 
-How should each new observation $\mathbf{x}$ affect my mental model? At the very least, we should somehow increase $p(\mathbf{x})$, the probability we assign to observing $\mathbf{x}$, since we literally just observed it!
+We can think of these bars (probabilities) as knobs we can tweak to adjust our model to better fit each new observation (without losing sight of previous ones).
 
-$p(\mathbf{x})$ is an averaged opinion across all the latent variables on how likely $\mathbf{x}$ is. Let's take some random $\mathbf{z}$. Suppose $\mathbf{z}$ leads me to think that $\mathbf{x}$ is likely, say 60%, while the averaged opinion is only 20%. Given that we just observed $\mathbf{x}$, $\mathbf{z}$ did better than the average. Let's promote it by bumping its assigned probability. Formally, $p(\mathbf{x} | \mathbf{z}) = 0.6$ and $p(\mathbf{x}) = 0.2$:
+Let's take some random $\mathbf{z}$. Suppose $\mathbf{z}$ leads me to think that $\mathbf{x}$ is likely, say 60% ($p(\mathbf{x} | \mathbf{z}) = 0.6$), while the averaged opinion is only 20% ($p(\mathbf{x}) = 0.2$). Given that we just observed $\mathbf{x}$, $\mathbf{z}$ did better than average. Let's promote it by bumping its assigned probability by:
 
 $$
 \frac{p(\mathbf{x}|\mathbf{z})}{p(\mathbf{x})} = \frac{0.6}{0.2} = 3
@@ -163,15 +169,13 @@ $$
 p(\mathbf{z} | \mathbf{x}) = 3 * p(\mathbf{z})
 $$
 
-This has the effect of 1) assigning a higher probability to a $\mathbf{z}$ that led to an accurate prediction and 2) bringing up $p(\mathbf{x})$, the averaged opinion on how likely $\mathbf{x}$ is.
-
-Conversely, if $\mathbf{z}$ leads me to think that $\mathbf{x}$ is unlikely, say 20%, while the averaged opinion is 60%, then $\mathbf{z}$ did worse than the average. Let's decrease its assigned probability. $p(\mathbf{x} | \mathbf{z}) = 0.2$ and $p(\mathbf{x}) = 0.6$:
+Conversely, if $\mathbf{z}$ leads me to think that $\mathbf{x}$ is unlikely, say 20% ($p(\mathbf{x} | \mathbf{z}) = 0.2$), while the averaged opinion is 60% ($p(\mathbf{x}) = 0.6$), then $\mathbf{z}$ did worse than the average. Let's decrease its assigned probability:
 
 $$
 \frac{p(\mathbf{x}|\mathbf{z})}{p(\mathbf{x})} = \frac{0.2}{0.6} = 1/3 \implies p(\mathbf{z} | \mathbf{x}) = 1/3 * p(\mathbf{z})
 $$
 
-Similarly, this 1) assigns a lower probability to a $\mathbf{z}$ that led to an inaccurate prediction and 2) brings up $p(\mathbf{x})$, the averaged opinion on how likely $\mathbf{x}$ is.
+Either by promoting an advocate of $\mathbf{x}$ or demoting a naysayer, we 1) adjust the latent distribution $p(z)$ to be more amenable to $\mathbf{x}$ and 2) bring up the average opinion, $p(\mathbf{x})$.
 
 That's the essence of the update rule: it's all controlled by the fraction $\frac{p(\mathbf{x}|\mathbf{z})}{p(\mathbf{x})}$.
 
@@ -179,13 +183,13 @@ That's the essence of the update rule: it's all controlled by the fraction $\fra
 
 As we mentioned, the evidence $p(\mathbf{x})$ is impossible to compute because it is a sum over all possible latent variables. Since $p(\mathbf{x})$ is the denominator of the Bayesian update, this means that we can't actually compute the posterior distribution – we need to approximate it.
 
-The two most popular methods for approximating complex distributions are [Markov Chain Monte Carlo (MCMC)](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo) and **variational inference**. We talked about MCMC previously [in](/protein-evolution/#generating-new-sequences) [various](/protein-representation/#using-the-representation) [contexts](/protein-hallucination). It uses a trial-and-error approach to generate samples, from which we can approximate the underlying complex distribution.
+The two most popular methods for approximating complex distributions are [Markov Chain Monte Carlo (MCMC)](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo) and **variational inference**. We talked about MCMC previously [in](/protein-evolution/#generating-new-sequences) [various](/protein-representation/#using-the-representation) [contexts](/protein-hallucination). It uses a trial-and-error approach to generate samples from which we can learn about the underlying complex distribution.
 
-in contrast, variational inference looks at a collection of distributions. For example, we assume the observations follow a normal distribution and consider all distributions we get by varying the the mean and variance.
+In contrast, variational inference looks at a family of distributions. For illustration, we assume the observations follow a normal distribution and consider all distributions we get by varying the the mean and variance.
 
 <Figure content={<VariationalInference />}></Figure>
 
-Variational inference is a principled way to _vary_ these parameters of the distribution (hence the name!) and find a setting of them that best explains the observations.
+Variational inference is a principled way to _vary_ these parameters of the distribution (hence the name!) and find a setting of them that best explains the observations. In practice, the distributions are much more complex.
 
 In our case, let's try to use some distribution $q(z | \mathbf{x})$ to approximate $p(z | \mathbf{x})$. We want $q(z | \mathbf{x})$ to be as similar to $p(z | \mathbf{x})$ as possible, which we can enforce by minimizing the KL divergence between them:
 
@@ -197,9 +201,9 @@ If the KL divergence is $0$, then $q(z | \mathbf{x})$ perfectly approximates the
 
 ### Deriving the Evidence Lower Bound (ELBO)
 
-If you're not interested in the mathematical details, this section can be safely [skipped](http://localhost:8000/variational-autoencoder/#what-does-elbo-mean) entirely. TLDR: expanding out $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ yields the equation at the end of the section, the foundational equation of variational inference.
+If you're not interested in the mathematical details, this section can be [skipped](#what-does-elbo-mean) entirely. TLDR: expanding out $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ yields the foundational equation of variational inference at the end of the section.
 
-By definition of KL divergence and log rules:
+By definition of KL divergence and applying log rules:
 
 $$
 \begin{align*}
@@ -256,15 +260,138 @@ Let's think about the left hand side of the equation. Maximizing ELBO has 2 effe
 
 2. minimize $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$, which satisfies our goal of approximating the posterior.
 
-### Connections with encoder-decoder
+### The connections
 
-We have now derived VAEs from two angles: machine learning (encoder-decoder, reconstruction loss, regularization) and variational inference (Bayesian updates, evidence maximization, posterior approximation). They are two sides of the same coin. Let's explore the connections:
+We have now derived VAEs from two angles: machine learning (encoder-decoder, reconstruction loss, regularization) and variational inference (Bayesian updates, evidence maximization, posterior approximation). They are two sides of the same coin. Let's explore some connections:
 
-- In variational inference, we used the distribution $q(z | \mathbf{x})$ to approximate the posterior $p(z | \mathbf{x})$. This _is_ the encoder. The flexibility of a neural network encoder lets us approximate the complex posterior well.
-
-- $p(x | \mathbf{z})$ is the decoder. The average (log-)probability of perfect reconstruction under our encoder-decoder model, $\mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log p(\mathbf{x} | \mathbf{z})\right]$, falls out, perhaps unsurprisingly, as a good proxy for the intractable evidence, $\log p(\mathbf{x})$, that we want to maximize.
-
-- In variational inference, p(z) is the our prior. Before any observation, believing $p(z) \sim Normal(0, 1)$ seems reasonable. It's a starting point.
+<table
+  style={{
+    width: "100%",
+    border: "2px solid",
+  }}
+>
+  <thead styly={{ height: 10 }}>
+    <tr>
+      <th
+        style={{
+          border: "2px solid",
+          padding: "8px",
+          textAlign: "left",
+        }}
+      >
+      </th>
+      <th
+        style={{
+          border: "2px solid",
+          padding: "8px",
+          textAlign: "left",
+        }}
+      >
+        Variational Inference
+      </th>
+      <th
+        style={{
+          border: "2px solid",
+          padding: "8px",
+          textAlign: "left",
+        }}
+      >
+        Machine Learning (VAE)
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td
+        style={{
+          border: "2px solid",
+          padding: "8px",
+          textAlign: "left",
+        }}
+      >
+        $q(z | \mathbf{x})$
+      </td>
+      <td
+        style={{
+          border: "2px solid",
+          padding: "8px",
+          textAlign: "left",
+        }}
+      >
+        We couldn't directly compute the posterior $p(z | \mathbf{x})$ in the Bayesian update, so we try to approximate it with $q(z | \mathbf{x})$.
+      </td>
+      <td
+        style={{
+          border: "2px solid",
+          padding: "8px",
+          textAlign: "left",
+        }}
+      >
+        $q(z | \mathbf{x})$ is the encoder. Using a neural network as the encoder gives us the flexibility to do this approximation well.
+      </td>
+    </tr>
+    <tr>
+      <td
+        style={{
+          border: "2px solid",
+          padding: "8px",
+          textAlign: "left",
+        }}
+      >
+        $p(x | \mathbf{z})$
+      </td>
+      <td
+        style={{
+          border: "2px solid",
+          padding: "8px",
+          textAlign: "left",
+        }}
+      >
+        $\mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log p(\mathbf{x} | \mathbf{z})\right]$ fell out as a term in ELBO whose maximization accomplishes the dual goal of maximizing the intractable evidence, $\log p(\mathbf{x})$, and bringing $q(z | \mathbf{x})$ close to $p(z | \mathbf{x})$.
+      </td>
+      <td
+        style={{
+          border: "2px solid",
+          padding: "8px",
+          textAlign: "left",
+        }}
+      >
+        $p(x | \mathbf{z})$ is the decoder, also a neural network. $\mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log p(\mathbf{x} | \mathbf{z})\right]$ is the probability of perfect reconstruction. Striving for perfect reconstruction not only makes intuitive sense, but is also grounded in the variational reasoning on the left.
+      </td>
+    </tr>
+    <tr>
+      <td
+        style={{
+          border: "2px solid",
+          padding: "8px",
+          textAlign: "left",
+        }}
+      >
+        $p(z)$
+      </td>
+      <td
+        style={{
+          border: "2px solid",
+          padding: "8px",
+          textAlign: "left",
+        }}
+      >
+      $p(z)$ is the prior we use before seeing any observations. $p(z) \sim Normal(0, 1)$ is a reasonable choice. It's a starting point. It would take a lot of observations that disobey $Normal(0, 1)$ to, via Bayesian updates, convince us of a drastically different distribution.
+      </td>
+      <td
+        style={{
+          border: "2px solid",
+          padding: "8px",
+          textAlign: "left",
+        }}
+      >
+      Our encoder and decoder are both neural networks. They're just black-box learners of complex distributions with no concept of priors. They can easily conjure up a wildly complex distribution – nothing like $Normal(0, 1)$ – that merely memorizes the observations, a problem called overfitting.
+      
+      To prevent this, we constantly nudge the encoder $q(z | \mathbf{x})$ towards $Normal(0, 1)$, as a reminder of *where it would have started* if we were using Bayesian inference. When viewed this way, $D_{KL}(q(z | \mathbf{x}) || p(z))$ is a *regularization term*.
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ## Modeling protein sequences
 
@@ -366,4 +493,3 @@ Here's one way to look at these results. MSAs contains a wealth of information, 
 Enter neural networks, which are much better than us at recognizing those signals hidden in MSAs. They known _where to look_, _what to look at_ – beyond our simple statistics. This comes at the cost of interpretability. The comparison between our VAE model and statistical models like <Link to="/protein-evolution">Direct Coupling Analysis (DCA)</Link> exemplifies these two paradigms.
 
 <NoteList />
-$$
