@@ -1,6 +1,6 @@
 ---
 title: "A practical introduction to variational autoencoders"
-date: "2023-10-14"
+date: "2023-10-27"
 description: Predicting protein function using deep generative models. Latent variable models, reconstruction, variational autoencoders (VAEs), Bayesian inference, evidence lower bound (ELBO), mutation effect prediction.
 ---
 
@@ -63,7 +63,7 @@ $$
 
 If $P_{\text{perfect reconstruction}}(\mathbf{x})$ is high, we can tell our model that it did a good job.
 
-### But... please don't just memorize
+### Regularization
 
 If use use neural networks as both the encoder and the decoder, our model is called a **variational autoencoder (VAE)**.
 
@@ -85,7 +85,11 @@ $$
 p(z) = Normal(0, 1)
 $$
 
-We talked previously about [KL divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence), a similarity measure between probability distributions: $D_{KL}(q(z | \mathbf{x}) || p(z))$ tells us how far the encoder has strayed from the standard normal. Let's write down the intuition that we want the model to 1) reconstruct well and 2) have an encoder distribution close to the standard normal:
+We talked previously about [KL divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence), a similarity measure between probability distributions: $D_{KL}(q(z | \mathbf{x}) || p(z))$ tells us how far the encoder has strayed from the standard normal.
+
+### The loss function
+
+Let's write down the intuition that we want the model to 1) reconstruct well and 2) have an encoder distribution close to the standard normal:
 
 $$
 ELBO(\mathbf{x}) = \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})}[\log p(\mathbf{x} | \mathbf{z})] - D_{KL}(q(\mathbf{z} | \mathbf{x}) || p(\mathbf{z}))
@@ -99,6 +103,8 @@ $$
 Loss(\mathbf{x}) = - ELBO(\mathbf{x})
 $$
 
+### Some notes
+
 Forcing $p(z)$ to be standard normal might seem strange. Don't we want the distribution of $z$ to be something informative learned by the model? Think about it like this: the encoder and decoder are complex functions with many parameters (they're neural networks!) and _they have all the power_. With a sufficiently complex function, $p(z) = Normal(0,1)$ can be transformed into _anything you want_. The art is in this transformation.
 
 <Figure
@@ -111,7 +117,7 @@ So far, we talked about variational autoencoders purely through the lens of mach
 
 Variational autoencoders are actually deeply rooted in a field of statistics called [**variational inference**](https://en.wikipedia.org/wiki/Variational_Bayesian_methods), which provides the first principles behind our decisions. That is the subject of the next section. However, since we already have a working machine learning model, feel free to [skip it](#modeling-protein-sequences) if you are more interested in how VAEs are applied.
 
-## Why are VAEs the way that they are?
+## Variational Inference
 
 Here's another way to look at the reconstruction problem. Every time the baby hears and repeats a word, he makes some _update_ to his internal view of the world: a distribution over the latent space, $p(z)$. Learning is nothing but _a series of these updates_.
 
@@ -157,6 +163,8 @@ Under the hood, we have a long vector $p(z)$ with a probability value for each p
 
 We can think of these bars (probabilities) as knobs we can tweak to adjust our model to better fit each new observation (without losing sight of previous ones).
 
+### Understanding the fraction
+
 Let's take some random $\mathbf{z}$. Suppose $\mathbf{z}$ leads me to think that $\mathbf{x}$ is likely, say 60% ($p(\mathbf{x} | \mathbf{z}) = 0.6$), while the averaged opinion is only 20% ($p(\mathbf{x}) = 0.2$). Given that we just observed $\mathbf{x}$, $\mathbf{z}$ did better than average. Let's promote it by bumping its assigned probability by:
 
 $$
@@ -199,7 +207,7 @@ $$
 
 If the KL divergence is $0$, then $q(z | \mathbf{x})$ perfectly approximates the posterior $p(z | \mathbf{x})$.
 
-### Deriving the Evidence Lower Bound (ELBO)
+### The Evidence Lower Bound (ELBO)
 
 If you're not interested in the mathematical details, this section can be [skipped](#what-does-elbo-mean) entirely. TLDR: expanding out $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ yields the foundational equation of variational inference at the end of the section.
 
@@ -260,9 +268,9 @@ Let's think about the left hand side of the equation. Maximizing ELBO has 2 effe
 
 2. minimize $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$, which satisfies our goal of approximating the posterior.
 
-### The connections
+### Variational autoencoders are neural networks that do variational inference
 
-We have now derived VAEs from two angles: machine learning (encoder-decoder, reconstruction loss, regularization) and variational inference (Bayesian updates, evidence maximization, posterior approximation). They are two sides of the same coin. Let's explore some connections:
+The machine learning motivations for VAEs we started with (encoder-decoder, reconstruction loss, regularization) are grounded in the statistics of variational inference (Bayesian updates, evidence maximization, posterior approximation). Let's explore the connections:
 
 <table
   style={{
@@ -270,7 +278,7 @@ We have now derived VAEs from two angles: machine learning (encoder-decoder, rec
     border: "2px solid",
   }}
 >
-  <thead styly={{ height: 10 }}>
+  <thead>
     <tr>
       <th
         style={{
@@ -296,7 +304,7 @@ We have now derived VAEs from two angles: machine learning (encoder-decoder, rec
           textAlign: "left",
         }}
       >
-        Machine Learning (VAE)
+        VAEs (machine learning)
       </th>
     </tr>
   </thead>
@@ -376,7 +384,7 @@ We have now derived VAEs from two angles: machine learning (encoder-decoder, rec
           textAlign: "left",
         }}
       >
-      $p(z)$ is the prior we use before seeing any observations. $p(z) \sim Normal(0, 1)$ is a reasonable choice. It's a starting point. It would take a lot of observations that disobey $Normal(0, 1)$ to, via Bayesian updates, convince us of a drastically different distribution.
+      $p(z)$ is the prior we use before seeing any observations. $p(z) \sim Normal(0, 1)$ is a reasonable choice. It's a starting point. It would take a lot of observations that disobey $Normal(0, 1)$ to, via Bayesian updates, convince us of a drastically different latent distribution.
       </td>
       <td
         style={{
