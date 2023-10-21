@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react"
 import * as d3 from "d3"
+import { useMediaQuery } from "react-responsive"
 
 const initialProbs = {
   "z = [-0.1, 0.2, 0.5]": 0.09,
@@ -144,7 +145,7 @@ const HorizontalPDFGraph = ({
           borderRadius: 6,
           cursor: "pointer",
           fontSize: 14,
-          padding: 2,
+          padding: 5,
         }}
         onClick={handleButtonClick}
       >
@@ -155,10 +156,11 @@ const HorizontalPDFGraph = ({
 }
 
 const DistributionUpdate = () => {
+  const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
   return (
     <HorizontalPDFGraph
       initialProbs={initialProbs}
-      width={360}
+      width={isMobile ? 300 : 400}
       leftLabelSpace={120}
       labelLength={120}
       incomplete
