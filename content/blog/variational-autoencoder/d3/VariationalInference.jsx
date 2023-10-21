@@ -138,6 +138,7 @@ function VariationalInference() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        marginBottom: 10,
       }}
     >
       <svg ref={plotRef} />

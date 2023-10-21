@@ -25,6 +25,24 @@ const notes = {
       <InlineMath>{"p(x)"}</InlineMath>.
     </>
   ),
+  4: (
+    <>
+      <span>This is a </span>
+      <a href="https://stats.stackexchange.com/questions/335197/why-kl-divergence-is-non-negative">
+        property
+      </a>
+      <span> of KL divergence.</span>
+    </>
+  ),
+  5: (
+    <>
+      <span>This is equivalent to the equations we derived </span>
+      <a href="https://liambai.com/protein-evolution/#predicting-mutation-effects">
+        here
+      </a>
+      <span> using a pair-wise model.</span>
+    </>
+  ),
 }
 
 export const { Note, NoteList } = getNoteComponents(notes)

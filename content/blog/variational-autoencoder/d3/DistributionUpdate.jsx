@@ -25,11 +25,14 @@ const HorizontalPDFGraph = ({
     svg.html("")
 
     const height = 250
-    const margin = { top: 30, right: 10, bottom: 50, left: 0 }
+    const margin = { top: 0, bottom: 50 }
 
     svg.attr("width", width).attr("height", height)
 
-    const x = d3.scaleLinear().domain([0, 1]).range([leftLabelSpace, width])
+    const x = d3
+      .scaleLinear()
+      .domain([0, 1])
+      .range([leftLabelSpace, width - 10])
 
     let yDomain = Object.keys(probs)
     if (incomplete) {
@@ -125,14 +128,28 @@ const HorizontalPDFGraph = ({
   }
 
   return (
-    <div style={{ position: "relative" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        marginBottom: 15,
+      }}
+    >
+      <svg ref={svgRef} style={{ margin: "auto", width: width }} />
       <button
-        style={{ position: "absolute", top: 30, right: 100 }}
+        style={{
+          marginTop: 10,
+          width: 200,
+          borderRadius: 6,
+          cursor: "pointer",
+          fontSize: 14,
+          padding: 2,
+        }}
         onClick={handleButtonClick}
       >
         Update
       </button>
-      <svg ref={svgRef} style={{ margin: "auto", width: width }} />
     </div>
   )
 }
@@ -141,7 +158,7 @@ const DistributionUpdate = () => {
   return (
     <HorizontalPDFGraph
       initialProbs={initialProbs}
-      width={400}
+      width={360}
       leftLabelSpace={120}
       labelLength={120}
       incomplete

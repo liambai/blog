@@ -21,7 +21,7 @@ Here's one way to look at learning. We interact with the world through observing
   content={<Image path={require("./images/representation.png")} width="50%" />}
 ></Figure>
 
-### The encoder-decoder model
+### Encoding & decoding
 
 Imitation is an effective way to learn that engages both observation and action. For example, babies repeat the words of their parents. As they make mistakes and get corrected, they hone their internal representation of the words they hear (the **encoder**) as well as the way they create their own words from that representation (the **decoder**).
 
@@ -30,16 +30,15 @@ Imitation is an effective way to learn that engages both observation and action.
     <Image path={require("./images/encoder-decoder-baby.png")} width="50%" />
   }
 >
-  The encoder-decoder model. The model tries to reconstruct the input via its
-  internal representation. In this case, it incorrectly reconstructs "Dog" as
-  "Dah".
+  The baby tries to reconstruct the input via its internal representation. In
+  this case, he incorrectly reconstructs "Dog" as "Dah".
 </Figure>
 
 Crudely casting this in machine learning terms, the representation is a vector $\mathbf{z}$ called a **latent variable**, which lives in the **latent space**. The baby is a **latent variable model** engaged in a task called **reconstruction**. <Note id={1} />
 
-A note on notation: when talking about probability, I find it helpful to make explicit whether something is fixed or a variable in a distribution. I will make fixed things **bold**. For example, $\mathbf{z} = [0.12, -0.25, -0.05, 0.33, 0.02]$ is a fixed vector, $p(x|\mathbf{z})$ is a conditional distribution over possible values of $x$. $p(\mathbf{x})$ is a number between $0$ and $1$ (a probability) while $p(x)$ is a distribution, i.e. a function of $x$.
+A note on notation: when talking about probability, I find it helpful to make explicit whether something is fixed or a variable in a distribution by making fixed things **bold**. For example, $\mathbf{z} = [0.12, -0.25, -0.05, 0.33, 0.02]$ is a fixed vector, $p(x|\mathbf{z})$ is a conditional distribution over possible values of $x$. $p(\mathbf{x})$ is a number between $0$ and $1$ (a probability) while $p(x)$ is a distribution, i.e. a function of $x$.
 
-Given observation $\mathbf{x}$, the encoder is a distribution $q(z|\mathbf{x})$ over the latent space: knowing $\mathbf{x} = \text{``Dog"}$, the encoder tells us which latent variables are probable. To obtain some $\mathbf{z}$, we sample from $q(z|\mathbf{x})$.
+Given observation $\mathbf{x}$, the encoder is a distribution $q(z|\mathbf{x})$ over the latent space; knowing $\mathbf{x} = \text{``Dog"}$, the encoder tells us which latent variables are probable. To obtain some $\mathbf{z}$, we sample from $q(z|\mathbf{x})$.
 
 Similarly, given some latent variable $\mathbf{z}$, the decoder is a distribution $p(x|\mathbf{z})$. When sampled from, the decoder produces a reconstructed $\mathbf{\tilde{x}}$.
 
@@ -48,12 +47,13 @@ Similarly, given some latent variable $\mathbf{z}$, the decoder is a distributio
     <Image path={require("./images/encoder-decoder-details.png")} width="50%" />
   }
 >
-  The encoder and decoder are both conditional distributions.
+  The latent variable is a vector $\mathbf{z}$. The encoder and decoder are both
+  conditional distributions.
 </Figure>
 
 ### Evaluation reconstruction
 
-A good model at reconstruction gets it exactly right with high probability. Given some input $\mathbf{x}$, let's pick some random $\mathbf{z_{rand}}$ and look at $p(\mathbf{x}|\mathbf{z_{rand}})$: the probability of reconstructing the input perfectly. We want this number to be big.
+A good model at reconstruction is likely to get it exactly right: $\mathbf{\tilde{x}} = \mathbf{x}$. Given some input $\mathbf{x}$, let's pick some random $\mathbf{z_{rand}}$ and look at $p(\mathbf{x}|\mathbf{z_{rand}})$: the probability of reconstructing the input perfectly. We want this number to be big.
 
 But that's not really fair: what if we picked a $\mathbf{z_{rand}}$ that the encoder would never choose? After all, the decoder only sees the latent variables produced by the encoder. Ideally, we want to assign more weight to $\mathbf{z}$'s that the encoder is more likely to produce:
 
@@ -69,7 +69,7 @@ $$
 
 If $P_{\text{perfect reconstruction}}(\mathbf{x})$ is high, we can tell our model that it did a good job.
 
-### Regularization
+### The variational autoencoder & regularization
 
 When neural networks are used as both the encoder and the decoder, the model is called a **variational autoencoder (VAE)**.
 
@@ -85,7 +85,7 @@ $$
 
 We would get perfect reconstruction! But this is not what we want. The model failed to capture the close relationship between "Dog" and "Doggy". A good, generalizable model should treat them similarly by assigning them similar latent variables. In other words, we don't want our model to merely memorize and regurgitate the inputs.
 
-Although a baby's brain is exceptionally good at dealing with this problem, neural networks need a helping hand. One approach is to guide the distribution of the latent variable to be something simple and nice, like the [standard normal](https://en.wikipedia.org/wiki/Normal_distribution#Standard_normal_distribution):
+While a baby's brain is exceptionally good at dealing with this problem, neural networks need a helping hand. One approach is to guide the distribution of the latent variable to be something simple and nice, like the [standard normal](https://en.wikipedia.org/wiki/Normal_distribution#Standard_normal_distribution):
 
 $$
 p(z) = Normal(0, 1)
@@ -95,15 +95,15 @@ We talked previously about [KL divergence](https://en.wikipedia.org/wiki/Kullbac
 
 ### The loss function
 
-Let's write down the intuition that we want the model to 1) reconstruct well and 2) have an encoder distribution close to the standard normal:
+Putting everything together, let's write down the intuition that we want the model to 1) reconstruct well and 2) have an encoder distribution close to the standard normal:
 
 $$
 ELBO(\mathbf{x}) = \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})}[\log p(\mathbf{x} | \mathbf{z})] - D_{KL}(q(\mathbf{z} | \mathbf{x}) || p(\mathbf{z}))
 $$
 
-This is the **Evidence Lower BOund (ELBO)** – we'll explain the name later! – a quantity we want to _maximize_. We can view the KL divergence term as a penalization for complex, nonstandard encoder distributions. This technique to prevent overfitting is called **regularization**.
+This is the **Evidence Lower BOund (ELBO)** – we'll explain the name later! – a quantity we want to _maximize_. We can view the KL divergence term as a penalty for complex, nonstandard encoder distributions. This technique to prevent overfitting is called **regularization**.
 
-In machine learning, we're used to _minimizing_, so let's define a loss function whose minimization is equivalent to maximizing ELBO:
+In machine learning, we're used to minimizing things, so let's define a loss function whose minimization is equivalent to maximizing ELBO:
 
 $$
 Loss(\mathbf{x}) = - ELBO(\mathbf{x})
@@ -111,7 +111,7 @@ $$
 
 ### Some notes
 
-Forcing $p(z)$ to be standard normal might seem strange. Don't we want the distribution of $z$ to be something informative learned by the model? Think about it like this: the encoder and decoder are complex functions with many parameters (they're neural networks!) and _they have all the power_. Under a sufficiently complex function, $p(z) = Normal(0,1)$ can be transformed into _anything you want_. The art is in this transformation.
+Forcing $p(z)$ to be standard normal might seem strange. Don't we want the distribution of $z$ to be something informative learned by the model? I think about it like this: the encoder and decoder are complex functions with many parameters (they're neural networks!) and _they have all the power_. Under a sufficiently complex function, $p(z) = Normal(0,1)$ can be transformed into _anything you want_. The art is in this transformation.
 
 <Figure
   content={
@@ -120,13 +120,14 @@ Forcing $p(z)$ to be standard normal might seem strange. Don't we want the distr
 >
   On the left are samples from a standard normal distribution. On the right are
   those samples mapped through the function $g(z) = z/10 + z/ \lVert z \rVert$.
-  VAEs learn functions like $g$ that create arbitrary complex distributions.
-  Figure from https://arxiv.org/abs/1606.05908.
+  VAEs work in a similar way: they learn functions like $g$ that create
+  arbitrary complex distributions. Figure from
+  [https://arxiv.org/abs/1606.05908](https://arxiv.org/abs/1606.05908).
 </Figure>
 
 So far, we talked about variational autoencoders purely through the lens of machine learning. Some of the formulations might feel unnatural, e.g. why do we regularize in this weird way?
 
-Variational autoencoders are actually deeply rooted in a field of statistics called [**variational inference**](https://en.wikipedia.org/wiki/Variational_Bayesian_methods), which provides the first principles behind these decisions. That is the subject of the next section. However, since we already have a working machine learning model, feel free to [skip it](#modeling-protein-sequences) if you are more interested in how VAEs are applied.
+Variational autoencoders are actually deeply rooted in a field of statistics called [**variational inference**](https://en.wikipedia.org/wiki/Variational_Bayesian_methods) – the first principles behind these decisions. That is the subject of the next section. However, since we already have a working machine learning model, feel free to [skip it](#modeling-protein-sequences) if you are more interested in how VAEs are applied.
 
 ## Variational Inference
 
@@ -138,7 +139,7 @@ $$
 p(z) \leftarrow p(z | \mathbf{x})
 $$
 
-$p(z)$ is the **prior distribution** (before the update) and $p(z | \mathbf{x})$ is the **posterior distribution** (after the update). With each observation, the baby computes the posterior and uses it as the prior for the next observation. This is called **Bayesian inference** because to compute the posterior, we use **Bayes rule**:
+$p(z)$ is the **prior distribution** (before the update) and $p(z | \mathbf{x})$ is the **posterior distribution** (after the update). With each observation, the baby computes the posterior and uses it as the prior for the next observation. This approach is called **Bayesian inference** because to compute the posterior, we use **Bayes rule**:
 
 $$
 p(z | \mathbf{x}) = \frac{p(\mathbf{x} | z) p(z)}{p(\mathbf{x})}
@@ -156,7 +157,7 @@ $$
 
 $p(\mathbf{x})$ is an averaged opinion across all $\mathbf{z}$'s that represents our best guess at how probable $\mathbf{x}$ is.
 
-(When the latent space is massive, as in our case, $\mathbf{x}$ is infeasible to compute.)
+When the latent space is massive, as in our case, $p(\mathbf{x})$ is infeasible to compute.
 
 ### Bayesian updates
 
@@ -170,7 +171,10 @@ How should the new observation $\mathbf{x}$ influence my mental model? At the ve
 
 Under the hood, we have a long vector $p(z)$ with a probability value for each possible $\mathbf{z}$ in the latent space. With each observation, we update _every_ value in $p(z)$.
 
-<Figure content={<DistributionUpdate />}></Figure>
+<Figure content={<DistributionUpdate />}>
+  Click the update button to adjust $p(z)$ based on some observed $\mathbf{x}$.
+  The probabilities are made up.
+</Figure>
 
 We can think of these bars (probabilities) as knobs we can tweak to adjust our mental model to better fit each new observation (without losing sight of previous ones).
 
@@ -194,7 +198,7 @@ $$
 \frac{p(\mathbf{x}|\mathbf{z})}{p(\mathbf{x})} = \frac{0.2}{0.6} = 1/3 \implies p(\mathbf{z} | \mathbf{x}) = 1/3 * p(\mathbf{z})
 $$
 
-Either by promoting an advocate of $\mathbf{x}$ or demoting a naysayer, we 1) adjust the latent distribution $p(z)$ to be more amenable to $\mathbf{x}$ and 2) bring up the average opinion, $p(\mathbf{x})$.
+Either by promoting an advocate of $\mathbf{x}$ or demoting a naysayer, we 1) adjust the latent distribution $p(z)$ to better fit $\mathbf{x}$ and 2) bring up the average opinion, $p(\mathbf{x})$.
 
 That's the essence of the update rule: it's all controlled by the fraction $\frac{p(\mathbf{x}|\mathbf{z})}{p(\mathbf{x})}$.
 
@@ -204,11 +208,15 @@ As we mentioned, the evidence $p(\mathbf{x})$ is impossible to compute because i
 
 The two most popular methods for approximating complex distributions are [Markov Chain Monte Carlo (MCMC)](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo) and **variational inference**. We talked about MCMC previously [in](/protein-evolution/#generating-new-sequences) [various](/protein-representation/#using-the-representation) [contexts](/protein-hallucination). It uses a trial-and-error approach to generate samples from which we can learn about the underlying complex distribution.
 
-In contrast, variational inference looks at a family of distributions to tries to pick the best one. For illustration, we assume the observations follow a normal distribution and consider all distributions we get by varying the the mean and variance.
+In contrast, variational inference looks at a family of distributions and tries to pick the best one. For illustration, we assume the observations follow a normal distribution and consider all distributions we get by varying the the mean and variance.
 
-<Figure content={<VariationalInference />}></Figure>
+<Figure content={<VariationalInference />}>
+  Try adjusting the the mean and variance of the normal distribution to fit the
+  observations (blue bots). In essense, varational inference is all about doing
+  these adjustments.
+</Figure>
 
-Variational inference is a principled way to _vary_ these parameters of the distribution (hence the name!) and find a setting of them that best explains the observations. In practice, the distributions are much more complex.
+Variational inference is a principled way to _vary_ these parameters of the distribution (hence the name!) and find a setting of them that best explains the observations. Of course, in practice the distributions are much more complex.
 
 In our case, let's try to use some distribution $q(z | \mathbf{x})$ to approximate $p(z | \mathbf{x})$. We want $q(z | \mathbf{x})$ to be as similar to $p(z | \mathbf{x})$ as possible, which we can enforce by minimizing the KL divergence between them:
 
@@ -259,7 +267,7 @@ $$
 \log p(\mathbf{x}) - D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x})) = \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log p(\mathbf{x} | \mathbf{z})\right] - D_{KL}(q(z | \mathbf{x}) || p(z))
 $$
 
-This is the central equation in variational inference. The right hand side is exactly what we have called the _evidence lower bound (ELBO)_.
+This is the central equation in variational inference. The right hand side is exactly what we have called the evidence lower bound (ELBO).
 
 ### Interpreting ELBO
 
@@ -269,11 +277,16 @@ $$
 \log p(\mathbf{x}) - D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x})) = ELBO(\mathbf{x})
 $$
 
-Now the name makes sense. Since $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ is always positive (N: a property of KL divergences), $ELBO(\mathbf{x})$ is a _lower bound_ on the (log-)evidence, $\log p(\mathbf{x})$.
+Since $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ cannot be negative <Note id={4}/>, $ELBO(\mathbf{x})$ is a _lower bound_ on the (log-)evidence, $\log p(\mathbf{x})$. That's why it's called the evidence lower bound!
 
-<Figure content={<Slider />}></Figure>
+<Figure content={<Slider />}>
+  Adjust the slider to mimic the process of maximizing ELBO, a lower bound on
+  the (log-)evidence. Since $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ is
+  the "distance" between ELBO and $\log(p(\mathbf{x}))$, our orginial goal of
+  minimizing it brings ELBO closer to $\log(p(\mathbf{x}))$.
+</Figure>
 
-Let's think about the left hand side of the equation. Maximizing ELBO has 2 effects:
+Let's think about the left hand side of the equation. Maximizing ELBO has two desired effects:
 
 1. increase $\log p(\mathbf{x})$. This is our basic requirement: since we just observed $\mathbf{x}$, $p(\mathbf{x})$ should go up!
 
@@ -375,7 +388,7 @@ The machine learning motivations for VAEs we started with (encoder-decoder, reco
           textAlign: "left",
         }}
       >
-        $p(x | \mathbf{z})$ is the decoder, also a neural network. $\mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log p(\mathbf{x} | \mathbf{z})\right]$ is the probability of perfect reconstruction. Striving for perfect reconstruction not only makes intuitive sense, but is also grounded in the variational reasoning on the left.
+        $p(x | \mathbf{z})$ is the decoder, also a neural network. $\mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log p(\mathbf{x} | \mathbf{z})\right]$ is the probability of perfect reconstruction. It makes sense to strive for perfect reconstruction and maximize this probability.
       </td>
     </tr>
     <tr>
@@ -406,7 +419,7 @@ The machine learning motivations for VAEs we started with (encoder-decoder, reco
       >
       Our encoder and decoder are both neural networks. They're just black-box learners of complex distributions with no concept of priors. They can easily conjure up a wildly complex distribution – nothing like $Normal(0, 1)$ – that merely memorizes the observations, a problem called overfitting.
       
-      To prevent this, we constantly nudge the encoder $q(z | \mathbf{x})$ towards $Normal(0, 1)$, as a reminder of *where it would have started* if we were using Bayesian inference. When viewed this way, $D_{KL}(q(z | \mathbf{x}) || p(z))$ is a *regularization term*.
+      To prevent this, we constantly nudge the encoder $q(z | \mathbf{x})$ towards $Normal(0, 1)$, as a reminder of *where it would have started* if we were using traditional Bayesian updates. When viewed this way, $D_{KL}(q(z | \mathbf{x}) || p(z))$ is a *regularization term*.
       </td>
     </tr>
   </tbody>
@@ -416,7 +429,7 @@ The machine learning motivations for VAEs we started with (encoder-decoder, reco
 
 ### Pair-wise models are limiting
 
-In a <Link to="/protein-evolution">previous post</Link>, we talked about ways to extract the information hidden in [Multiple Sequence Alignments (MSAs)](https://en.wikipedia.org/wiki/Multiple_sequence_alignment): the co-evolutionary data of proteins. For example, amino acid positions that co-vary in the MSA tend to be tend to interact with each other in the folded structure, often via direct 3D contact.
+In a <Link to="/protein-evolution">previous post</Link>, we talked about ways to extract the information hidden in [Multiple Sequence Alignments (MSAs)](https://en.wikipedia.org/wiki/Multiple_sequence_alignment): the co-evolutionary data of proteins. For example, amino acid positions that co-vary in the MSA tend to interact with each other in the folded structure, often via direct 3D contact.
 
 <Figure content={<MSACoupling />}>
   An MSA contains different variants of a sequence. The structure sketches how
@@ -425,7 +438,7 @@ In a <Link to="/protein-evolution">previous post</Link>, we talked about ways to
   structure. Hover over the blue link to highlight the contacting positions.
 </Figure>
 
-We considered models that look at each position (position-wise) and models that additionally consider all possible pairs of positions ([pair-wise](https://en.wikipedia.org/wiki/Potts_model)). But what about the interactions between 3 positions (third-order interactions)? Or even more? Those interactions are commonplace in natural proteins but are unfortunately computationally unfeasible.
+We talked about position-wise models that look at each position and [pair-wise models](https://en.wikipedia.org/wiki/Potts_model) that consider all possible pairs of positions. But what about the interactions between 3 positions? Or even more? Those higher-order interactions are commonplace in natural proteins but modelling them is unfortunately computationally unfeasible.
 
 ### Variational autoencoders for proteins
 
@@ -435,7 +448,7 @@ Let's imagine there being some latent variable vector $\mathbf{z}$ that explains
 
 Like the mysterious representation hidden in the baby's brain, we don't need to understand exactly _how_ it encodes these higher-order interactions; we let the neural networks, guided by the reconstruction task, figure it out.
 
-In [this work](https://www.nature.com/articles/s41592-018-0138-4), researchers from the [Marks lab](https://www.deboramarkslab.com/) did exactly this to create a VAE model called [DeepSequence](https://github.com/debbiemarkslab/DeepSequence). The used a neural network with 2 fully connected layers for both the encoder and the decoder.
+In [this work](https://www.nature.com/articles/s41592-018-0138-4), researchers from the [Marks lab](https://www.deboramarkslab.com/) did exactly this to create a VAE model called [DeepSequence](https://github.com/debbiemarkslab/DeepSequence).
 
 During training, we feed sequences in the MSA into DeepSequence and use gradient descent to update encoder and decoder parameters (blue arrow). During inference – i.e. when given an unknown input sequence – we pass it through the encoder-decoder in the same way and produce a probability for the input sequence (green arrow).
 
@@ -448,7 +461,7 @@ During training, we feed sequences in the MSA into DeepSequence and use gradient
   }
 ></Figure>
 
-Given an unknown input sequence $\mathbf{x}$, $p(\mathbf{x})$ describes how likely it is for $\mathbf{x}$ to be a functional protein given the evolutionary sequences in our MSA. $p(\mathbf{x})$ is a predictor of fitness with a range of applications, from improving protein function to from interpreting human disease variants.
+Given an unknown input sequence $\mathbf{x}$, $p(\mathbf{x})$ describes how likely it is for $\mathbf{x}$ to be a functional protein given the evolutionary sequences in our MSA. $p(\mathbf{x})$ is a fitness predictor with a range of applications, from improving protein function to interpreting human disease variants.
 
 ## Predicting mutation effects
 
@@ -458,11 +471,12 @@ $$
 \log\frac{p(\mathbf{x}^{\text{(Mutant)}})}{p(\mathbf{x}^{\text{(Wild-type)}})}
 $$
 
-measures the improvement of the mutant over the wild-type.
+measures the improvement of the mutant over the wild-type <Note id={5} />.
 
-- Model assigns $\mathbf{x}^{\text{(Mutant)}}$ a higher probability than $\mathbf{x}^{\text{(Wild-type)}}$ $\rightarrow$ the mutation is likely beneficial $\rightarrow$ positive log ratio.
+- Our model favors $\mathbf{x}^{\text{(Mutant)}}$ over $\mathbf{x}^{\text{(Wild-type)}}$ $\rightarrow$ $p(\mathbf{x}^{\text{(Mutant)}}) > p(\mathbf{x}^{\text{(Wild-type)}})$ $\rightarrow$ the mutation is likely beneficial $\rightarrow$ positive log ratio.
 
-- Model assigns $\mathbf{x}^{\text{(Mutant)}}$ a lower probability than $\mathbf{x}^{\text{(Wild-type)}}$ $\rightarrow$ the mutation is likely harmful $\rightarrow$ negative log ratio.
+- Our model favors $\mathbf{x}^{\text{(Wild-type)}}$ over $\mathbf{x}^{\text{(Mutant)}}$
+  $\rightarrow$ $p(\mathbf{x}^{\text{(Wild-type)}}) > p(\mathbf{x}^{\text{(Mutant)}})$ $\rightarrow$ the mutation is likely harmful $\rightarrow$ negative log ratio.
 
 ### Disease variants
 
@@ -478,7 +492,7 @@ Predicting the pathogenicity of human protein variants like this can be an impor
 
 2. unsupervised computational approaches like VAEs can make a huge impact.
 
-[ClinVar](https://www.ncbi.nlm.nih.gov/clinvar/intro/) is a public archive that sheds light in this darkness. It collects experimental data on the impacts of mutations in proteins important to human health. Predictions from a VAE-based approach called [EVE](https://github.com/OATML/EVE) agrees strongly with labels from ClinVar.
+Among this scarcity of experimental data, [ClinVar](https://www.ncbi.nlm.nih.gov/clinvar/intro/) is a public database of mutation effects in proteins important to human health. Predictions from a VAE-based approach called [EVE](https://github.com/OATML/EVE) agrees strongly with labels from ClinVar.
 
 <Figure content={<Image path={require("./images/EVE-ClinVar.png")} />}>
   EVE outperforms other computational approaches of variant effect prediction in
@@ -489,7 +503,7 @@ Predicting the pathogenicity of human protein variants like this can be an impor
   similarly outperforms others models.
 </Figure>
 
-I find the VAE model's strong predictive power incredible. After all, the model is completely unsupervised: it has never seen _any_ labeled data of variant phenotype. It learns purely through studying the evolutionary sequence in the protein's family.
+Incredibly, VAE models acquir such strong predictive power while being completely unsupervised: they has never seen _any_ labeled data of variant effects. They learn purely through studying the evolutionary sequences in the protein's family.
 
 ### The power of latent variables
 
@@ -507,7 +521,7 @@ The sites at which their accuracy improved the most are ones that cooperate with
 
 This demonstrates the flexibility of the latent variable model that can capture higher-order interactions.
 
-Here's one way to look at these results. MSAs contains a wealth of information, some of which we can understand through simple statistics: position-wise frequencies, pair-wise frequencies, etc. (what we did in a <Link to="/protein-evolution">previous post</Link>). Those models are interpretable but limiting – they fail at teasing out more complex, higher-order signals.
+Here's one way to look at these results. MSAs contain a wealth of information, some of which we can understand through simple statistics: <Link to="/protein-evolution#counting-amino-acid-frequencies">position-wise frequencies</Link>, <Link to="/protein-evolution#pairwise-frequencies">pair-wise frequencies</Link>, etc. Those models are interpretable but limiting – they fail at teasing out more complex, higher-order signals.
 
 Enter neural networks, which are much better than us at recognizing those signals hidden in MSAs. They known _where to look_, _what to look at_ – beyond our simple statistics. This comes at the cost of interpretability. The comparison between our VAE model and statistical models like <Link to="/protein-evolution">Direct Coupling Analysis (DCA)</Link> exemplifies these two paradigms.
 
