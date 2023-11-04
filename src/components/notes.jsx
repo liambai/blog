@@ -2,7 +2,11 @@ import React from "react"
 
 export default function getNoteComponents(notes) {
   const Note = ({ id }) => {
-    return <a id={`n${id}`} href={`#fn:n${id}`} />
+    return (
+      <a id={`n${id}`} href={`#fn:n${id}`} aria-label="Expand note">
+        {" "}
+      </a>
+    )
   }
 
   const NoteList = () => {
