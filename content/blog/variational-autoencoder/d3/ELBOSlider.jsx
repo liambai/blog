@@ -6,18 +6,18 @@ const Slider = () => {
   const sliderRef = useRef()
   const [pos, setPos] = useState(-10)
 
-  const slider = sliderBottom()
-    .min(-10)
-    .max(-2)
-    .step(0.1)
-    .width(250)
-    .default(-10)
-    .displayValue(false)
-    .on("onchange", x => {
-      setPos(x)
-    })
-
   useEffect(() => {
+    const slider = sliderBottom()
+      .min(-10)
+      .max(-2)
+      .step(0.1)
+      .width(250)
+      .default(-10)
+      .displayValue(false)
+      .on("onchange", x => {
+        setPos(x)
+      })
+
     const g = d3
       .select(sliderRef.current)
       .append("g")
