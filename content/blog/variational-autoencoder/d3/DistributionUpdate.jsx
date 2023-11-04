@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react"
 import * as d3 from "d3"
 import { useMediaQuery } from "react-responsive"
+import { InlineMath } from "react-katex"
 
 const initialProbs = {
   "z = [-0.1, 0.2, 0.5]": 0.09,
@@ -143,19 +144,31 @@ const HorizontalPDFGraph = ({
       }}
     >
       <svg ref={svgRef} style={{ margin: "auto", width: width }} />
-      <button
+      <div
         style={{
-          marginTop: 10,
+          display: "flex",
+          flexDirection: "row",
           width: 200,
-          borderRadius: 6,
-          cursor: "pointer",
-          fontSize: 14,
-          padding: 5,
+          justifyContent: "space-evenly",
+          alignItems: "center",
+          marginTop: 10,
         }}
-        onClick={handleButtonClick}
       >
-        Update
-      </button>
+        <InlineMath>{"\\mathbf{x}"}</InlineMath>
+        <InlineMath>{"\\longrightarrow"}</InlineMath>
+        <button
+          style={{
+            width: 100,
+            borderRadius: 6,
+            cursor: "pointer",
+            fontSize: 14,
+            padding: 5,
+          }}
+          onClick={handleButtonClick}
+        >
+          Update
+        </button>
+      </div>
     </div>
   )
 }

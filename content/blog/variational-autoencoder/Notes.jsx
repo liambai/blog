@@ -3,17 +3,8 @@ import getNoteComponents from "../../../src/components/notes"
 import { InlineMath } from "react-katex"
 
 const notes = {
-  1: (
-    <>
-      <b>z </b>
-      <span>
-        usually has fewer dimensions than the input, so the encoding process can
-        be viewed as a form of compression.
-      </span>
-    </>
-  ),
-  2: "We also use log probability for mathematical convenience.",
-  3: (
+  1: "We also use log probability for mathematical convenience.",
+  2: (
     <>
       <InlineMath>{"p(x,z) = p(z|x)p(x) = p(x|z)p(z)"}</InlineMath>
       <span>
@@ -25,7 +16,7 @@ const notes = {
       <InlineMath>{"p(x)"}</InlineMath>.
     </>
   ),
-  4: (
+  3: (
     <>
       <span>This is a </span>
       <a href="https://stats.stackexchange.com/questions/335197/why-kl-divergence-is-non-negative">

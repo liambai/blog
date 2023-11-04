@@ -1,7 +1,7 @@
 ---
 title: "A practical introduction to variational autoencoders"
-date: "2023-10-27"
-description: Predicting protein function using deep generative models. Latent variable models, reconstruction, variational autoencoders (VAEs), Bayesian inference, evidence lower bound (ELBO), mutation effect prediction.
+date: "2023-11-04"
+description: Predicting protein function using deep generative models. Latent variable models, reconstruction, variational autoencoders (VAEs), Bayesian inference, evidence lower bound (ELBO).
 ---
 
 import Figure from "../../../src/components/figure.jsx"
@@ -35,7 +35,7 @@ Imitation is an effective way to learn that engages both observation and action.
   this case, he incorrectly reconstructs "Dog" as "Dah".
 </Figure>
 
-Crudely casting this in machine learning terms, the representation is a vector $\mathbf{z}$ called a **latent variable**, which lives in the **latent space**. The baby is a **latent variable model** engaged in a task called **reconstruction**. <Note id={1} />
+Crudely casting this in machine learning terms, the representation is a vector $\mathbf{z}$ called a **latent variable**, which lives in the **latent space**. The baby is a **latent variable model** engaged in a task called **reconstruction**.
 
 A note on notation: when talking about probability, I find it helpful to make explicit whether something is fixed or a variable in a distribution by making fixed things **bold**. For example, $\mathbf{z} = [0.12, -0.25, -0.05, 0.33, 0.02]$ is a fixed vector, $p(x|\mathbf{z})$ is a conditional distribution over possible values of $x$. $p(\mathbf{x})$ is a number between $0$ and $1$ (a probability) while $p(x)$ is a distribution, i.e. a function of $x$.
 
@@ -52,6 +52,20 @@ Similarly, given some latent variable $\mathbf{z}$, the decoder is a distributio
   conditional distributions.
 </Figure>
 
+### The variational autoencoder
+
+When neural networks are used as both the encoder and the decoder, the latent variable model is called a **variational autoencoder (VAE)**.
+
+<Figure
+  content={<Image path={require("./images/VAE-compression.png")} width="60%" />}
+>
+  Variational autoencoders are a type of encoder-decoder model. Figure from this
+  [blog
+  post](https://towardsdatascience.com/understanding-variational-autoencoders-vaes-f70510919f73).
+</Figure>
+
+The latent space has fewer dimensions than the inputs, so encoding can be viewed as a form of [data compression](https://en.wikipedia.org/wiki/Data_compression). The baby doesn't retain all the details of each syllable heard – the intricate patterns of each sound wave – only their salient features, a compression.
+
 ### Evaluation reconstruction
 
 A good model at reconstruction is likely to get it exactly right: $\mathbf{\tilde{x}} = \mathbf{x}$. Given some input $\mathbf{x}$, let's pick some random $\mathbf{z_{rand}}$ and look at $p(\mathbf{x}|\mathbf{z_{rand}})$: the probability of reconstructing the input perfectly. We want this number to be big.
@@ -62,7 +76,7 @@ $$
 \sum_{\mathbf{z} \in \text{latent space}} q(\mathbf{z}|\mathbf{x}) p(\mathbf{x} | \mathbf{z})
 $$
 
-The weighted average is also known as an _expectation_ over $q(z|\mathbf{x})$, written as $\mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})}$ <Note id={2}/>:
+The weighted average is also known as an _expectation_ over $q(z|\mathbf{x})$, written as $\mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})}$ <Note id={1}/>:
 
 $$
 P_{\text{perfect reconstruction}}(\mathbf{x}) = \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})}[\log p(\mathbf{x} | \mathbf{z})]
@@ -70,9 +84,7 @@ $$
 
 If $P_{\text{perfect reconstruction}}(\mathbf{x})$ is high, we can tell our model that it did a good job.
 
-### The variational autoencoder & regularization
-
-When neural networks are used as both the encoder and the decoder, the model is called a **variational autoencoder (VAE)**.
+### Regularization
 
 Neural networks tend to **overfit**. Imagine if our encoder learns to give each input it sees during training its unique corner in the latent space, and the decoder cooperates on this obvious signal.
 
@@ -145,7 +157,7 @@ $$
 p(z | \mathbf{x}) = \frac{p(\mathbf{x} | z) p(z)}{p(\mathbf{x})}
 $$
 
-This formula seems obvious from the manipulation of math-symbols <Note id={3}/>, but I've always found it hard to understand what it actually means. In the rest of this section, I will try to provide an intuitive explanation.
+This formula seems obvious from the manipulation of math-symbols <Note id={2}/>, but I've always found it hard to understand what it actually means. In the rest of this section, I will try to provide an intuitive explanation.
 
 ### The evidence
 
@@ -207,13 +219,13 @@ That's the essence of the update rule: it's all controlled by the fraction $\fra
 
 As we mentioned, the evidence $p(\mathbf{x})$ is impossible to compute because it is a sum over all possible latent variables. Since $p(\mathbf{x})$ is the denominator of the Bayesian update, this means that we can't actually compute the posterior distribution – we need to approximate it.
 
-The two most popular methods for approximating complex distributions are [Markov Chain Monte Carlo (MCMC)](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo) and **variational inference**. We talked about MCMC previously [in](/protein-evolution/#generating-new-sequences) [various](/protein-representation/#using-the-representation) [contexts](/protein-hallucination). It uses a trial-and-error approach to generate samples from which we can learn about the underlying complex distribution.
+The two most popular methods for approximating complex distributions are [Markov Chain Monte Carlo (MCMC)](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo) and **variational inference**. We talked about MCMC previously [in](/protein-evolution/#generating-new-sequences) [various](/protein-representation/#using-the-representation) [contexts](/protein-hallucination). It uses a trial-and-error approach to generate samples from which we can then learn about the underlying complex distribution.
 
 In contrast, variational inference looks at a family of distributions and tries to pick the best one. For illustration, we assume the observations follow a normal distribution and consider all distributions we get by varying the the mean and variance.
 
 <Figure content={<VariationalInference />}>
   Try adjusting the the mean and variance of the normal distribution to fit the
-  observations (blue bots). In essense, varational inference is all about doing
+  observations (blue dots). In essense, varational inference is all about doing
   these adjustments.
 </Figure>
 
@@ -278,7 +290,7 @@ $$
 \log p(\mathbf{x}) - D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x})) = ELBO(\mathbf{x})
 $$
 
-Since $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ cannot be negative <Note id={4}/>, $ELBO(\mathbf{x})$ is a _lower bound_ on the (log-)evidence, $\log p(\mathbf{x})$. That's why it's called the evidence lower bound!
+Since $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ cannot be negative <Note id={3}/>, $ELBO(\mathbf{x})$ is a _lower bound_ on the (log-)evidence, $\log p(\mathbf{x})$. That's why it's called the evidence lower bound!
 
 <Figure content={<Slider />}>
   Adjust the slider to mimic the process of maximizing ELBO, a lower bound on
@@ -293,7 +305,7 @@ Let's think about the left hand side of the equation. Maximizing ELBO has two de
 
 2. minimize $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$, which satisfies our goal of approximating the posterior.
 
-### Variational autoencoders are neural networks that do variational inference
+### VAEs are neural networks that do variational inference
 
 The machine learning motivations for VAEs we started with (encoder-decoder, reconstruction loss, regularization) are grounded in the statistics of variational inference (Bayesian updates, evidence maximization, posterior approximation). Let's explore the connections:
 
