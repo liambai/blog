@@ -9,6 +9,7 @@ const initialProbs = {
   "z = [0.3, 0.3, -0.1]": 0.05,
   "z = [0.4, -0.6, 0.1]": 0.08,
 }
+const updateDecayMultiplier = 0.9
 
 const HorizontalPDFGraph = ({
   initialProbs,
@@ -20,6 +21,7 @@ const HorizontalPDFGraph = ({
   const svgRef = useRef()
 
   const [probs, setProbs] = useState(initialProbs)
+  const [updateCount, setUpdateCount] = useState(0)
 
   useEffect(() => {
     const svg = d3.select(svgRef.current)
@@ -120,11 +122,14 @@ const HorizontalPDFGraph = ({
   const handleButtonClick = () => {
     let newProbs = { ...probs }
     for (const key in probs) {
-      const newProb = probs[key] + 0.05 * (Math.random() - 0.5)
+      const newProb =
+        probs[key] +
+        0.05 * updateDecayMultiplier ** updateCount * (Math.random() - 0.5)
       if (newProb > 0) {
         newProbs[key] = newProb
       }
     }
+    setUpdateCount(updateCount + 1)
     setProbs(newProbs)
   }
 

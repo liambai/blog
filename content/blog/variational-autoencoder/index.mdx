@@ -12,10 +12,11 @@ import { Note, NoteList } from "./Notes.jsx"
 import DistributionUpdate from "./d3/DistributionUpdate.jsx"
 import VariationalInference from "./d3/VariationalInference.jsx"
 import Slider from "./d3/ELBOSlider.jsx"
+import { Reference, ReferenceList } from "./References.jsx"
 
 ## We are all latent variable models
 
-Here's one way to look at learning. We interact with the world through observing (hearing, seeing) and acting (speaking, doing). We encode our observations about the world into some _representation_ in our brain – and refine it as we observe more. Our actions reflect this representation.
+Here's one way of looking at learning. We interact with the world through observing (hearing, seeing) and acting (speaking, doing). We encode our observations about the world into some _representation_ in our brain – and refine it as we observe more. Our actions reflect this representation.
 
 <Figure
   content={<Image path={require("./images/representation.png")} width="50%" />}
@@ -83,7 +84,7 @@ $$
 \mathbf{x} = \text{``Doggy"} \xrightarrow{encoder} \mathbf{z} = [0, 1, 0, 0, 0] \xrightarrow{decoder} \mathbf{\tilde{x}} = \text{``Doggy"}
 $$
 
-We would get perfect reconstruction! But this is not what we want. The model failed to capture the close relationship between "Dog" and "Doggy". A good, generalizable model should treat them similarly by assigning them similar latent variables. In other words, we don't want our model to merely memorize and regurgitate the inputs.
+We would get perfect reconstruction! But we don't want this. The model failed to capture the close relationship between "Dog" and "Doggy". A good, _generalizable_ model should treat them similarly by assigning them similar latent variables. In other words, we don't want our model to merely memorize and regurgitate the inputs.
 
 While a baby's brain is exceptionally good at dealing with this problem, neural networks need a helping hand. One approach is to guide the distribution of the latent variable to be something simple and nice, like the [standard normal](https://en.wikipedia.org/wiki/Normal_distribution#Standard_normal_distribution):
 
@@ -101,7 +102,7 @@ $$
 ELBO(\mathbf{x}) = \mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})}[\log p(\mathbf{x} | \mathbf{z})] - D_{KL}(q(\mathbf{z} | \mathbf{x}) || p(\mathbf{z}))
 $$
 
-This is the **Evidence Lower BOund (ELBO)** – we'll explain the name later! – a quantity we want to _maximize_. We can view the KL divergence term as a penalty for complex, nonstandard encoder distributions. This technique to prevent overfitting is called **regularization**.
+This is the **Evidence Lower BOund (ELBO)** – we'll explain the name later! – a quantity we want to _maximize_. The expectation captures our strive for perfect reconstruction, while the KL divergence term acts as a penalty for complex, nonstandard encoder distributions. This technique to prevent overfitting is called **regularization**.
 
 In machine learning, we're used to minimizing things, so let's define a loss function whose minimization is equivalent to maximizing ELBO:
 
@@ -121,13 +122,12 @@ Forcing $p(z)$ to be standard normal might seem strange. Don't we want the distr
   On the left are samples from a standard normal distribution. On the right are
   those samples mapped through the function $g(z) = z/10 + z/ \lVert z \rVert$.
   VAEs work in a similar way: they learn functions like $g$ that create
-  arbitrary complex distributions. Figure from
-  [https://arxiv.org/abs/1606.05908](https://arxiv.org/abs/1606.05908).
+  arbitrary complex distributions. Figure from <Reference id={1} />.
 </Figure>
 
 So far, we talked about variational autoencoders purely through the lens of machine learning. Some of the formulations might feel unnatural, e.g. why do we regularize in this weird way?
 
-Variational autoencoders are actually deeply rooted in a field of statistics called [**variational inference**](https://en.wikipedia.org/wiki/Variational_Bayesian_methods) – the first principles behind these decisions. That is the subject of the next section. However, since we already have a working machine learning model, feel free to [skip it](#modeling-protein-sequences) if you are more interested in how VAEs are applied.
+Variational autoencoders are actually deeply rooted in a field of statistics called [**variational inference**](https://en.wikipedia.org/wiki/Variational_Bayesian_methods) – the first principles behind these decisions. That is the subject of the next section.
 
 ## Variational Inference
 
@@ -173,7 +173,8 @@ Under the hood, we have a long vector $p(z)$ with a probability value for each p
 
 <Figure content={<DistributionUpdate />}>
   Click the update button to adjust $p(z)$ based on some observed $\mathbf{x}$.
-  The probabilities are made up.
+  At each step, the probability associated with each $z$ is updated. The
+  probabilities are made up.
 </Figure>
 
 We can think of these bars (probabilities) as knobs we can tweak to adjust our mental model to better fit each new observation (without losing sight of previous ones).
@@ -444,85 +445,23 @@ We talked about position-wise models that look at each position and [pair-wise m
 
 Let's imagine there being some latent variable vector $\mathbf{z}$ that explains _all_ interactions – including higher-order ones.
 
-<Figure content={<Image path={require("./images/MSA-latent.png")} />}></Figure>
+<Figure content={<Image path={require("./images/MSA-latent.png")} />}>
+  Applying latent variable models like VAEs to MSAs. Figure from{" "}
+  <Reference id={2} />.
+</Figure>
 
 Like the mysterious representation hidden in the baby's brain, we don't need to understand exactly _how_ it encodes these higher-order interactions; we let the neural networks, guided by the reconstruction task, figure it out.
 
-In [this work](https://www.nature.com/articles/s41592-018-0138-4), researchers from the [Marks lab](https://www.deboramarkslab.com/) did exactly this to create a VAE model called [DeepSequence](https://github.com/debbiemarkslab/DeepSequence).
+In [this work](https://www.nature.com/articles/s41592-018-0138-4), researchers from the [Marks lab](https://www.deboramarkslab.com/) did exactly this to create a VAE model called [DeepSequence](https://github.com/debbiemarkslab/DeepSequence). I will do a deep dive on this model – and variants of it – in the next post!
 
-During training, we feed sequences in the MSA into DeepSequence and use gradient descent to update encoder and decoder parameters (blue arrow). During inference – i.e. when given an unknown input sequence – we pass it through the encoder-decoder in the same way and produce a probability for the input sequence (green arrow).
+## Further reading
 
-<Figure
-  content={
-    <Image
-      path={require("./images/DeepSequence-architecture.png")}
-      width="90%"
-    />
-  }
-></Figure>
+I am inspired by this [blog post](https://jaan.io/what-is-variational-autoencoder-vae-tutorial/) by Jaan Altosaar and this [blog post](https://lilianweng.github.io/posts/2018-08-12-vae/) by Lilian Weng, both of which are superb and go into more technical details.
 
-Given an unknown input sequence $\mathbf{x}$, $p(\mathbf{x})$ describes how likely it is for $\mathbf{x}$ to be a functional protein given the evolutionary sequences in our MSA. $p(\mathbf{x})$ is a fitness predictor with a range of applications, from improving protein function to interpreting human disease variants.
+Also, check out the cool [paper](https://www.nature.com/articles/s41592-018-0138-4) from the Marks lab applying VAEs to protein sequences. You should have the theorical tools to understand it well.
 
-## Predicting mutation effects
+## References
 
-Given a wild-type sequence $\mathbf{x}^{\text{(Wild-type)}}$ and a mutant sequence $\mathbf{x}^{\text{(Mutant)}}$, the log ratio
-
-$$
-\log\frac{p(\mathbf{x}^{\text{(Mutant)}})}{p(\mathbf{x}^{\text{(Wild-type)}})}
-$$
-
-measures the improvement of the mutant over the wild-type <Note id={5} />.
-
-- Our model favors $\mathbf{x}^{\text{(Mutant)}}$ over $\mathbf{x}^{\text{(Wild-type)}}$ $\rightarrow$ $p(\mathbf{x}^{\text{(Mutant)}}) > p(\mathbf{x}^{\text{(Wild-type)}})$ $\rightarrow$ the mutation is likely beneficial $\rightarrow$ positive log ratio.
-
-- Our model favors $\mathbf{x}^{\text{(Wild-type)}}$ over $\mathbf{x}^{\text{(Mutant)}}$
-  $\rightarrow$ $p(\mathbf{x}^{\text{(Wild-type)}}) > p(\mathbf{x}^{\text{(Mutant)}})$ $\rightarrow$ the mutation is likely harmful $\rightarrow$ negative log ratio.
-
-### Disease variants
-
-We can compute this log ratio for each possible amino acid substitution at each position to produce a heatmap that illustrates their consequences:
-
-<Figure
-  content={<Image path={require("./images/mutation-effect-heatmap.png")} />}
-></Figure>
-
-Predicting the pathogenicity of human protein variants like this can be an important guide for clinical decisions. Most of the variants of human proteins related to disease (98% of [genomAD](https://gnomad.broadinstitute.org/)!) have unknown consequences, a testament to <Link to="/protein-representation">the difficulty of obtaining functional data relative to sequence data</Link>. This means:
-
-1. we are deeply ignorant about the proteins in our bodies and how their malfunctions cause disease.
-
-2. unsupervised computational approaches like VAEs can make a huge impact.
-
-Among this scarcity of experimental data, [ClinVar](https://www.ncbi.nlm.nih.gov/clinvar/intro/) is a public database of mutation effects in proteins important to human health. Predictions from a VAE-based approach called [EVE](https://github.com/OATML/EVE) agrees strongly with labels from ClinVar.
-
-<Figure content={<Image path={require("./images/EVE-ClinVar.png")} />}>
-  EVE outperforms other computational approaches of variant effect prediction in
-  concordance with ClinVar. On the y-axis, [Deep Mutational Scanning
-  (DMS)](https://www.nature.com/articles/nmeth.3027) is an experimental method
-  for screening a large set of variants for a specific function, another source
-  of experimental labels. When evaluated on the concordance with DMS data, EVE
-  similarly outperforms others models.
-</Figure>
-
-Incredibly, VAE models acquir such strong predictive power while being completely unsupervised: they has never seen _any_ labeled data of variant effects. They learn purely through studying the evolutionary sequences in the protein's family.
-
-### The power of latent variables
-
-When compared to independent position-wise models, the latent variable model is significantly more accurate for all possible mutations.
-
-<Figure
-  content={<Image path={require("./images/DeepSequence-vs-others.png")} />}
-></Figure>
-
-The sites at which their accuracy improved the most are ones that cooperate with several other sites.
-
-<Figure
-  content={<Image path={require("./images/DeepSequence-vs-independent.png")} />}
-></Figure>
-
-This demonstrates the flexibility of the latent variable model that can capture higher-order interactions.
-
-Here's one way to look at these results. MSAs contain a wealth of information, some of which we can understand through simple statistics: <Link to="/protein-evolution/#counting-amino-acid-frequencies">position-wise frequencies</Link>, <Link to="/protein-evolution/#pairwise-frequencies">pair-wise frequencies</Link>, etc. Those models are interpretable but limiting – they fail at teasing out more complex, higher-order signals.
-
-Enter neural networks, which are much better than us at recognizing those signals hidden in MSAs. They known _where to look_, _what to look at_ – beyond our simple statistics. This comes at the cost of interpretability. The comparison between our VAE model and statistical models like <Link to="/protein-evolution">Direct Coupling Analysis (DCA)</Link> exemplifies these two paradigms.
+<ReferenceList />
 
 <NoteList />

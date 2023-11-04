@@ -1,0 +1,86 @@
+During training, we feed sequences in the MSA into DeepSequence and use gradient descent to update encoder and decoder parameters (blue arrow). During inference – i.e. when given an unknown input sequence – we pass it through the encoder-decoder in the same way and produce a probability for the input sequence (green arrow).
+
+<Figure
+  content={
+    <Image
+      path={require("./images/DeepSequence-architecture.png")}
+      width="90%"
+    />
+  }
+></Figure>
+
+Given an unknown input sequence $\mathbf{x}$, $p(\mathbf{x})$ describes how likely it is for $\mathbf{x}$ to be a functional protein given the evolutionary sequences in our MSA. $p(\mathbf{x})$ is a fitness predictor with a range of applications, from improving protein function to interpreting human disease variants.
+
+## Predicting mutation effects
+
+Given a wild-type sequence $\mathbf{x}^{\text{(Wild-type)}}$ and a mutant sequence $\mathbf{x}^{\text{(Mutant)}}$, the log ratio
+
+$$
+\log\frac{p(\mathbf{x}^{\text{(Mutant)}})}{p(\mathbf{x}^{\text{(Wild-type)}})}
+$$
+
+measures the improvement of the mutant over the wild-type <Note id={5} />.
+
+<>
+  5: (
+  <>
+    <span>This is equivalent to the equations we derived </span>
+    <a href="https://liambai.com/protein-evolution/#predicting-mutation-effects">
+      here
+    </a>
+    <span> using a pair-wise model.</span>
+  </>
+  )
+</>
+
+- Our model favors $\mathbf{x}^{\text{(Mutant)}}$ over $\mathbf{x}^{\text{(Wild-type)}}$ $\rightarrow$ $p(\mathbf{x}^{\text{(Mutant)}}) > p(\mathbf{x}^{\text{(Wild-type)}})$ $\rightarrow$ the mutation is likely beneficial $\rightarrow$ positive log ratio.
+
+- Our model favors $\mathbf{x}^{\text{(Wild-type)}}$ over $\mathbf{x}^{\text{(Mutant)}}$
+  $\rightarrow$ $p(\mathbf{x}^{\text{(Wild-type)}}) > p(\mathbf{x}^{\text{(Mutant)}})$ $\rightarrow$ the mutation is likely harmful $\rightarrow$ negative log ratio.
+
+### Disease variants
+
+We can compute this log ratio for each possible amino acid substitution at each position to produce a heatmap that illustrates their consequences:
+
+<Figure
+  content={<Image path={require("./images/mutation-effect-heatmap.png")} />}
+></Figure>
+
+Predicting the pathogenicity of human protein variants like this can be an important guide for clinical decisions. Most of the variants of human proteins related to disease (98% of [genomAD](https://gnomad.broadinstitute.org/)!) have unknown consequences, a testament to <Link to="/protein-representation">the difficulty of obtaining functional data relative to sequence data</Link>. This means:
+
+1. we are deeply ignorant about the proteins in our bodies and how their malfunctions cause disease.
+
+2. unsupervised computational approaches like VAEs can make a huge impact.
+
+Among this scarcity of experimental data, [ClinVar](https://www.ncbi.nlm.nih.gov/clinvar/intro/) is a public database of mutation effects in proteins important to human health. Predictions from a VAE-based approach called [EVE](https://github.com/OATML/EVE) agrees strongly with labels from ClinVar.
+
+<Figure content={<Image path={require("./images/EVE-ClinVar.png")} />}>
+  EVE outperforms other computational approaches of variant effect prediction in
+  concordance with ClinVar. On the y-axis, [Deep Mutational Scanning
+  (DMS)](https://www.nature.com/articles/nmeth.3027) is an experimental method
+  for screening a large set of variants for a specific function, another source
+  of experimental labels. When evaluated on the concordance with DMS data, EVE
+  similarly outperforms others models.
+</Figure>
+
+Incredibly, VAE models acquir such strong predictive power while being completely unsupervised: they has never seen _any_ labeled data of variant effects. They learn purely through studying the evolutionary sequences in the protein's family.
+
+### The power of latent variables
+
+When compared to independent position-wise models, the latent variable model is significantly more accurate for all possible mutations.
+
+<Figure
+  content={<Image path={require("./images/DeepSequence-vs-others.png")} />}
+></Figure>
+
+The sites at which their accuracy improved the most are ones that cooperate with several other sites.
+
+<Figure
+  content={<Image path={require("./images/DeepSequence-vs-independent.png")} />}
+></Figure>
+
+This demonstrates the flexibility of the latent variable model that can capture higher-order interactions.
+
+Here's one way to look at these results. MSAs contain a wealth of information, some of which we can understand through simple statistics: <Link to="/protein-evolution/#counting-amino-acid-frequencies">position-wise frequencies</Link>, <Link to="/protein-evolution/#pairwise-frequencies">pair-wise frequencies</Link>, etc. Those models are interpretable but limiting – they fail at teasing out more complex, higher-order signals.
+
+Enter neural networks, which are much better than us at recognizing those signals hidden in MSAs. They known _where to look_, _what to look at_ – beyond our simple statistics. This comes at the cost of interpretability. The comparison between our VAE model and statistical models like <Link to="/protein-evolution">Direct Coupling Analysis (DCA)</Link> exemplifies these two paradigms.

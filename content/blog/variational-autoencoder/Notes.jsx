@@ -34,15 +34,6 @@ const notes = {
       <span> of KL divergence.</span>
     </>
   ),
-  5: (
-    <>
-      <span>This is equivalent to the equations we derived </span>
-      <a href="https://liambai.com/protein-evolution/#predicting-mutation-effects">
-        here
-      </a>
-      <span> using a pair-wise model.</span>
-    </>
-  ),
 }
 
 export const { Note, NoteList } = getNoteComponents(notes)
