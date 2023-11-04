@@ -64,11 +64,11 @@ When neural networks are used as both the encoder and the decoder, the latent va
   post](https://towardsdatascience.com/understanding-variational-autoencoders-vaes-f70510919f73).
 </Figure>
 
-The latent space has fewer dimensions than the inputs, so encoding can be viewed as a form of [data compression](https://en.wikipedia.org/wiki/Data_compression). The baby doesn't retain all the details of each syllable heard – the intricate patterns of each sound wave – only their salient features, a compression.
+The latent space has fewer dimensions than the inputs, so encoding can be viewed as a form of [data compression](https://en.wikipedia.org/wiki/Data_compression). The baby doesn't retain all the details of each syllable heard – the intricate patterns of each sound wave – only their compressed, salient features.
 
 ### Evaluation reconstruction
 
-A good model at reconstruction is likely to get it exactly right: $\mathbf{\tilde{x}} = \mathbf{x}$. Given some input $\mathbf{x}$, let's pick some random $\mathbf{z_{rand}}$ and look at $p(\mathbf{x}|\mathbf{z_{rand}})$: the probability of reconstructing the input perfectly. We want this number to be big.
+A good model at reconstruction often gets it exactly right: $\mathbf{\tilde{x}} = \mathbf{x}$. Given some input $\mathbf{x}$, let's pick some random $\mathbf{z_{rand}}$ and look at $p(\mathbf{x}|\mathbf{z_{rand}})$: the probability of reconstructing the input perfectly. We want this number to be big.
 
 But that's not really fair: what if we picked a $\mathbf{z_{rand}}$ that the encoder would never choose? After all, the decoder only sees the latent variables produced by the encoder. Ideally, we want to assign more weight to $\mathbf{z}$'s that the encoder is more likely to produce:
 
