@@ -24,7 +24,7 @@ const Slider = () => {
       .attr("transform", "translate(30,30)")
 
     g.call(slider)
-  }, [slider])
+  }, [])
 
   const ELBOLineRef = useRef()
   const ELBOLabelRef = useRef()

@@ -297,134 +297,137 @@ Let's think about the left hand side of the equation. Maximizing ELBO has two de
 
 The machine learning motivations for VAEs we started with (encoder-decoder, reconstruction loss, regularization) are grounded in the statistics of variational inference (Bayesian updates, evidence maximization, posterior approximation). Let's explore the connections:
 
-<table
-  style={{
-    width: "100%",
-    border: "2px solid",
-  }}
->
-  <thead>
-    <tr>
-      <th
-        style={{
-          border: "2px solid",
-          padding: "8px",
-          textAlign: "left",
-        }}
-      >
-      </th>
-      <th
-        style={{
-          border: "2px solid",
-          padding: "8px",
-          textAlign: "left",
-        }}
-      >
-        Variational Inference
-      </th>
-      <th
-        style={{
-          border: "2px solid",
-          padding: "8px",
-          textAlign: "left",
-        }}
-      >
-        VAEs (machine learning)
-      </th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td
-        style={{
-          border: "2px solid",
-          padding: "8px",
-          textAlign: "left",
-        }}
-      >
-        $q(z | \mathbf{x})$
-      </td>
-      <td
-        style={{
-          border: "2px solid",
-          padding: "8px",
-          textAlign: "left",
-        }}
-      >
-        We couldn't directly compute the posterior $p(z | \mathbf{x})$ in the Bayesian update, so we try to approximate it with $q(z | \mathbf{x})$.
-      </td>
-      <td
-        style={{
-          border: "2px solid",
-          padding: "8px",
-          textAlign: "left",
-        }}
-      >
-        $q(z | \mathbf{x})$ is the encoder. Using a neural network as the encoder gives us the flexibility to do this approximation well.
-      </td>
-    </tr>
-    <tr>
-      <td
-        style={{
-          border: "2px solid",
-          padding: "8px",
-          textAlign: "left",
-        }}
-      >
-        $p(x | \mathbf{z})$
-      </td>
-      <td
-        style={{
-          border: "2px solid",
-          padding: "8px",
-          textAlign: "left",
-        }}
-      >
-        $\mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log p(\mathbf{x} | \mathbf{z})\right]$ fell out as a term in ELBO whose maximization accomplishes the dual goal of maximizing the intractable evidence, $\log p(\mathbf{x})$, and bringing $q(z | \mathbf{x})$ close to $p(z | \mathbf{x})$.
-      </td>
-      <td
-        style={{
-          border: "2px solid",
-          padding: "8px",
-          textAlign: "left",
-        }}
-      >
-        $p(x | \mathbf{z})$ is the decoder, also a neural network. $\mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log p(\mathbf{x} | \mathbf{z})\right]$ is the probability of perfect reconstruction. It makes sense to strive for perfect reconstruction and maximize this probability.
-      </td>
-    </tr>
-    <tr>
-      <td
-        style={{
-          border: "2px solid",
-          padding: "8px",
-          textAlign: "left",
-        }}
-      >
-        $p(z)$
-      </td>
-      <td
-        style={{
-          border: "2px solid",
-          padding: "8px",
-          textAlign: "left",
-        }}
-      >
-      $p(z)$ is the prior we use before seeing any observations. $p(z) \sim Normal(0, 1)$ is a reasonable choice. It's a starting point. It would take a lot of observations that disobey $Normal(0, 1)$ to, via Bayesian updates, convince us of a drastically different latent distribution.
-      </td>
-      <td
-        style={{
-          border: "2px solid",
-          padding: "8px",
-          textAlign: "left",
-        }}
-      >
-      Our encoder and decoder are both neural networks. They're just black-box learners of complex distributions with no concept of priors. They can easily conjure up a wildly complex distribution – nothing like $Normal(0, 1)$ – that merely memorizes the observations, a problem called overfitting.
-      
-      To prevent this, we constantly nudge the encoder $q(z | \mathbf{x})$ towards $Normal(0, 1)$, as a reminder of *where it would have started* if we were using traditional Bayesian updates. When viewed this way, $D_{KL}(q(z | \mathbf{x}) || p(z))$ is a *regularization term*.
-      </td>
-    </tr>
-  </tbody>
-</table>
+<div style={{overflowX: 'auto'}}>
+  <table
+    style={{
+      width: "100%",
+      border: "2px solid",
+      overflowX: "auto"
+    }}
+  >
+    <thead>
+      <tr>
+        <th
+          style={{
+            border: "2px solid",
+            padding: "8px",
+            textAlign: "left",
+          }}
+        >
+        </th>
+        <th
+          style={{
+            border: "2px solid",
+            padding: "8px",
+            textAlign: "left",
+          }}
+        >
+          Variational Inference
+        </th>
+        <th
+          style={{
+            border: "2px solid",
+            padding: "8px",
+            textAlign: "left",
+          }}
+        >
+          VAEs (machine learning)
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td
+          style={{
+            border: "2px solid",
+            padding: "8px",
+            textAlign: "left",
+          }}
+        >
+          $q(z | \mathbf{x})$
+        </td>
+        <td
+          style={{
+            border: "2px solid",
+            padding: "8px",
+            textAlign: "left",
+          }}
+        >
+          We couldn't directly compute the posterior $p(z | \mathbf{x})$ in the Bayesian update, so we try to approximate it with $q(z | \mathbf{x})$.
+        </td>
+        <td
+          style={{
+            border: "2px solid",
+            padding: "8px",
+            textAlign: "left",
+          }}
+        >
+          $q(z | \mathbf{x})$ is the encoder. Using a neural network as the encoder gives us the flexibility to do this approximation well.
+        </td>
+      </tr>
+      <tr>
+        <td
+          style={{
+            border: "2px solid",
+            padding: "8px",
+            textAlign: "left",
+          }}
+        >
+          $p(x | \mathbf{z})$
+        </td>
+        <td
+          style={{
+            border: "2px solid",
+            padding: "8px",
+            textAlign: "left",
+          }}
+        >
+          $\mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log p(\mathbf{x} | \mathbf{z})\right]$ fell out as a term in ELBO whose maximization accomplishes the dual goal of maximizing the intractable evidence, $\log p(\mathbf{x})$, and bringing $q(z | \mathbf{x})$ close to $p(z | \mathbf{x})$.
+        </td>
+        <td
+          style={{
+            border: "2px solid",
+            padding: "8px",
+            textAlign: "left",
+          }}
+        >
+          $p(x | \mathbf{z})$ is the decoder, also a neural network. $\mathbb E_{\mathbf{z} \sim q(z|\mathbf{x})} \left[\log p(\mathbf{x} | \mathbf{z})\right]$ is the probability of perfect reconstruction. It makes sense to strive for perfect reconstruction and maximize this probability.
+        </td>
+      </tr>
+      <tr>
+        <td
+          style={{
+            border: "2px solid",
+            padding: "8px",
+            textAlign: "left",
+          }}
+        >
+          $p(z)$
+        </td>
+        <td
+          style={{
+            border: "2px solid",
+            padding: "8px",
+            textAlign: "left",
+          }}
+        >
+        $p(z)$ is the prior we use before seeing any observations. $p(z) \sim Normal(0, 1)$ is a reasonable choice. It's a starting point. It would take a lot of observations that disobey $Normal(0, 1)$ to, via Bayesian updates, convince us of a drastically different latent distribution.
+        </td>
+        <td
+          style={{
+            border: "2px solid",
+            padding: "8px",
+            textAlign: "left",
+          }}
+        >
+        Our encoder and decoder are both neural networks. They're just black-box learners of complex distributions with no concept of priors. They can easily conjure up a wildly complex distribution – nothing like $Normal(0, 1)$ – that merely memorizes the observations, a problem called overfitting.
+        
+        To prevent this, we constantly nudge the encoder $q(z | \mathbf{x})$ towards $Normal(0, 1)$, as a reminder of *where it would have started* if we were using traditional Bayesian updates. When viewed this way, $D_{KL}(q(z | \mathbf{x}) || p(z))$ is a *regularization term*.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 ## Modeling protein sequences
 
