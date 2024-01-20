@@ -1,5 +1,6 @@
 import * as React from "react"
 import { Link, graphql } from "gatsby"
+import { Helmet } from "react-helmet"
 
 import Bio from "../components/bio"
 import Layout from "../components/layout"
@@ -12,7 +13,12 @@ const BlogPostTemplate = ({
   children,
 }) => {
   const siteTitle = site.siteMetadata?.title || `Title`
+  const previewImageUrl = `${site.siteMetadata.siteUrl}${post.frontmatter.image}`
   return (
+    <>
+    <Helmet>
+      <meta property="og:image" content={previewImageUrl} />
+    </Helmet>
     <Layout location={location} title={siteTitle}>
       <article
         className="blog-post"
@@ -58,6 +64,7 @@ const BlogPostTemplate = ({
         </ul>
       </nav>
     </Layout>
+    </>
   )
 }
 
@@ -81,6 +88,7 @@ export const pageQuery = graphql`
     site {
       siteMetadata {
         title
+        siteUrl
       }
     }
     mdx(id: { eq: $id }) {
@@ -91,6 +99,7 @@ export const pageQuery = graphql`
         title
         date(formatString: "MMMM DD, YYYY")
         description
+        image
       }
     }
     previous: mdx(id: { eq: $previousPostId }) {

@@ -15,7 +15,7 @@ module.exports = {
       summary: `who lives and works in Boston trying to build useful things.`,
     },
     description: `Blog about machine learning and proteins.`,
-    siteUrl: `https://liambai.com/`,
+    siteUrl: `https://liambai.com`,
     social: {
       twitter: "liambai21",
       linkedin: "liambai",
@@ -24,6 +24,7 @@ module.exports = {
   },
   plugins: [
     `gatsby-plugin-image`,
+    `gatsby-plugin-react-helmet`,
     {
       resolve: `gatsby-source-filesystem`,
       options: {
