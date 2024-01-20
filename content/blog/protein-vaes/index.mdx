@@ -1,3 +1,67 @@
+---
+title: "Protein VAEs"
+date: "2024-01-15"
+description: Stuff
+---
+
+import Figure from "../../../src/components/figure.jsx"
+import Image from "../../../src/components/image.jsx"
+import { Link } from "gatsby"
+import MSACoupling from "../protein-evolution/d3/MSACoupling.jsx"
+
+The evolutionary history of a protein – in the form of an [Multiple Sequence Alignments (MSAs)](https://en.wikipedia.org/wiki/Multiple_sequence_alignment) - holds clues to its structure and function. An example: positions that co-vary in the MSA tend to interact with each other in the folded structure, often via direct 3D contact.
+
+<Figure content={<MSACoupling />}>
+  An MSA contains many different variants of a protein sequence sampled by
+  evolution. The structure sketches how the amino acid chain might fold in space
+  (try dragging the nodes). Hover over each row in the MSA to see the
+  corresponding amino acid in the folded structure. Hover over the blue link to
+  highlight the contacting positions.
+</Figure>
+
+In a previous <Link to="/protein-evolution">post</Link>, we talked about ways of capturing information like this hidden in MSAs using [pair-wise models](https://en.wikipedia.org/wiki/Potts_model) that account for every possible pair of positions. But what about the interactions between 3 positions? Or even more? Those higher-order interactions are commonplace in natural proteins but account for them all is unfortunately computationally infeasible.
+
+This post is about a solution to this problem of tracking these far-too-numerous higher-order terms – based on a machine learning tool called **variational autoencoders (VAEs)**. If you're new to VAEs, check out this <Link to="/variational-autoencoder">deep dive</Link>.
+
+## The idea
+
+Imagine some vector $\mathbf{z}$, a **latent variable**, that distills all the information in the MSA: pairwise, higher-order, anything.
+
+<Figure
+  content={
+    <Image path={require("../variational-autoencoder/images/MSA-latent.png")} />
+  }
+>
+  Applying latent variable models like VAEs to MSAs. TODO: cite.
+</Figure>
+
+How do we get this magical $\mathbf{z}$? Since we can't precisely account all the combinations, let's ask a neural network, called an **encoder**, to figure it out. That's the key idea behind VAEs.
+
+Given a protein sequence, let's ask the encoder: Can you capture (in $\mathbf{z}$) the salient features of this protein? Biologically, this might mean things like: which residues form a binding pocket, or interact allosterically. There are 2 rules:
+
+1. No BS. You have to actually capture something meaningful about the input sequence. As a test, a neural network (called a **decoder**) needs to be able to decode from $\mathbf{z}$ what the input sequence was, reasonably well. TODO: note on joint training. This is called **reconstruction**.
+
+2. No rote memorization. If you merely memorize the sequence, you'll be great at the first rule but you won't be any help for sequences you've never seen before. This is called **regularization**.
+
+These 2 rules define the <Link to="/variational-autoencoder/#the-loss-function">loss function</Link> we use when training the neural networks.
+
+<Figure
+  content={
+    <Image
+      path={require("../variational-autoencoder/images/VAE-compression.png")}
+      width="60%"
+    />
+  }
+>
+  Variational autoencoders are a type of encoder-decoder model. Figure from this
+  [blog
+  post](https://towardsdatascience.com/understanding-variational-autoencoders-vaes-f70510919f73).
+</Figure>
+
+...
+
+## How training works
+
 During training, we feed sequences in the MSA into DeepSequence and use gradient descent to update encoder and decoder parameters (blue arrow). During inference – i.e. when given an unknown input sequence – we pass it through the encoder-decoder in the same way and produce a probability for the input sequence (green arrow).
 
 <Figure
@@ -19,7 +83,7 @@ $$
 \log\frac{p(\mathbf{x}^{\text{(Mutant)}})}{p(\mathbf{x}^{\text{(Wild-type)}})}
 $$
 
-measures the improvement of the mutant over the wild-type <Note id={5} />.
+measures the improvement of the mutant over the wild-type.
 
 <>
   5: (

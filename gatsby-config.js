@@ -12,7 +12,7 @@ module.exports = {
     title: `Liam's Blog`,
     author: {
       name: `Liam Bai`,
-      summary: `who lives and works in Boston trying to build useful things.`,
+      summary: `who works on software at Ginkgo Bioworks and writes about math, AI, and biology.`,
     },
     description: `Blog about machine learning and proteins.`,
     siteUrl: `https://liambai.com`,
