@@ -13,11 +13,12 @@ const BlogPostTemplate = ({
   children,
 }) => {
   const siteTitle = site.siteMetadata?.title || `Title`
-  const previewImageUrl = `${site.siteMetadata.siteUrl}${post.frontmatter.image}`
+  const slug = post.fields.slug.replace(/\//g, "")
+  const previewUrl = `${site.siteMetadata.siteUrl}/previews/${slug}.png`
   return (
     <>
     <Helmet>
-      <meta property="og:image" content={previewImageUrl} />
+      <meta property="og:image" content={previewUrl} />
     </Helmet>
     <Layout location={location} title={siteTitle}>
       <article
@@ -95,11 +96,13 @@ export const pageQuery = graphql`
       id
       excerpt(pruneLength: 160)
       body
+      fields {
+        slug
+      }
       frontmatter {
         title
         date(formatString: "MMMM DD, YYYY")
         description
-        image
       }
     }
     previous: mdx(id: { eq: $previousPostId }) {
