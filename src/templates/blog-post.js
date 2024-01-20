@@ -19,6 +19,7 @@ const BlogPostTemplate = ({
     <>
     <Helmet>
       <meta property="og:image" content={previewUrl} />
+      <meta name="twitter:image" content={previewUrl} />
     </Helmet>
     <Layout location={location} title={siteTitle}>
       <article
