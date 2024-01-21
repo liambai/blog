@@ -6,24 +6,48 @@ description: Stuff
 
 import Figure from "../../../src/components/figure.jsx"
 import Image from "../../../src/components/image.jsx"
+import LinkPreview from "../../../src/components/link-preview.jsx"
 import { Link } from "gatsby"
 import MSACoupling from "../protein-evolution/d3/MSACoupling.jsx"
 
-The evolutionary history of a protein – in the form of an [Multiple Sequence Alignments (MSAs)](https://en.wikipedia.org/wiki/Multiple_sequence_alignment) - holds clues to its structure and function. An example: positions that co-vary in the MSA tend to interact with each other in the folded structure, often via direct 3D contact.
+The evolutionary history of a protein – in the form of a [Multiple Sequence Alignments (MSAs)](https://en.wikipedia.org/wiki/Multiple_sequence_alignment) - holds clues to its structure and function. An example: positions that correlate tend to have some important relationship with each other, e.g. direct contact in the folded structure.
 
 <Figure content={<MSACoupling />}>
   An MSA contains many different variants of a protein sequence sampled by
-  evolution. The structure sketches how the amino acid chain might fold in space
-  (try dragging the nodes). Hover over each row in the MSA to see the
-  corresponding amino acid in the folded structure. Hover over the blue link to
-  highlight the contacting positions.
+  evolution. The structure sketches how the amino acid chain might fold in
+  space. Hover over each row in the MSA to see the corresponding amino acid in
+  the folded structure. Hover over the blue link to highlight the contacting
+  positions.
 </Figure>
 
-In a previous <Link to="/protein-evolution">post</Link>, we talked about ways of capturing information like this hidden in MSAs using [pair-wise models](https://en.wikipedia.org/wiki/Potts_model) that account for every possible pair of positions. But what about the interactions between 3 positions? Or even more? Those higher-order interactions are commonplace in natural proteins but account for them all is unfortunately computationally infeasible.
+Why? One possible explanation: these correlated positions form a binding pocket important to the protein's function. A willy-nilly mutation to one position disrupts the binding pocket and renders the protein useless. Poor organisms that carried that mutation are dead therefore absent from the MSA.
 
-This post is about a solution to this problem of tracking these far-too-numerous higher-order terms – based on a machine learning tool called **variational autoencoders (VAEs)**. If you're new to VAEs, check out this <Link to="/variational-autoencoder">deep dive</Link>.
+<Figure
+  content={
+    <Image
+      path={require("./images/binding-pocket.png")}
+      width="40%"
+      mobileWidth="60%"
+    />
+  }
+>
+  A binding pocket. TODO: cite.
+</Figure>
+
+In a previous <Link to="/protein-evolution">post</Link>, we talked about ways of capturing information like this hidden in MSAs using [pair-wise models](https://en.wikipedia.org/wiki/Potts_model) that account for every possible pair of positions. But what about the interactions between 3 positions? Or even more? Binding pockets, for example, are made up of many positions. Unfortunately, accounting for all these possible combinations is computationally impossible.
+
+This post is about a solution to this problem of tracking these far-too-numerous combinations – based on a machine learning tool called **variational autoencoders (VAEs)**. If you're new to VAEs, check out this deep dive.
+
+<LinkPreview
+  title="An introduction to variational autoencoders"
+  description="Predicting protein function using deep generative models. Latent variable models, reconstruction, variational autoencoders (VAEs), Bayesian inference, evidence lower bound (ELBO)."
+  url="https://liambai.com/variational-autoencoder"
+  ogImageSrc="https://liambai.com/previews/variational-autoencoder.png"
+/>
 
 ## The idea
+
+### Latent variables
 
 Imagine some vector $\mathbf{z}$, a **latent variable**, that distills all the information in the MSA: pairwise, higher-order, anything.
 
@@ -32,14 +56,17 @@ Imagine some vector $\mathbf{z}$, a **latent variable**, that distills all the i
     <Image path={require("../variational-autoencoder/images/MSA-latent.png")} />
   }
 >
-  Applying latent variable models like VAEs to MSAs. TODO: cite.
+  Applying latent variable models like VAEs to MSAs. TODO:
+  https://en.wikipedia.org/wiki/Binding_site.
 </Figure>
 
 How do we get this magical $\mathbf{z}$? Since we can't precisely account all the combinations, let's ask a neural network, called an **encoder**, to figure it out. That's the key idea behind VAEs.
 
+### VAEs in a nutshell
+
 Given a protein sequence, let's ask the encoder: Can you capture (in $\mathbf{z}$) the salient features of this protein? Biologically, this might mean things like: which residues form a binding pocket, or interact allosterically. There are 2 rules:
 
-1. No BS. You have to actually capture something meaningful about the input sequence. As a test, a neural network (called a **decoder**) needs to be able to decode from $\mathbf{z}$ what the input sequence was, reasonably well. TODO: note on joint training. This is called **reconstruction**.
+1. No BS. You have to actually capture something meaningful about the input sequence. As a test, a neural network (called a **decoder**) needs to be able to tell from $\mathbf{z}$ what the input sequence was, reasonably well. TODO: note on joint training. This is called **reconstruction**.
 
 2. No rote memorization. If you merely memorize the sequence, you'll be great at the first rule but you won't be any help for sequences you've never seen before. This is called **regularization**.
 
@@ -58,11 +85,15 @@ These 2 rules define the <Link to="/variational-autoencoder/#the-loss-function">
   post](https://towardsdatascience.com/understanding-variational-autoencoders-vaes-f70510919f73).
 </Figure>
 
-...
+A note on the decoder.
 
-## How training works
+## Training & inference
 
-During training, we feed sequences in the MSA into DeepSequence and use gradient descent to update encoder and decoder parameters (blue arrow). During inference – i.e. when given an unknown input sequence – we pass it through the encoder-decoder in the same way and produce a probability for the input sequence (green arrow).
+During training, we show the MSA to our VAE one sequence at a time. For each sequence, we compute the loss function and use gradient descent to update the encoder and decoder parameters.
+
+After seeing everything in the MSA, hopefully our VAE has learned some important things about what's it's like to be this protein, e.g. which residues form a binding pocket.
+
+To train the VAE, we feed in sequences in the MSA and use gradient descent to update the encoder and decoder parameters (blue arrow). During inference – i.e. when given an unknown input sequence – we pass it through the encoder-decoder in the same way and produce a probability for the input sequence (green arrow).
 
 <Figure
   content={
@@ -73,7 +104,7 @@ During training, we feed sequences in the MSA into DeepSequence and use gradient
   }
 ></Figure>
 
-Given an unknown input sequence $\mathbf{x}$, $p(\mathbf{x})$ describes how likely it is for $\mathbf{x}$ to be a functional protein given the evolutionary sequences in our MSA. $p(\mathbf{x})$ is a fitness predictor with a range of applications, from improving protein function to interpreting human disease variants.
+Given an unknown input sequence $\mathbf{x}$, $p(\mathbf{x})$ describes how likely it is for $\mathbf{x}$ to be a functional protein given the evolutionary sequences in our MSA. $p(\mathbf{x})$ is a fitness predictor: high = good, low = bad. from improving protein function to interpreting human disease variants.
 
 ## Predicting mutation effects
 
