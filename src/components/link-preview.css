@@ -15,7 +15,11 @@
     border-radius: 3px;
     max-height: 120px;
     text-decoration: none;
-  }
+}
+
+.preview-notion-container:hover {
+  background-color: #EFEFEF;
+}
 
   .preview-notion-wrapper {
     flex: 4 1 320px;

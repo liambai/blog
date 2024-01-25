@@ -10,7 +10,36 @@ import LinkPreview from "../../../src/components/link-preview.jsx"
 import { Link } from "gatsby"
 import MSACoupling from "../protein-evolution/d3/MSACoupling.jsx"
 
-The evolutionary history of a protein – in the form of a [Multiple Sequence Alignments (MSAs)](https://en.wikipedia.org/wiki/Multiple_sequence_alignment) - holds clues to its structure and function. An example: positions that correlate tend to have some important relationship with each other, e.g. direct contact in the folded structure.
+What is life? In essence, a dizzying but methodical chemical dance choreographed by proteins. It's so mind-bendingly complex that most of its patterns still elude us. This blog is about the inadequate but inspiring ways we have of shedding light on this elusive dance – of understanding the methods in the madness. Here's one:
+
+**Binding pockets** are "little hands" that proteins use to influence their surroundings: [speed something up](https://en.wikipedia.org/wiki/Enzyme), [break something down](https://en.wikipedia.org/wiki/Protease), [guide something along](<https://en.wikipedia.org/wiki/Chaperone_(protein)>).
+
+<Figure
+  content={
+    <Image
+      path={require("./images/binding-site.png")}
+      width="40%"
+      mobileWidth="60%"
+    />
+  }
+>
+  A binding pocket. Image from
+  [https://en.wikipedia.org/wiki/Binding_site](https://en.wikipedia.org/wiki/Binding_site).
+</Figure>
+
+Through billions of years, evolution introduces random mutations to every protein. All else can change – the binding pockets almost never do. This is unsurprising: they are the parts that do the work! Spoons come in different shapes and sizes: what doesn't change? The part that scoops.
+
+<Figure
+  content={
+    <Image
+      path={require("./images/spoons.png")}
+      width="50%"
+      mobileWidth="60%"
+    />
+  }
+/>
+
+That's why the evolutionary history of a protein – in the form of a [Multiple Sequence Alignments (MSAs)](https://en.wikipedia.org/wiki/Multiple_sequence_alignment) - holds important clues to its structure and function. Positions that correlate tend to have some important relationship with each other, e.g. direct contact in the folded structure.
 
 <Figure content={<MSACoupling />}>
   An MSA contains many different variants of a protein sequence sampled by
@@ -22,19 +51,7 @@ The evolutionary history of a protein – in the form of a [Multiple Sequence Al
 
 Why? One possible explanation: these correlated positions form a binding pocket important to the protein's function. A willy-nilly mutation to one position disrupts the binding pocket and renders the protein useless. Poor organisms that carried that mutation are dead therefore absent from the MSA.
 
-<Figure
-  content={
-    <Image
-      path={require("./images/binding-pocket.png")}
-      width="40%"
-      mobileWidth="60%"
-    />
-  }
->
-  A binding pocket. TODO: cite.
-</Figure>
-
-In a previous <Link to="/protein-evolution">post</Link>, we talked about ways of capturing information like this hidden in MSAs using [pair-wise models](https://en.wikipedia.org/wiki/Potts_model) that account for every possible pair of positions. But what about the interactions between 3 positions? Or even more? Binding pockets, for example, are made up of many positions. Unfortunately, accounting for all these possible combinations is computationally impossible.
+In a previous <Link to="/protein-evolution">post</Link>, we talked about ways of capturing information like this hidden in MSAs using [pair-wise models](https://en.wikipedia.org/wiki/Potts_model) that account for every possible pair of positions. But what about the interactions between 3 positions? Or even more? Binding pockets, for example, are made up of many positions. Unfortunately, accounting for all these possible combinations in this way is computationally impossible.
 
 This post is about a solution to this problem of tracking these far-too-numerous combinations – based on a machine learning tool called **variational autoencoders (VAEs)**. If you're new to VAEs, check out this deep dive.
 
@@ -46,6 +63,10 @@ This post is about a solution to this problem of tracking these far-too-numerous
 />
 
 ## The idea
+
+Our goal is simple:
+
+find a function $p(\mathbf{x})$ that, given some amino acid sequence $\mathbf{x}$, outputs the probability of it being a variant in the MSA.
 
 ### Latent variables
 

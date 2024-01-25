@@ -15,6 +15,11 @@ const LinkPreview = ({ url, title, description, ogImageSrc }) => {
           <div class="preview-notion-title">{title}</div>
           <div class="preview-notion-description">{description}</div>
           <div class="preview-notion-url">
+            {/* <img
+              class="preview-notion-favicon"
+              src="src/images/gatsby-icon.png"
+              alt={`${title}-favicon`}
+            /> */}
             <div class="preview-notion-link">{url}</div>
           </div>
         </div>
@@ -22,7 +27,7 @@ const LinkPreview = ({ url, title, description, ogImageSrc }) => {
           <img
             class="preview-notion-image"
             src={ogImageSrc}
-            alt='link-preview'
+            alt="link-preview"
           />
         </div>
       </a>
