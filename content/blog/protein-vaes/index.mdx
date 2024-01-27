@@ -27,7 +27,7 @@ What is life? In essence, a dizzying but methodical chemical dance choreographed
   [https://en.wikipedia.org/wiki/Binding_site](https://en.wikipedia.org/wiki/Binding_site).
 </Figure>
 
-Through billions of years, evolution introduces random mutations to every protein. All else can change – the binding pockets almost never do. This is unsurprising: they are the parts that do the work! Spoons come in different shapes and sizes: what doesn't change? The part that scoops.
+Through billions of years, evolution introduces random mutations to every protein. All else can change, but the binding pockets almost never do. This is perhaps unsurprising: they are the parts that actually do the work! Spoons come in different shapes and sizes, but the part the scoops never changes.
 
 <Figure
   content={
@@ -39,7 +39,7 @@ Through billions of years, evolution introduces random mutations to every protei
   }
 />
 
-That's why the evolutionary history of a protein – in the form of a [Multiple Sequence Alignments (MSAs)](https://en.wikipedia.org/wiki/Multiple_sequence_alignment) - holds important clues to its structure and function. Positions that correlate tend to have some important relationship with each other, e.g. direct contact in the folded structure.
+That's why the evolutionary history of a protein – in the form of a [Multiple Sequence Alignments (MSAs)](https://en.wikipedia.org/wiki/Multiple_sequence_alignment) - holds such important clues to its structure and function. Positions that correlate in the MSA tend to have some important relationship with each other, e.g. direct contact in the folded structure.
 
 <Figure content={<MSACoupling />}>
   An MSA contains many different variants of a protein sequence sampled by
@@ -49,11 +49,11 @@ That's why the evolutionary history of a protein – in the form of a [Multiple 
   positions.
 </Figure>
 
-Why? One possible explanation: these correlated positions form a binding pocket important to the protein's function. A willy-nilly mutation to one position disrupts the binding pocket and renders the protein useless. Poor organisms that carried that mutation are dead therefore absent from the MSA.
+One possible explanation: these correlated positions form a binding pocket important to the protein's function. A willy-nilly mutation to one position disrupts the binding pocket, which renders the protein useless. Poor organisms that carried that mutation are dead and therefore absent from the MSA.
 
-In a previous <Link to="/protein-evolution">post</Link>, we talked about ways of capturing information like this hidden in MSAs using [pair-wise models](https://en.wikipedia.org/wiki/Potts_model) that account for every possible pair of positions. But what about the interactions between 3 positions? Or even more? Binding pockets, for example, are made up of many positions. Unfortunately, accounting for all these possible combinations in this way is computationally impossible.
+In a previous <Link to="/protein-evolution">post</Link>, we talked about ways of learning information like this from MSAs using [pair-wise models](https://en.wikipedia.org/wiki/Potts_model) that account for every possible pair of positions. But what about the interactions between 3 positions? Or even more? Binding pockets, after all, are made up of many positions. Unfortunately, accounting for all these possible combinations in this way is computationally impossible.
 
-This post is about a solution to this problem of tracking these far-too-numerous combinations – based on a machine learning tool called **variational autoencoders (VAEs)**. If you're new to VAEs, check out this deep dive.
+This post is about a solution to this problem of tracking these far-too-numerous combinations – using a tool from machine learning called **variational autoencoders (VAEs)**. If you're new to VAEs, check out this deep dive.
 
 <LinkPreview
   title="An introduction to variational autoencoders"
@@ -64,13 +64,9 @@ This post is about a solution to this problem of tracking these far-too-numerous
 
 ## The idea
 
-Our goal is simple:
-
-find a function $p(\mathbf{x})$ that, given some amino acid sequence $\mathbf{x}$, outputs the probability of it being a variant in the MSA.
-
 ### Latent variables
 
-Imagine some vector $\mathbf{z}$, a **latent variable**, that distills all the information in the MSA: pairwise, higher-order, anything.
+Imagine some vector $\mathbf{z}$, a **latent variable**, that distills all the information in the MSA: pairwise, any 3 positions, anything.
 
 <Figure
   content={
@@ -81,15 +77,15 @@ Imagine some vector $\mathbf{z}$, a **latent variable**, that distills all the i
   https://en.wikipedia.org/wiki/Binding_site.
 </Figure>
 
-How do we get this magical $\mathbf{z}$? Since we can't precisely account all the combinations, let's ask a neural network, called an **encoder**, to figure it out. That's the key idea behind VAEs.
+To get this magical $\mathbf{z}$, let's ask a neural network called an **encoder**. We don't know how it's done – nor do we really care – as long as it's done! That's the key idea behind VAEs.
 
 ### VAEs in a nutshell
 
-Given a protein sequence, let's ask the encoder: Can you capture (in $\mathbf{z}$) the salient features of this protein? Biologically, this might mean things like: which residues form a binding pocket, or interact allosterically. There are 2 rules:
+Given a protein sequence, let's ask the encoder: Can you capture (in $\mathbf{z}$) the salient features of this protein? Biologically, this might mean things like: which residues form a binding pocket. There are 2 rules:
 
 1. No BS. You have to actually capture something meaningful about the input sequence. As a test, a neural network (called a **decoder**) needs to be able to tell from $\mathbf{z}$ what the input sequence was, reasonably well. TODO: note on joint training. This is called **reconstruction**.
 
-2. No rote memorization. If you merely memorize the sequence, you'll be great at the first rule but you won't be any help for sequences you've never seen before. This is called **regularization**.
+2. No rote memorization. If you merely memorize the input sequence, you'll be great at the first rule but you won't be any help for sequences you've never seen before. This is called **regularization**.
 
 These 2 rules define the <Link to="/variational-autoencoder/#the-loss-function">loss function</Link> we use when training the neural networks.
 
@@ -106,26 +102,40 @@ These 2 rules define the <Link to="/variational-autoencoder/#the-loss-function">
   post](https://towardsdatascience.com/understanding-variational-autoencoders-vaes-f70510919f73).
 </Figure>
 
-A note on the decoder.
+### The model
 
-## Training & inference
+What do we actually mean by _model_? Abstractly, our model captures information about a specific protein, via its evolutionary history (MSA). Concretely, our model is a function that takes a protein sequence $\mathbf{x}$ and spits out a probability, $p(\mathbf{x})$:
 
-During training, we show the MSA to our VAE one sequence at a time. For each sequence, we compute the loss function and use gradient descent to update the encoder and decoder parameters.
+$$
+\mathbf{x} \rightarrow p(\mathbf{x})
+$$
 
-After seeing everything in the MSA, hopefully our VAE has learned some important things about what's it's like to be this protein, e.g. which residues form a binding pocket.
+With training, we want this probability to approximate how likely it is for the input sequence to have come from our MSA. In other words, how likely is it to be a functional variant of our protein?
 
-To train the VAE, we feed in sequences in the MSA and use gradient descent to update the encoder and decoder parameters (blue arrow). During inference – i.e. when given an unknown input sequence – we pass it through the encoder-decoder in the same way and produce a probability for the input sequence (green arrow).
+This probability is the collaborative work of our encoder and decoder, which are trained together.
+
+$$
+\mathbf{x} \xrightarrow{encoder} \mathbf{z} \xrightarrow{decoder} p(\mathbf{x})
+$$
+
+An accurate model enables us to make predictions about disease variants we've never seen before, or even engineer new ones with desired properties. More on this later!
+
+### Training & inference
+
+During training, we show the MSA to our VAE one sequence at a time. For each sequence, we compute the loss function and use gradient descent to update the encoder and decoder parameters. Repeating this many times gives our VAE a good idea of what it's like to be this protein.
+
+When given an unknown input sequence, we pass it through the VAE in the same way and produce a probability for the input sequence (green arrow).
 
 <Figure
   content={
     <Image
-      path={require("./images/DeepSequence-architecture.png")}
+      path={require("./images/protein-vae-architecture.png")}
       width="90%"
     />
   }
 ></Figure>
 
-Given an unknown input sequence $\mathbf{x}$, $p(\mathbf{x})$ describes how likely it is for $\mathbf{x}$ to be a functional protein given the evolutionary sequences in our MSA. $p(\mathbf{x})$ is a fitness predictor: high = good, low = bad. from improving protein function to interpreting human disease variants.
+Given an unknown input sequence $\mathbf{x}$, $p(\mathbf{x})$ is a measure of its fitness. $p(\mathbf{x})$ is low, $\mathbf{x}$ probably won't even fold into a working protein. If $p(\mathbf{x})$ is high, $\mathbf{x}$ is probably
 
 ## Predicting mutation effects
 
