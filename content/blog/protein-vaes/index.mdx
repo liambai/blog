@@ -9,10 +9,11 @@ import Image from "../../../src/components/image.jsx"
 import LinkPreview from "../../../src/components/link-preview.jsx"
 import { Link } from "gatsby"
 import MSACoupling from "../protein-evolution/d3/MSACoupling.jsx"
+import { Note, NoteList } from "./Notes.jsx"
 
-What is life? In essence, a dizzying but methodical chemical dance choreographed by proteins. It's so mind-bendingly complex that most of its patterns still elude us. This blog is about the inadequate but inspiring ways we have of shedding light on this elusive dance – of understanding the methods in the madness. Here's one:
+Life, in essence, is a dizzying chemical dance choreographed by proteins. It's so mind-bendingly complex that most of its patterns still elude us. This blog is about the inadequate but inspiring ways we have of shedding light on this elusive dance – of understanding the methods in the madness. Here's one such method:
 
-**Binding pockets** are "little hands" that proteins use to influence their surroundings: [speed something up](https://en.wikipedia.org/wiki/Enzyme), [break something down](https://en.wikipedia.org/wiki/Protease), [guide something along](<https://en.wikipedia.org/wiki/Chaperone_(protein)>).
+**Binding pockets** are "hands" that proteins use to act on their surroundings: [speed something up](https://en.wikipedia.org/wiki/Enzyme), [break something down](https://en.wikipedia.org/wiki/Protease), [guide something along](<https://en.wikipedia.org/wiki/Chaperone_(protein)>).
 
 <Figure
   content={
@@ -27,7 +28,7 @@ What is life? In essence, a dizzying but methodical chemical dance choreographed
   [https://en.wikipedia.org/wiki/Binding_site](https://en.wikipedia.org/wiki/Binding_site).
 </Figure>
 
-Through billions of years, evolution introduces random mutations to every protein. All else can change, but the binding pockets almost never do. This is perhaps unsurprising: they are the parts that actually do the work! Spoons come in different shapes and sizes, but the part the scoops never changes.
+Over billions of years, evolution introduces random mutations to every protein. There is a pattern: the binding pockets almost never change. This is perhaps unsurprising: they are the parts that actually do the work! Spoons come in different shapes and sizes, but the part that scoops never changes.
 
 <Figure
   content={
@@ -39,7 +40,7 @@ Through billions of years, evolution introduces random mutations to every protei
   }
 />
 
-That's why the evolutionary history of a protein – in the form of a [Multiple Sequence Alignments (MSAs)](https://en.wikipedia.org/wiki/Multiple_sequence_alignment) - holds such important clues to its structure and function. Positions that correlate in the MSA tend to have some important relationship with each other, e.g. direct contact in the folded structure.
+That's why the evolutionary history of a protein, in the form of a [Multiple Sequence Alignments (MSAs)](https://en.wikipedia.org/wiki/Multiple_sequence_alignment), holds such important clues to the protein's structure and function – its role in this elusive dance. Positions that correlate in the MSA tend to have some important relationship with each other, e.g. direct contact in the folded structure.
 
 <Figure content={<MSACoupling />}>
   An MSA contains many different variants of a protein sequence sampled by
@@ -49,11 +50,11 @@ That's why the evolutionary history of a protein – in the form of a [Multiple 
   positions.
 </Figure>
 
-One possible explanation: these correlated positions form a binding pocket important to the protein's function. A willy-nilly mutation to one position disrupts the binding pocket, which renders the protein useless. Poor organisms that carried that mutation are dead and therefore absent from the MSA.
+A possible explanation: these correlated positions form a binding pocket with some important function. A willy-nilly mutation to one position disrupts the binding pocket and renders the protein useless. During evolution, poor organisms that carried that mutation didn't survive and are therefore absent from the MSA.
 
-In a previous <Link to="/protein-evolution">post</Link>, we talked about ways of learning information like this from MSAs using [pair-wise models](https://en.wikipedia.org/wiki/Potts_model) that account for every possible pair of positions. But what about the interactions between 3 positions? Or even more? Binding pockets, after all, are made up of many positions. Unfortunately, accounting for all these possible combinations in this way is computationally impossible.
+In a previous <Link to="/protein-evolution">post</Link>, we talked about ways of teasing out such information from MSAs using [pair-wise models](https://en.wikipedia.org/wiki/Potts_model) that account for every possible pair of positions. But what about the interactions between 3 positions? Or even more? Binding pockets, after all, are made up of many positions. Unfortunately, accounting for all the possible combinations in this way is computationally impossible.
 
-This post is about a solution to this problem of tracking these far-too-numerous combinations – using a tool from machine learning called **variational autoencoders (VAEs)**. If you're new to VAEs, check out this deep dive.
+This post is about a solution to this problem of having to track these far-too-numerous combinations – using a tool from machine learning called **variational autoencoders (VAEs)**. If you're new to VAEs, check out this deep dive!
 
 <LinkPreview
   title="An introduction to variational autoencoders"
@@ -66,28 +67,27 @@ This post is about a solution to this problem of tracking these far-too-numerous
 
 ### Latent variables
 
-Imagine some vector $\mathbf{z}$, a **latent variable**, that distills all the information in the MSA: pairwise, any 3 positions, anything.
+Imagine some vector $\mathbf{z}$, a **latent variable**, that distills all the information in the MSA. All the interactions: pairwise, any 3 positions, any 4... Knowing $\mathbf{z}$, we'd have a pretty good idea about the important characteristics of our protein.
 
 <Figure
   content={
     <Image path={require("../variational-autoencoder/images/MSA-latent.png")} />
   }
 >
-  Applying latent variable models like VAEs to MSAs. TODO:
-  https://en.wikipedia.org/wiki/Binding_site.
+  Applying latent variable models like VAEs to MSAs. TODO: cite.
 </Figure>
 
-To get this magical $\mathbf{z}$, let's ask a neural network called an **encoder**. We don't know how it's done – nor do we really care – as long as it's done! That's the key idea behind VAEs.
+We can view $\mathbf{z}$ as a form of data compression: the piles of sequences in this MSA into one small vector <Note id={1} />. Here's the key insight of VAEs: we might not actually know what the best way of doing this compression is; let's ask neural networks to figure it out. The neural network that creates $\mathbf{z}$ is called an **encoder**.
 
 ### VAEs in a nutshell
 
-Given a protein sequence, let's ask the encoder: Can you capture (in $\mathbf{z}$) the salient features of this protein? Biologically, this might mean things like: which residues form a binding pocket. There are 2 rules:
+Given a protein sequence, let's ask the encoder: can you capture (in $\mathbf{z}$) its salient features? Things like: which residues form a binding pocket. There are 2 rules:
 
-1. No BS. You have to actually capture something meaningful about the input sequence. As a test, a neural network (called a **decoder**) needs to be able to tell from $\mathbf{z}$ what the input sequence was, reasonably well. TODO: note on joint training. This is called **reconstruction**.
+1. No BS. You have to actually capture something meaningful about the input sequence. As a test, a neural network (called a **decoder**) needs to be able to tell from $\mathbf{z}$ what the input sequence was, reasonably well. This rule is called **reconstruction**.
 
-2. No rote memorization. If you merely memorize the input sequence, you'll be great at the first rule but you won't be any help for sequences you've never seen before. This is called **regularization**.
+2. No rote memorization. If you merely memorize the input sequence, you'll be great at reconstruction but you'll be stumped by sequences you've never seen before. This rule is called **regularization**.
 
-These 2 rules define the <Link to="/variational-autoencoder/#the-loss-function">loss function</Link> we use when training the neural networks.
+A common theme of machine learning is the tension between these to rules – the need to artfully balance them. For VAEs, they define the two terms of the <Link to="/variational-autoencoder/#the-loss-function">loss function</Link> we use when training.
 
 <Figure
   content={
@@ -104,27 +104,36 @@ These 2 rules define the <Link to="/variational-autoencoder/#the-loss-function">
 
 ### The model
 
-What do we actually mean by _model_? Abstractly, our model captures information about a specific protein, via its evolutionary history (MSA). Concretely, our model is a function that takes a protein sequence $\mathbf{x}$ and spits out a probability, $p(\mathbf{x})$:
+OK, intuition aside, what do we actually mean by _model_? What are its inputs and outputs? Concretely, our model is just a function that takes a protein sequence, say ILAVP, and spits out a probability, $p(\mathrm{ILAVP})$:
 
 $$
-\mathbf{x} \rightarrow p(\mathbf{x})
+\mathrm{ILAVP} \rightarrow p(\mathrm{ILAVP})
 $$
 
-With training, we want this probability to approximate how likely it is for the input sequence to have come from our MSA. In other words, how likely is it to be a functional variant of our protein?
+With training, we want this probability to approximate how likely it is for ILAVP to have come from our MSA. In other words, how likely is it to be a functional variant of our protein?
 
 This probability is the collaborative work of our encoder and decoder, which are trained together.
 
 $$
-\mathbf{x} \xrightarrow{encoder} \mathbf{z} \xrightarrow{decoder} p(\mathbf{x})
+\mathrm{ILAVP} \xrightarrow{encoder} \mathbf{z} \xrightarrow{decoder} p(\mathrm{ILAVP})
 $$
 
-An accurate model enables us to make predictions about disease variants we've never seen before, or even engineer new ones with desired properties. More on this later!
+An accurate model is powerful. It enables us to make predictions about protein variants we've never seen before – including ones associated with disease – or even engineer new ones with properties we desire. More on this later!
 
 ### Training & inference
 
-During training, we show the MSA to our VAE one sequence at a time. For each sequence, we compute the loss function and use gradient descent to update the encoder and decoder parameters. Repeating this many times gives our VAE a good idea of what it's like to be this protein.
+Training our model looks something like this:
 
-When given an unknown input sequence, we pass it through the VAE in the same way and produce a probability for the input sequence (green arrow).
+1. take an input sequence, say ILAVP, from the MSA.
+2. pass it through encoder and decoder: $\mathrm{ILAVP} \xrightarrow{encoder} \mathbf{z} \xrightarrow{decoder} p(\mathrm{ILAVP}).
+$
+3. compute the loss function.
+4. use gradient descent to update the encoder and decoder parameters (purple arrow).
+5. repeat.
+
+After going through each sequence in the MSA, our model should have a decent idea of what it's like to be this protein!
+
+Now, when given an unknown input sequence, we can pass it through the VAE in the same way and produce an informed probability for the input sequence (green arrow).
 
 <Figure
   content={
@@ -135,50 +144,50 @@ When given an unknown input sequence, we pass it through the VAE in the same way
   }
 ></Figure>
 
-Given an unknown input sequence $\mathbf{x}$, $p(\mathbf{x})$ is a measure of its fitness. $p(\mathbf{x})$ is low, $\mathbf{x}$ probably won't even fold into a working protein. If $p(\mathbf{x})$ is high, $\mathbf{x}$ is probably
+Once training, we can think of our model's predictions, e.g. $p(\mathrm{ILAVP})$, as a measure of the fitness.
 
-## Predicting mutation effects
+- $p(\mathrm{ILAVP})$ is low $\rightarrow$ ILAVP probably won't even fold into a working protein.
+- $p(\mathrm{ILAVP})$ is high $\rightarrow$ ILAVP fits right in with the natural variants of this protein – and probably works great.
 
-Given a wild-type sequence $\mathbf{x}^{\text{(Wild-type)}}$ and a mutant sequence $\mathbf{x}^{\text{(Mutant)}}$, the log ratio
+Now, let's put our model to use.
 
-$$
-\log\frac{p(\mathbf{x}^{\text{(Mutant)}})}{p(\mathbf{x}^{\text{(Wild-type)}})}
-$$
+## VAEs at work
 
-measures the improvement of the mutant over the wild-type.
+### Predicting disease variants
 
-<>
-  5: (
-  <>
-    <span>This is equivalent to the equations we derived </span>
-    <a href="https://liambai.com/protein-evolution/#predicting-mutation-effects">
-      here
-    </a>
-    <span> using a pair-wise model.</span>
-  </>
-  )
-</>
+The explosion in DNA sequencing technology in the last decade came with a conundrum: the enormous amounts of sequence data we unlocked far exceeds our ability to understand them.
 
-- Our model favors $\mathbf{x}^{\text{(Mutant)}}$ over $\mathbf{x}^{\text{(Wild-type)}}$ $\rightarrow$ $p(\mathbf{x}^{\text{(Mutant)}}) > p(\mathbf{x}^{\text{(Wild-type)}})$ $\rightarrow$ the mutation is likely beneficial $\rightarrow$ positive log ratio.
+For example, [genomAD](https://gnomad.broadinstitute.org/) is a massive database of sequence data. If we look at all the human protein variants in genomAD and ask: for how many of these do we know their disease consequences? The answer: a mere 2%. We are deeply ignorant about the proteins in our bodies and how their malfunctions cause disease.
 
-- Our model favors $\mathbf{x}^{\text{(Wild-type)}}$ over $\mathbf{x}^{\text{(Mutant)}}$
-  $\rightarrow$ $p(\mathbf{x}^{\text{(Wild-type)}}) > p(\mathbf{x}^{\text{(Mutant)}})$ $\rightarrow$ the mutation is likely harmful $\rightarrow$ negative log ratio.
-
-### Disease variants
-
-We can compute this log ratio for each possible amino acid substitution at each position to produce a heatmap that illustrates their consequences:
+Now, image a tool that can look at every of possible variant of a protein and make a prediction about its consequence. Something like this, where blue means good and red means bad.
 
 <Figure
   content={<Image path={require("./images/mutation-effect-heatmap.png")} />}
-></Figure>
+>
+  TODO
+</Figure>
 
-Predicting the pathogenicity of human protein variants like this can be an important guide for clinical decisions. Most of the variants of human proteins related to disease (98% of [genomAD](https://gnomad.broadinstitute.org/)!) have unknown consequences, a testament to <Link to="/protein-representation">the difficulty of obtaining functional data relative to sequence data</Link>. This means:
+A map like this, if dependable, so valuable precisely because of our lack of experimental data. It fills the gaps in our understanding.
 
-1. we are deeply ignorant about the proteins in our bodies and how their malfunctions cause disease.
+### The log ratio
 
-2. unsupervised computational approaches like VAEs can make a huge impact.
+Here's how we can compute such a map like that with our VAE. Given a natural sequence (called wild-type) and a mutant sequence, the log ratio
 
-Among this scarcity of experimental data, [ClinVar](https://www.ncbi.nlm.nih.gov/clinvar/intro/) is a public database of mutation effects in proteins important to human health. Predictions from a VAE-based approach called [EVE](https://github.com/OATML/EVE) agrees strongly with labels from ClinVar.
+$$
+\log\frac{p(\text{mutant})}{p(\text{wild-type})}
+$$
+
+measures the improvement of the mutant over the wild-type <Note id={2} />.
+
+- If our model favors the mutant over the wild-type $\rightarrow$ $p(\text{mutant}) > p(\text{wild-type})$ $\rightarrow$ positive log ratio $\rightarrow$ the mutation is likely beneficial.
+
+- If our model favors the wild-type over the mutant $\rightarrow$ $p(\text{wild-type}) > p(\text{mutant})$ $\rightarrow$ negative log ratio $\rightarrow$ the mutation is likely harmful.
+
+We can create our map by simply computing this log ratio for every possible mutation at every possible position.
+
+### Evaluating our predictions
+
+[ClinVar](https://www.ncbi.nlm.nih.gov/clinvar/intro/) is a smaller database of mutation effects in proteins important to human health. We can evaluate our model's performance by comparing its predictions to the actual outcomes recorded in ClinVar.
 
 <Figure content={<Image path={require("./images/EVE-ClinVar.png")} />}>
   EVE outperforms other computational approaches of variant effect prediction in
@@ -189,9 +198,29 @@ Among this scarcity of experimental data, [ClinVar](https://www.ncbi.nlm.nih.gov
   similarly outperforms others models.
 </Figure>
 
-Incredibly, VAE models acquire such strong predictive power while being completely unsupervised: they has never seen _any_ labeled data of variant effects. They learn purely through studying the evolutionary sequences in the protein's family.
+On ClinVar, along with another experimental dataset of mutation effects, a VAE-based model called [EVE](https://github.com/OATML/EVE) did better than all previous models.
 
-### The power of latent variables
+Incredibly, VAE models acquire such strong predictive power while being completely **unsupervised**! They had never seen _any_ labeled data of mutation effects – and learned purely through studying the evolutionary sequences in the protein's family.
+
+### Predicting viral antibody escape
+
+A costly challenge during the COVID pandemic was the constant emergence of viral variants that evolved to escape our immune system, a phenomenon known as **antibody escape** (antibodies are our bodies' natural fighters that fend off the virus; vaccines work by boosting their presence).
+
+Could we have flagged such dangerous variants ahead of their breakout? Such early warnings would have won life-saving time for vaccine development.
+
+The VAE-based model EVE can help do exactly that. [EVEScape](https://evescape.org/) combines EVE's mutation fitness predictions with biophysical data to achieve accurate predictions of antibody escape.
+
+<Figure content={<Image path={require("./images/EVEScape.png")} />}>
+  TODO
+</Figure>
+
+Had we known...
+
+<Figure content={<Image path={require("./images/EVEScape-timeline.png")} />}>
+  TODO
+</Figure>
+
+## The power of latent variables
 
 When compared to independent position-wise models, the latent variable model is significantly more accurate for all possible mutations.
 
@@ -210,3 +239,5 @@ This demonstrates the flexibility of the latent variable model that can capture 
 Here's one way to look at these results. MSAs contain a wealth of information, some of which we can understand through simple statistics: <Link to="/protein-evolution/#counting-amino-acid-frequencies">position-wise frequencies</Link>, <Link to="/protein-evolution/#pairwise-frequencies">pair-wise frequencies</Link>, etc. Those models are interpretable but limiting – they fail at teasing out more complex, higher-order signals.
 
 Enter neural networks, which are much better than us at recognizing those signals hidden in MSAs. They known _where to look_, _what to look at_ – beyond our simple statistics. This comes at the cost of interpretability. The comparison between our VAE model and statistical models like <Link to="/protein-evolution">Direct Coupling Analysis (DCA)</Link> exemplifies these two paradigms.
+
+<NoteList />
