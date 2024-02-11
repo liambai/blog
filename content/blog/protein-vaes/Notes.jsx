@@ -13,6 +13,7 @@ const notes = {
       <span> for the a pair-wise model.</span>
     </>
   ),
+  3: "Antibodies are natural fighters in our bodies that fend off viruses. Vaccines work by amplifying them.",
 }
 
 export const { Note, NoteList } = getNoteComponents(notes)

@@ -1,7 +1,7 @@
 ---
 title: "Protein VAEs"
-date: "2024-01-15"
-description: Stuff
+date: "2024-02-11"
+description: Predicting variant effects with variational autoencoders. Machine learning for clinical decisions, improving pandemic preparedness by predicting antibody escape.
 ---
 
 import Figure from "../../../src/components/figure.jsx"
@@ -10,8 +10,9 @@ import LinkPreview from "../../../src/components/link-preview.jsx"
 import { Link } from "gatsby"
 import MSACoupling from "../protein-evolution/d3/MSACoupling.jsx"
 import { Note, NoteList } from "./Notes.jsx"
+import { Reference, ReferenceList } from "./References.jsx"
 
-Life, in essence, is a dizzying chemical dance choreographed by proteins. It's so mind-bendingly complex that most of its patterns still elude us. This blog is about the inadequate but inspiring ways we have of shedding light on this elusive dance – of understanding the methods in the madness. Here's one such method:
+Life, in essence, is a dizzying chemical dance choreographed by proteins. It's so incomprehensibly complex that most of its patterns still elude us. But there are methods in the madness – and finding them is the key to fighting disease and reducing suffering. Here is one:
 
 **Binding pockets** are "hands" that proteins use to act on their surroundings: [speed something up](https://en.wikipedia.org/wiki/Enzyme), [break something down](https://en.wikipedia.org/wiki/Protease), [guide something along](<https://en.wikipedia.org/wiki/Chaperone_(protein)>).
 
@@ -54,7 +55,7 @@ A possible explanation: these correlated positions form a binding pocket with so
 
 In a previous <Link to="/protein-evolution">post</Link>, we talked about ways of teasing out such information from MSAs using [pair-wise models](https://en.wikipedia.org/wiki/Potts_model) that account for every possible pair of positions. But what about the interactions between 3 positions? Or even more? Binding pockets, after all, are made up of many positions. Unfortunately, accounting for all the possible combinations in this way is computationally impossible.
 
-This post is about a solution to this problem of having to track these far-too-numerous combinations – using a tool from machine learning called **variational autoencoders (VAEs)**. If you're new to VAEs, check out this deep dive!
+This post is about a solution to this problem of accounting for these far-too-numerous combinations – using a tool from machine learning called **variational autoencoders (VAEs)**. If you're new to VAEs, check out this deep dive!
 
 <LinkPreview
   title="An introduction to variational autoencoders"
@@ -74,20 +75,21 @@ Imagine some vector $\mathbf{z}$, a **latent variable**, that distills all the i
     <Image path={require("../variational-autoencoder/images/MSA-latent.png")} />
   }
 >
-  Applying latent variable models like VAEs to MSAs. TODO: cite.
+  Applying latent variable models like VAEs to MSAs. Figure from{" "}
+  <Reference id={1} />.
 </Figure>
 
-We can view $\mathbf{z}$ as a form of data compression: the piles of sequences in this MSA into one small vector <Note id={1} />. Here's the key insight of VAEs: we might not actually know what the best way of doing this compression is; let's ask neural networks to figure it out. The neural network that creates $\mathbf{z}$ is called an **encoder**.
+We can view $\mathbf{z}$ as a form of data compression: piles of sequences in this MSA $\rightarrow$ one small vector <Note id={1} />. Here's the key insight of VAEs: we might not actually know what the best way of doing this compression is; let's ask neural networks to figure it out. The neural network that creates $\mathbf{z}$ is called an **encoder**.
 
 ### VAEs in a nutshell
 
-Given a protein sequence, let's ask the encoder: can you capture (in $\mathbf{z}$) its salient features? Things like: which residues form a binding pocket. There are 2 rules:
+Given a protein sequence, let's ask the encoder: can you capture (in $\mathbf{z}$) its salient features? Things like: which residues work together to form a binding pocket! There are 2 rules:
 
 1. No BS. You have to actually capture something meaningful about the input sequence. As a test, a neural network (called a **decoder**) needs to be able to tell from $\mathbf{z}$ what the input sequence was, reasonably well. This rule is called **reconstruction**.
 
 2. No rote memorization. If you merely memorize the input sequence, you'll be great at reconstruction but you'll be stumped by sequences you've never seen before. This rule is called **regularization**.
 
-A common theme of machine learning is the tension between these to rules – the need to artfully balance them. For VAEs, they define the two terms of the <Link to="/variational-autoencoder/#the-loss-function">loss function</Link> we use when training.
+A common theme of machine learning is the tension between these two rules – and the need to artfully balance them. For VAEs, they define the two terms of the <Link to="/variational-autoencoder/#the-loss-function">loss function</Link> we use while training.
 
 <Figure
   content={
@@ -104,32 +106,32 @@ A common theme of machine learning is the tension between these to rules – th
 
 ### The model
 
-OK, intuition aside, what do we actually mean by _model_? What are its inputs and outputs? Concretely, our model is just a function that takes a protein sequence, say ILAVP, and spits out a probability, $p(\mathrm{ILAVP})$:
+OK, intuition aside, what does the model actually do? What are its inputs and outputs? Concretely, our model is just a function that takes a protein sequence, say ILAVP, and spits out a probability, $p(\mathrm{ILAVP})$:
 
 $$
 \mathrm{ILAVP} \rightarrow p(\mathrm{ILAVP})
 $$
 
-With training, we want this probability to approximate how likely it is for ILAVP to have come from our MSA. In other words, how likely is it to be a functional variant of our protein?
+With training, we want this probability to approximate how likely is is for ILAVP to be a functional variant of our protein.
 
-This probability is the collaborative work of our encoder and decoder, which are trained together.
+This probability is the collaborative work of the encoder and the decoder, which are trained together.
 
 $$
 \mathrm{ILAVP} \xrightarrow{encoder} \mathbf{z} \xrightarrow{decoder} p(\mathrm{ILAVP})
 $$
 
-An accurate model is powerful. It enables us to make predictions about protein variants we've never seen before – including ones associated with disease – or even engineer new ones with properties we desire. More on this later!
+An accurate model is powerful. It enables us to make predictions about protein variants we've never seen before – including ones associated with disease – or even engineer new ones with properties we desire.
 
 ### Training & inference
 
 Training our model looks something like this:
 
-1. take an input sequence, say ILAVP, from the MSA.
-2. pass it through encoder and decoder: $\mathrm{ILAVP} \xrightarrow{encoder} \mathbf{z} \xrightarrow{decoder} p(\mathrm{ILAVP}).
+1. Take an input sequence, say ILAVP, from the MSA.
+2. Pass it through encoder and decoder: $\mathrm{ILAVP} \xrightarrow{encoder} \mathbf{z} \xrightarrow{decoder} p(\mathrm{ILAVP}).
 $
-3. compute the loss function.
-4. use gradient descent to update the encoder and decoder parameters (purple arrow).
-5. repeat.
+3. Compute the loss function.
+4. Use gradient descent to update the encoder and decoder parameters (purple arrow).
+5. Repeat.
 
 After going through each sequence in the MSA, our model should have a decent idea of what it's like to be this protein!
 
@@ -144,9 +146,9 @@ Now, when given an unknown input sequence, we can pass it through the VAE in th
   }
 ></Figure>
 
-Once training, we can think of our model's predictions, e.g. $p(\mathrm{ILAVP})$, as a measure of the fitness.
+Once trained, we can think of our model's predictions, e.g. $p(\mathrm{ILAVP})$, as a measure of fitness:
 
-- $p(\mathrm{ILAVP})$ is low $\rightarrow$ ILAVP probably won't even fold into a working protein.
+- $p(\mathrm{ILAVP})$ is low $\rightarrow$ ILAVP is garbage and probably won't even fold into a working protein.
 - $p(\mathrm{ILAVP})$ is high $\rightarrow$ ILAVP fits right in with the natural variants of this protein – and probably works great.
 
 Now, let's put our model to use.
@@ -157,21 +159,28 @@ Now, let's put our model to use.
 
 The explosion in DNA sequencing technology in the last decade came with a conundrum: the enormous amounts of sequence data we unlocked far exceeds our ability to understand them.
 
-For example, [genomAD](https://gnomad.broadinstitute.org/) is a massive database of sequence data. If we look at all the human protein variants in genomAD and ask: for how many of these do we know their disease consequences? The answer: a mere 2%. We are deeply ignorant about the proteins in our bodies and how their malfunctions cause disease.
+For example, [genomAD](https://gnomad.broadinstitute.org/) is a massive database of sequence data. If we look at all the human protein variants in genomAD and ask: for how many of these do we know their disease consequences? The answer is: a mere 2%. This means that:
 
-Now, image a tool that can look at every of possible variant of a protein and make a prediction about its consequence. Something like this, where blue means good and red means bad.
+1. We are deeply ignorant about the proteins in our bodies and how their malfunctions cause disease.
+
+2. Unsupervised approaches like VAEs that don't require training on experimental data on disease outcomes can make a big impact.
+
+Imagine an in-silico tool that can look at every of possible variant of a protein and make a prediction about its consequence: producing a heatmap like this, where red indicates potentially pathogenic variants to watch out for.
 
 <Figure
   content={<Image path={require("./images/mutation-effect-heatmap.png")} />}
 >
-  TODO
+  [EVE (Evolutionary model for Variant Effect)](https://evemodel.org/) is a
+  protein VAE. Here is a heatmap of it's predictions on the
+  [SCN1B](https://en.wikipedia.org/wiki/SCN1B) protein. Blue = beneficial; red =
+  pathogenic.
 </Figure>
 
-A map like this, if dependable, so valuable precisely because of our lack of experimental data. It fills the gaps in our understanding.
+A map like this, if dependable, is so valuable precisely because of our lack of experimental data. It enables physicians to make clinical decisions tailored to a specific patient's biology – a growing field known as [precision medicine](https://en.wikipedia.org/wiki/Personalized_medicine).
 
-### The log ratio
+### Computing pathogenicity scores
 
-Here's how we can compute such a map like that with our VAE. Given a natural sequence (called wild-type) and a mutant sequence, the log ratio
+Here's how we can compute such a map like that. Given a natural sequence (called **wild-type**) and a mutant sequence, the log ratio
 
 $$
 \log\frac{p(\text{mutant})}{p(\text{wild-type})}
@@ -183,61 +192,108 @@ measures the improvement of the mutant over the wild-type <Note id={2} />.
 
 - If our model favors the wild-type over the mutant $\rightarrow$ $p(\text{wild-type}) > p(\text{mutant})$ $\rightarrow$ negative log ratio $\rightarrow$ the mutation is likely harmful.
 
-We can create our map by simply computing this log ratio for every possible mutation at every possible position.
+We can create our map by simply computing this log ratio, a pathogenicity score, for every possible mutation at each position.
 
 ### Evaluating our predictions
 
-[ClinVar](https://www.ncbi.nlm.nih.gov/clinvar/intro/) is a smaller database of mutation effects in proteins important to human health. We can evaluate our model's performance by comparing its predictions to the actual outcomes recorded in ClinVar.
+We can evaluate our model on how well its predictions match up with actual experimental datasets. One two such datasets, the VAE-based [EVE](https://evemodel.org/) did better than all previous models.
 
 <Figure content={<Image path={require("./images/EVE-ClinVar.png")} />}>
-  EVE outperforms other computational approaches of variant effect prediction in
-  concordance with ClinVar. On the y-axis, [Deep Mutational Scanning
-  (DMS)](https://www.nature.com/articles/nmeth.3027) is an experimental method
-  for screening a large set of variants for a specific function, another source
-  of experimental labels. When evaluated on the concordance with DMS data, EVE
-  similarly outperforms others models.
+  EVE outperforms other computational methods of variant effect prediction in
+  concordance with 2 experimental dataset. On the x-axis,
+  [ClinVar](https://www.ncbi.nlm.nih.gov/clinvar/intro/) is a database of
+  mutation effects in proteins important to human health. On the y-axis, [Deep
+  Mutational Scanning (DMS)](https://www.nature.com/articles/nmeth.3027) is an
+  experimental method for screening a large set of variants for a specific
+  function. Figure from <Reference id={2} />.
 </Figure>
 
-On ClinVar, along with another experimental dataset of mutation effects, a VAE-based model called [EVE](https://github.com/OATML/EVE) did better than all previous models.
-
-Incredibly, VAE models acquire such strong predictive power while being completely **unsupervised**! They had never seen _any_ labeled data of mutation effects – and learned purely through studying the evolutionary sequences in the protein's family.
+Remarkably, EVE acquired such strong predictive power despite being completely unsupervised! Having never seen any labeled data of mutation effects, it learned entirely through studying the evolutionary sequences in the protein's family.
 
 ### Predicting viral antibody escape
 
-A costly challenge during the COVID pandemic was the constant emergence of viral variants that evolved to escape our immune system, a phenomenon known as **antibody escape** (antibodies are our bodies' natural fighters that fend off the virus; vaccines work by boosting their presence).
+A costly challenge during the COVID pandemic was the constant emergence of viral variants that evolved to escape our immune system, a phenomenon known as **antibody escape** <Note id={3}/>.
 
-Could we have flagged such dangerous variants ahead of their breakout? Such early warnings would have won life-saving time for vaccine development.
+Could we have flagged these dangerous variants ahead of their breakout? Such early warnings would have won life-saving time for vaccine development.
 
-The VAE-based model EVE can help do exactly that. [EVEScape](https://evescape.org/) combines EVE's mutation fitness predictions with biophysical data to achieve accurate predictions of antibody escape.
+VAEs to the rescue. [EVEScape](https://evescape.org/) is a new tool that combines EVE's mutation fitness predictions with biophysical data to achieve accurate predictions on antibody escape.
 
 <Figure content={<Image path={require("./images/EVEScape.png")} />}>
-  TODO
+  Given a mutation, [EVEScape](https://evescape.org/) leverages the VAE-based
+  EVE's predictions in conjunction with biophysical information to produce a
+  score, $P(\text{mutation escapes immunity})$. This score indicates the how likely it is for the mutation to cause antibody escape; a high score is an alarm call. Figure from <Reference id={3} />.
 </Figure>
 
-Had we known...
+Had we employed EVEScape early in the pandemic – which only requires information available at the time – we would have been alerted of harmful variants months before their breakout.
 
 <Figure content={<Image path={require("./images/EVEScape-timeline.png")} />}>
-  TODO
+  Figure from <Reference id={3} />.
 </Figure>
+
+Machine learning tools like EVEScape, also applicable to other viruses such influenza and HIV, will play a big role in public health decision-making and pandemic preparedness in the future.
 
 ## The power of latent variables
 
-When compared to independent position-wise models, the latent variable model is significantly more accurate for all possible mutations.
+### VAEs capture complex interactions
+
+Compared to previous <Link to="/protein-evolution">statistical models</Link>, VAE's are much more performant.
 
 <Figure
   content={<Image path={require("./images/DeepSequence-vs-others.png")} />}
-></Figure>
+>
+  Comparing a VAE called
+  [DeepSequence](https://www.nature.com/articles/s41592-018-0138-4) to
+  statistical models on variant effect prediction, evaluated on [Deep Mutational
+  Scanning (DMS)](https://www.nature.com/articles/nmeth.3027) datasets. Black
+  dots are results of [pair-wise
+  models](https://liambai.com/protein-evolution/#pairwise-frequencies); grey
+  dots are results of [position-wise
+  models](https://liambai.com/protein-evolution/#counting-amino-acid-frequencies).
+  Figure from <Reference id={1} />.
+</Figure>
 
-The sites at which their accuracy improved the most are ones that cooperate with several other sites.
+The positions at which their accuracy improved the most are ones that cooperate with several other positions, e.g. in forming a binding pocket! The latent variable model is better at capturing these complex, multi-position interactions.
 
 <Figure
   content={<Image path={require("./images/DeepSequence-vs-independent.png")} />}
 ></Figure>
 
-This demonstrates the flexibility of the latent variable model that can capture higher-order interactions.
-
 Here's one way to look at these results. MSAs contain a wealth of information, some of which we can understand through simple statistics: <Link to="/protein-evolution/#counting-amino-acid-frequencies">position-wise frequencies</Link>, <Link to="/protein-evolution/#pairwise-frequencies">pair-wise frequencies</Link>, etc. Those models are interpretable but limiting – they fail at teasing out more complex, higher-order signals.
 
-Enter neural networks, which are much better than us at recognizing those signals hidden in MSAs. They known _where to look_, _what to look at_ – beyond our simple statistics. This comes at the cost of interpretability. The comparison between our VAE model and statistical models like <Link to="/protein-evolution">Direct Coupling Analysis (DCA)</Link> exemplifies these two paradigms.
+Enter neural networks, which are much better than us at recognizing those signals hidden in MSAs. They known _where to look_, _what to look at_ – beyond our simple statistics. Like many advancements in machine learning, it's an exercise in humility.
+
+### Conceding our ignorance
+
+Computer vision had a similar Eureka moment. When processing an image – in the gory details of its complex pixels arrangements – a first step is to extract some salients features, e.g. vertical edges. To do that, we can use a matrix called a **filter** (also known as a **kernel**).
+
+<Figure content={<Image path={require("./images/filter.png")} />}></Figure>
+
+For example, this 3x3 matrix encodes what it means to be a vertical edge. Multiplying it element-wise with each patch in our image and summing the results tells us how much that patch resembles a vertical edge. This is called a **convolution**.
+
+For a while, researchers came up with better engineered filters, each with their own complex mathematical justifications. For example, there was the [Sobel filter](https://en.wikipedia.org/wiki/Sobel_operator), the [Scharr filter](https://plantcv.readthedocs.io/en/v3.0.5/scharr_filter/)...
+
+<Figure
+  content={<Image path={require("./images/sobel-vs-scharr.png")} />}
+></Figure>
+
+But what if we don't really know what the best filter looks like? In fact, we probably don't even know _what to look for_: vertical edges, horizontal edges, 45% edges, something else entirely... So why not leave these as parameters to be learned by neural networks? That's the key insight of [Yann LeCun](https://en.wikipedia.org/wiki/Yann_LeCun) in his early work on character recognition, which started a revolution in computer vision.
+
+<Figure
+  content={
+    <Image
+      path={require("./images/learned-filter.png")}
+      width="40%"
+      mobileWidth="50%"
+    />
+  }
+></Figure>
+
+In essence, we are recognizing our ignorance: we don't know what's best, but neural nets, trained end-to-end, might. This idea has played out time and again. To excel at protein structure prediction, AlphaFold similarly limited opinionated processing on MSAs and took in raw sequences instead. Compared to previous statistical models, our VAEs do the exact same thing here.
+
+But of course, the effectiveness of these methods comes at the cost of interpretability.
+
+## References
+
+<ReferenceList />
 
 <NoteList />
