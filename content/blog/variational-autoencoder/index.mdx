@@ -225,7 +225,7 @@ In contrast, variational inference looks at a family of distributions and tries 
 
 <Figure content={<VariationalInference />}>
   Try adjusting the the mean and variance of the normal distribution to fit the
-  observations (blue dots). In essense, varational inference is all about doing
+  observations (blue dots). In essence, variational inference is all about doing
   these adjustments.
 </Figure>
 
@@ -295,7 +295,7 @@ Since $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ cannot be negative <Note 
 <Figure content={<Slider />}>
   Adjust the slider to mimic the process of maximizing ELBO, a lower bound on
   the (log-)evidence. Since $D_{KL}(q(z | \mathbf{x}) || p(z | \mathbf{x}))$ is
-  the "distance" between ELBO and $\log(p(\mathbf{x}))$, our orginial goal of
+  the "distance" between ELBO and $\log(p(\mathbf{x}))$, our original goal of
   minimizing it brings ELBO closer to $\log(p(\mathbf{x}))$.
 </Figure>
 
@@ -454,7 +454,7 @@ In a <Link to="/protein-evolution">previous post</Link>, we talked about ways to
   structure. Hover over the blue link to highlight the contacting positions.
 </Figure>
 
-We talked about position-wise models that look at each position and [pair-wise models](https://en.wikipedia.org/wiki/Potts_model) that consider all possible pairs of positions. But what about the interactions between 3 positions? Or even more? Those higher-order interactions are commonplace in natural proteins but modelling them is unfortunately computationally unfeasible.
+We talked about position-wise models that look at each position and [pair-wise models](https://en.wikipedia.org/wiki/Potts_model) that consider all possible pairs of positions. But what about the interactions between 3 positions? Or even more? Those higher-order interactions are commonplace in natural proteins but modelling them is unfortunately computationally infeasible.
 
 ### Variational autoencoders for proteins
 
@@ -473,7 +473,7 @@ In [this work](https://www.nature.com/articles/s41592-018-0138-4), researchers f
 
 I am inspired by this [blog post](https://jaan.io/what-is-variational-autoencoder-vae-tutorial/) by Jaan Altosaar and this [blog post](https://lilianweng.github.io/posts/2018-08-12-vae/) by Lilian Weng, both of which are superb and go into more technical details.
 
-Also, check out the cool [paper](https://www.nature.com/articles/s41592-018-0138-4) from the Marks lab applying VAEs to protein sequences. You should have the theorical tools to understand it well.
+Also, check out the cool [paper](https://www.nature.com/articles/s41592-018-0138-4) from the Marks lab applying VAEs to protein sequences. You should have the theoretical tools to understand it well.
 
 ## References
 
