@@ -266,6 +266,19 @@ const BetaLactamaseTopTokens = () => {
       .style("opacity", 0)
       .style("z-index", 1000)
 
+    // Create function to handle tooltip events
+    const handleMouseOver = (event, i, j, logitValue) => {
+      tooltip.transition().duration(200).style("opacity", 0.9)
+      tooltip
+        .html(`Position: ${j + 1}<br>Layer: ${i + 1}<br>Logit: ${logitValue}`)
+        .style("left", event.pageX + 10 + "px")
+        .style("top", event.pageY - 28 + "px")
+    }
+
+    const handleMouseOut = () => {
+      tooltip.transition().duration(500).style("opacity", 0)
+    }
+
     // Create heatmap cells
     for (let i = 0; i < tokens.length; i++) {
       for (let j = 0; j < tokens[i].length; j++) {
@@ -287,15 +300,9 @@ const BetaLactamaseTopTokens = () => {
             .attr("stroke-width", 0.5)
             .style("cursor", "pointer")
             .on("mouseover", function (event) {
-              tooltip.transition().duration(200).style("opacity", 0.9)
-              tooltip
-                .html(`Position: ${j + 1}<br>Logit: ${logitValue.toFixed(2)}`)
-                .style("left", event.pageX + 10 + "px")
-                .style("top", event.pageY - 28 + "px")
+              handleMouseOver(event, i, j, logitValue)
             })
-            .on("mouseout", function () {
-              tooltip.transition().duration(500).style("opacity", 0)
-            })
+            .on("mouseout", handleMouseOut)
 
           svg
             .append("text")
@@ -308,15 +315,9 @@ const BetaLactamaseTopTokens = () => {
             .style("cursor", "pointer")
             .text(tokens[i][j])
             .on("mouseover", function (event) {
-              tooltip.transition().duration(200).style("opacity", 0.9)
-              tooltip
-                .html(`Position: ${j + 1}<br>Logit: ${logitValue.toFixed(2)}`)
-                .style("left", event.pageX + 10 + "px")
-                .style("top", event.pageY - 28 + "px")
+              handleMouseOver(event, i, j, logitValue)
             })
-            .on("mouseout", function () {
-              tooltip.transition().duration(500).style("opacity", 0)
-            })
+            .on("mouseout", handleMouseOut)
         }
       }
     }
