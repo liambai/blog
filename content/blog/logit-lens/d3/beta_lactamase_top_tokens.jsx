@@ -134,7 +134,7 @@ const BetaLactamaseTopTokens = () => {
     d3.select(svgRef.current).selectAll("*").remove()
     d3.select(yAxisRef.current).selectAll("*").remove()
 
-    const margin = { top: 20, right: 25, bottom: 30, left: 50 }
+    const margin = { top: 20, right: 25, bottom: 25, left: 50 }
     const width =
       Math.max(tokens[0].length * 20, 800) - margin.left - margin.right
     const height =
@@ -236,7 +236,7 @@ const BetaLactamaseTopTokens = () => {
       svg
         .append("text")
         .attr("x", j * cellWidth + cellWidth / 2)
-        .attr("y", height + 20)
+        .attr("y", height + 16)
         .attr("text-anchor", "middle")
         .attr("font-size", "12px")
         .attr("fill", textColor)
@@ -373,14 +373,7 @@ const BetaLactamaseTopTokens = () => {
       </h2>
 
       <div style={{ display: "flex" }}>
-        <div
-          style={{
-            position: "sticky",
-            left: 0,
-            zIndex: 10,
-            backgroundColor: "white",
-          }}
-        >
+        <div>
           <svg ref={yAxisRef}></svg>
         </div>
         <div
@@ -397,15 +390,13 @@ const BetaLactamaseTopTokens = () => {
       {/* Sticky label for the amino acid sequence */}
       <div
         style={{
-          position: "sticky",
-          bottom: isFullScreen ? "60px" : "50px",
           width: "100%",
           textAlign: "center",
           backgroundColor: "white",
-          zIndex: 99,
           fontWeight: 500,
           fontSize: 12,
           paddingLeft: 50,
+          marginBottom: 15,
         }}
       >
         True Amino Acid Sequence
