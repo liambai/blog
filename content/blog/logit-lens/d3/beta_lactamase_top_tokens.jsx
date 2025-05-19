@@ -11,18 +11,14 @@ const SEQ =
 // Parse CSV data only once outside the component
 const parseCSVData = () => {
   // Parse CSV data
-  const tokensData = Papa.parse(tokensCSVText, {
+  const tokens = Papa.parse(tokensCSVText, {
     header: false,
     dynamicTyping: false, // Ensure values are kept as strings
   }).data
-  const logitsData = Papa.parse(logitsCSVText, {
+  const logits = Papa.parse(logitsCSVText, {
     header: false,
     dynamicTyping: true, // Keep dynamic typing for numeric values
   }).data
-
-  // Remove empty rows
-  const tokens = tokensData.filter(row => row.length > 1)
-  const logits = logitsData.filter(row => row.length > 1)
 
   return { tokens, logits }
 }
@@ -356,6 +352,7 @@ const BetaLactamaseTopTokens = () => {
       className="beta-lactamase-heatmap"
       style={{
         position: "relative",
+        marginBottom: 10,
         ...fullScreenStyle,
       }}
     >
