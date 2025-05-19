@@ -162,14 +162,17 @@ const BetaLactamaseTopTokens = () => {
 
     // Add Y axis labels manually at the center of each cell
     for (let i = 0; i < tokens.length; i++) {
-      yAxisSvg
-        .append("text")
-        .attr("x", -5)
-        .attr("y", i * cellHeight + cellHeight / 2)
-        .attr("text-anchor", "end")
-        .attr("dominant-baseline", "middle")
-        .attr("font-size", "12px")
-        .text(i + 1)
+      // Show label only for first, last, and every 5th layer
+      if (i === 0 || i === tokens.length - 1 || (i + 1) % 5 === 0) {
+        yAxisSvg
+          .append("text")
+          .attr("x", -5)
+          .attr("y", i * cellHeight + cellHeight / 2)
+          .attr("text-anchor", "end")
+          .attr("dominant-baseline", "middle")
+          .attr("font-size", "12px")
+          .text(i + 1)
+      }
     }
 
     // Add Y axis label
