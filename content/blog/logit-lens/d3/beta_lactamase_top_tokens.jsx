@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react"
 import * as d3 from "d3"
 import Papa from "papaparse"
-import tokensCSVText from "!!raw-loader!../data/top_tokens.csv"
-import logitsCSVText from "!!raw-loader!../data/top_logits.csv"
+import tokensCSVText from "!!raw-loader!../data/beta_lactamase_top_tokens.csv"
+import logitsCSVText from "!!raw-loader!../data/beta_lactamase_top_logits.csv"
 
 const SEQ =
   "SPQPLEQIKLSESQLSGRVGMIEMDLASGRTLTAWRADERFPMMSTFKVVLCGAVLARVDAGDEQLERKIHYRQQDLVDYSPVSEKHLADGMTVGELCAAAITMSDNSAANLLLATVGGPAGLTAFLRQIGDNVTRLDRWETELNEALPGDARDTTTPASMAATLRKLLTSQRLSARSQRQLLQWMVDDRVAGPLIRSVLPAGWFIADKTGAGERGARGIVALLGPNNKAERIVVIYLRDTPASMAERNQQIAGIGAALIEHWQR"
@@ -51,9 +51,9 @@ const BetaLactamaseTopTokens = () => {
 
     d3.select(legendRef.current).selectAll("*").remove()
 
-    const margin = { top: 25, right: 10, bottom: 20, left: 10 }
-    const legendWidth = 200
-    const legendHeight = 20
+    const margin = { top: 20, right: 10, bottom: 20, left: 10 }
+    const legendWidth = 250
+    const legendHeight = 18
 
     const svg = d3
       .select(legendRef.current)
@@ -359,12 +359,23 @@ const BetaLactamaseTopTokens = () => {
         ...fullScreenStyle,
       }}
     >
+      <h2
+        style={{
+          textAlign: "center",
+          marginLeft: 50,
+          fontSize: "1.2rem",
+          fontWeight: "bold",
+        }}
+      >
+        Beta-Lactamase (PDB 4ZAM) Top Tokens by Logit
+      </h2>
+
       <button
         onClick={toggleFullScreen}
         style={{
           position: "absolute",
-          top: "10px",
-          right: "10px",
+          top: 80,
+          right: 10,
           zIndex: 1001,
           padding: "8px 12px",
           background: "#4a4a4a",
@@ -422,12 +433,12 @@ const BetaLactamaseTopTokens = () => {
       <div
         style={{
           position: "sticky",
-          left: 50,
           zIndex: 100,
           backgroundColor: "white",
           padding: "5px",
           boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
           borderRadius: "4px",
+          marginLeft: 50,
           marginBottom: 12,
           width: "fit-content",
         }}
