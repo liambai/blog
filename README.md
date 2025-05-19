@@ -6,7 +6,10 @@ https://liambai.com/
 
 ### Run locally
 
+Works with node v22
+
 ```
+yarn install
 yarn develop
 ```
 

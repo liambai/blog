@@ -1,6 +1,5 @@
 import React from "react"
 import getNoteComponents from "../../../src/components/notes"
-import { InlineMath } from "react-katex"
 
 const notes = {
   1: "Typically: z is a vector of ~30 numbers, each protein sequence are a few hundred characters long, MSAs have >1000 sequences.",
