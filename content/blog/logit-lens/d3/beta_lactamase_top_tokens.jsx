@@ -10,12 +10,98 @@ const SEQ =
 const BetaLactamaseTopTokens = () => {
   const svgRef = useRef(null)
   const yAxisRef = useRef(null)
+  const legendRef = useRef(null)
   const containerRef = useRef(null)
   const scrollContainerRef = useRef(null)
   const [isFullScreen, setIsFullScreen] = useState(false)
+  const [colorScaleData, setColorScaleData] = useState({
+    minLogit: 0,
+    maxLogit: 1,
+  })
 
   const toggleFullScreen = () => {
     setIsFullScreen(!isFullScreen)
+  }
+
+  const renderLegend = () => {
+    const { minLogit, maxLogit } = colorScaleData
+    if (minLogit === undefined || maxLogit === undefined) return
+
+    d3.select(legendRef.current).selectAll("*").remove()
+
+    const margin = { top: 25, right: 10, bottom: 20, left: 10 }
+    const legendWidth = 200
+    const legendHeight = 20
+
+    const svg = d3
+      .select(legendRef.current)
+      .attr("width", legendWidth + margin.left + margin.right)
+      .attr("height", legendHeight + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${margin.left}, ${margin.top})`)
+
+    const legendScale = d3
+      .scaleLinear()
+      .domain([minLogit, maxLogit])
+      .range([0, legendWidth])
+
+    const legendAxis = d3
+      .axisBottom(legendScale)
+      .ticks(5)
+      .tickFormat(d3.format(".1f"))
+
+    // Create color scale
+    const colorScale = d3
+      .scaleSequential()
+      .domain([minLogit, maxLogit])
+      .interpolator(d3.interpolateViridis)
+
+    // Create gradient for legend
+    const defs = svg.append("defs")
+
+    const gradient = defs
+      .append("linearGradient")
+      .attr("id", "legend-gradient")
+      .attr("x1", "0%")
+      .attr("y1", "0%")
+      .attr("x2", "100%")
+      .attr("y2", "0%")
+
+    // Add gradient stops
+    const numStops = 10
+    for (let i = 0; i <= numStops; i++) {
+      const offset = i / numStops
+      const value = minLogit + offset * (maxLogit - minLogit)
+
+      gradient
+        .append("stop")
+        .attr("offset", `${offset * 100}%`)
+        .attr("stop-color", colorScale(value))
+    }
+
+    // Draw legend rectangle
+    svg
+      .append("rect")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", legendWidth)
+      .attr("height", legendHeight)
+      .style("fill", "url(#legend-gradient)")
+
+    // Add legend axis
+    svg
+      .append("g")
+      .attr("transform", `translate(0, ${legendHeight})`)
+      .call(legendAxis)
+
+    // Add legend title
+    svg
+      .append("text")
+      .attr("x", legendWidth / 2)
+      .attr("y", -5)
+      .attr("text-anchor", "middle")
+      .attr("font-size", "12px")
+      .text("Logit Value")
   }
 
   const renderHeatmap = (tokens, logits) => {
@@ -26,7 +112,7 @@ const BetaLactamaseTopTokens = () => {
     d3.select(yAxisRef.current).selectAll("*").remove()
 
     // Set dimensions
-    const margin = { top: 50, right: 25, bottom: 50, left: 50 }
+    const margin = { top: 20, right: 25, bottom: 30, left: 50 }
     const width =
       Math.max(tokens[0].length * 20, 800) - margin.left - margin.right
     const height =
@@ -44,6 +130,9 @@ const BetaLactamaseTopTokens = () => {
 
     const minLogit = d3.min(flatLogits)
     const maxLogit = d3.max(flatLogits)
+
+    // Update color scale data for the legend
+    setColorScaleData({ minLogit, maxLogit })
 
     // Create color scale
     const colorScale = d3
@@ -180,80 +269,6 @@ const BetaLactamaseTopTokens = () => {
         }
       }
     }
-
-    // Add color legend
-    const legendWidth = 200
-    const legendHeight = 20
-
-    // Position legend in top left corner
-    const legendX = 0
-    const legendY = 620
-
-    const legendScale = d3
-      .scaleLinear()
-      .domain([minLogit, maxLogit])
-      .range([0, legendWidth])
-
-    const legendAxis = d3
-      .axisBottom(legendScale)
-      .ticks(5)
-      .tickFormat(d3.format(".1f"))
-
-    // Create gradient for legend
-    const defs = svg.append("defs")
-
-    const gradient = defs
-      .append("linearGradient")
-      .attr("id", "legend-gradient")
-      .attr("x1", "0%")
-      .attr("y1", "0%")
-      .attr("x2", "100%")
-      .attr("y2", "0%")
-
-    // Add gradient stops
-    const numStops = 10
-    for (let i = 0; i <= numStops; i++) {
-      const offset = i / numStops
-      const value = minLogit + offset * (maxLogit - minLogit)
-
-      gradient
-        .append("stop")
-        .attr("offset", `${offset * 100}%`)
-        .attr("stop-color", colorScale(value))
-    }
-
-    // Draw legend rectangle
-    svg
-      .append("rect")
-      .attr("x", legendX)
-      .attr("y", legendY)
-      .attr("width", legendWidth)
-      .attr("height", legendHeight)
-      .style("fill", "url(#legend-gradient)")
-
-    // Add legend axis
-    svg
-      .append("g")
-      .attr("transform", `translate(${legendX}, ${legendY + legendHeight})`)
-      .call(legendAxis)
-
-    // Add legend title
-    svg
-      .append("text")
-      .attr("x", legendX + legendWidth / 2)
-      .attr("y", legendY - 5)
-      .attr("text-anchor", "middle")
-      .attr("font-size", "12px")
-      .text("Logit Value")
-
-    // Add title
-    svg
-      .append("text")
-      .attr("x", width / 2)
-      .attr("y", -20)
-      .attr("text-anchor", "middle")
-      .attr("font-size", "16px")
-      .attr("font-weight", "bold")
   }
 
   useEffect(() => {
@@ -281,6 +296,11 @@ const BetaLactamaseTopTokens = () => {
 
     processData()
   }, [isFullScreen]) // Re-render when fullscreen state changes
+
+  // Render the legend whenever colorScaleData changes
+  useEffect(() => {
+    renderLegend()
+  }, [colorScaleData])
 
   const fullScreenStyle = isFullScreen
     ? {
@@ -366,6 +386,25 @@ const BetaLactamaseTopTokens = () => {
           </>
         )}
       </button>
+
+      {/* Fixed legend positioned at the top */}
+      <div
+        style={{
+          position: "sticky",
+          top: isFullScreen ? "10px" : "0",
+          left: 50,
+          zIndex: 100,
+          backgroundColor: "white",
+          padding: "5px",
+          boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+          borderRadius: "4px",
+          marginBottom: "10px",
+          width: "fit-content",
+        }}
+      >
+        <svg ref={legendRef} width="220" height="50"></svg>
+      </div>
+
       <div style={{ display: "flex" }}>
         <div
           style={{
@@ -384,10 +423,7 @@ const BetaLactamaseTopTokens = () => {
             overflowY: "auto",
           }}
         >
-          <svg
-            style={{ height: isFullScreen ? "calc(100vh - 40px)" : "720px" }}
-            ref={svgRef}
-          ></svg>
+          <svg ref={svgRef}></svg>
         </div>
       </div>
     </div>
