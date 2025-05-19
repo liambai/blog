@@ -121,10 +121,10 @@ const BetaLactamaseTopTokens = () => {
     svg
       .append("text")
       .attr("x", legendWidth / 2)
-      .attr("y", -5)
+      .attr("y", -6)
       .attr("text-anchor", "middle")
       .attr("font-size", "12px")
-      .text("Logit Value")
+      .text("logit value")
   }
 
   const renderHeatmap = (tokens, logits) => {
@@ -134,7 +134,6 @@ const BetaLactamaseTopTokens = () => {
     d3.select(svgRef.current).selectAll("*").remove()
     d3.select(yAxisRef.current).selectAll("*").remove()
 
-    // Set dimensions
     const margin = { top: 20, right: 25, bottom: 30, left: 50 }
     const width =
       Math.max(tokens[0].length * 20, 800) - margin.left - margin.right
@@ -364,60 +363,14 @@ const BetaLactamaseTopTokens = () => {
         style={{
           textAlign: "center",
           marginLeft: 50,
+          marginTop: 15,
+          marginBottom: 15,
           fontSize: "1.2rem",
           fontWeight: "bold",
         }}
       >
         Beta-Lactamase (PDB 4ZAM) Top Tokens by Logit
       </h2>
-
-      <button
-        onClick={toggleFullScreen}
-        style={{
-          position: "absolute",
-          top: 80,
-          right: 10,
-          zIndex: 1001,
-          padding: "8px 12px",
-          background: "#4a4a4a",
-          color: "white",
-          border: "none",
-          borderRadius: "4px",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          gap: "5px",
-        }}
-      >
-        {isFullScreen ? (
-          <>
-            <RiFullscreenExitFill size={16} />
-            Exit Full Screen
-          </>
-        ) : (
-          <>
-            <RiFullscreenFill size={16} />
-            Full Screen
-          </>
-        )}
-      </button>
-
-      {/* Fixed legend positioned at the top */}
-      <div
-        style={{
-          position: "sticky",
-          zIndex: 100,
-          backgroundColor: "white",
-          padding: "5px",
-          boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-          borderRadius: "4px",
-          marginLeft: 50,
-          marginBottom: 12,
-          width: "fit-content",
-        }}
-      >
-        <svg ref={legendRef} width="220" height="50"></svg>
-      </div>
 
       <div style={{ display: "flex" }}>
         <div
@@ -445,17 +398,74 @@ const BetaLactamaseTopTokens = () => {
       <div
         style={{
           position: "sticky",
-          bottom: isFullScreen ? "10px" : "0",
+          bottom: isFullScreen ? "60px" : "50px",
           width: "100%",
           textAlign: "center",
           backgroundColor: "white",
-          zIndex: 100,
+          zIndex: 99,
           fontWeight: 500,
           fontSize: 12,
           paddingLeft: 50,
         }}
       >
         True Amino Acid Sequence
+      </div>
+
+      {/* Bottom controls section */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginTop: 10,
+          paddingLeft: 50,
+          position: "sticky",
+          bottom: 0,
+          backgroundColor: "white",
+          zIndex: 100,
+        }}
+      >
+        {/* Legend positioned at the bottom */}
+        <div
+          style={{
+            backgroundColor: "white",
+            padding: "5px",
+            boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+            borderRadius: "4px",
+            width: "fit-content",
+          }}
+        >
+          <svg ref={legendRef} width="220" height="50"></svg>
+        </div>
+
+        {/* Full screen button */}
+        <button
+          onClick={toggleFullScreen}
+          style={{
+            padding: "8px 12px",
+            background: "#4a4a4a",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            marginRight: 10,
+          }}
+        >
+          {isFullScreen ? (
+            <>
+              <RiFullscreenExitFill size={16} />
+              Exit Full Screen
+            </>
+          ) : (
+            <>
+              <RiFullscreenFill size={16} />
+              Full Screen
+            </>
+          )}
+        </button>
       </div>
     </div>
   )
