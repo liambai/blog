@@ -3,6 +3,7 @@ import * as d3 from "d3"
 import Papa from "papaparse"
 import tokensCSVText from "!!raw-loader!../data/beta_lactamase_top_tokens.csv"
 import logitsCSVText from "!!raw-loader!../data/beta_lactamase_top_logits.csv"
+import { RiFullscreenFill, RiFullscreenExitFill } from "react-icons/ri"
 
 const SEQ =
   "SPQPLEQIKLSESQLSGRVGMIEMDLASGRTLTAWRADERFPMMSTFKVVLCGAVLARVDAGDEQLERKIHYRQQDLVDYSPVSEKHLADGMTVGELCAAAITMSDNSAANLLLATVGGPAGLTAFLRQIGDNVTRLDRWETELNEALPGDARDTTTPASMAATLRKLLTSQRLSARSQRQLLQWMVDDRVAGPLIRSVLPAGWFIADKTGAGERGARGIVALLGPNNKAERIVVIYLRDTPASMAERNQQIAGIGAALIEHWQR"
@@ -390,40 +391,12 @@ const BetaLactamaseTopTokens = () => {
       >
         {isFullScreen ? (
           <>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M1 6V1H6M10 1H15V6M15 10V15H10M6 15H1V10"
-                stroke="white"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <RiFullscreenExitFill size={16} />
             Exit Full Screen
           </>
         ) : (
           <>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M6 1H1V6M10 1H15V6M15 10V15H10M6 15H1V10"
-                stroke="white"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <RiFullscreenFill size={16} />
             Full Screen
           </>
         )}
