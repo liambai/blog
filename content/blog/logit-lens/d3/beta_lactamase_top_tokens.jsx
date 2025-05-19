@@ -7,6 +7,28 @@ import logitsCSVText from "!!raw-loader!../data/top_logits.csv"
 const SEQ =
   "SPQPLEQIKLSESQLSGRVGMIEMDLASGRTLTAWRADERFPMMSTFKVVLCGAVLARVDAGDEQLERKIHYRQQDLVDYSPVSEKHLADGMTVGELCAAAITMSDNSAANLLLATVGGPAGLTAFLRQIGDNVTRLDRWETELNEALPGDARDTTTPASMAATLRKLLTSQRLSARSQRQLLQWMVDDRVAGPLIRSVLPAGWFIADKTGAGERGARGIVALLGPNNKAERIVVIYLRDTPASMAERNQQIAGIGAALIEHWQR"
 
+// Parse CSV data only once outside the component
+const parseCSVData = () => {
+  // Parse CSV data
+  const tokensData = Papa.parse(tokensCSVText, {
+    header: false,
+    dynamicTyping: false, // Ensure values are kept as strings
+  }).data
+  const logitsData = Papa.parse(logitsCSVText, {
+    header: false,
+    dynamicTyping: true, // Keep dynamic typing for numeric values
+  }).data
+
+  // Remove empty rows
+  const tokens = tokensData.filter(row => row.length > 1)
+  const logits = logitsData.filter(row => row.length > 1)
+
+  return { tokens, logits }
+}
+
+// Parse data once outside the component
+const { tokens, logits } = parseCSVData()
+
 const BetaLactamaseTopTokens = () => {
   const svgRef = useRef(null)
   const yAxisRef = useRef(null)
@@ -301,29 +323,8 @@ const BetaLactamaseTopTokens = () => {
   }
 
   useEffect(() => {
-    const processData = async () => {
-      try {
-        // Parse CSV data
-        const tokensData = Papa.parse(tokensCSVText, {
-          header: false,
-          dynamicTyping: false, // Ensure values are kept as strings
-        }).data
-        const logitsData = Papa.parse(logitsCSVText, {
-          header: false,
-          dynamicTyping: true, // Keep dynamic typing for numeric values
-        }).data
-
-        // Remove empty rows
-        const tokens = tokensData.filter(row => row.length > 1)
-        const logits = logitsData.filter(row => row.length > 1)
-
-        renderHeatmap(tokens, logits)
-      } catch (error) {
-        console.error("Error processing data:", error)
-      }
-    }
-
-    processData()
+    // Use the pre-parsed data directly
+    renderHeatmap(tokens, logits)
   }, [isFullScreen]) // Re-render when fullscreen state changes
 
   // Render the legend whenever colorScaleData changes
