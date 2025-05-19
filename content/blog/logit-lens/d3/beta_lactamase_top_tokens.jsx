@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import * as d3 from "d3"
 import Papa from "papaparse"
 import tokensCSVText from "!!raw-loader!../data/top_tokens.csv"
@@ -6,9 +6,16 @@ import logitsCSVText from "!!raw-loader!../data/top_logits.csv"
 
 const SEQ =
   "SPQPLEQIKLSESQLSGRVGMIEMDLASGRTLTAWRADERFPMMSTFKVVLCGAVLARVDAGDEQLERKIHYRQQDLVDYSPVSEKHLADGMTVGELCAAAITMSDNSAANLLLATVGGPAGLTAFLRQIGDNVTRLDRWETELNEALPGDARDTTTPASMAATLRKLLTSQRLSARSQRQLLQWMVDDRVAGPLIRSVLPAGWFIADKTGAGERGARGIVALLGPNNKAERIVVIYLRDTPASMAERNQQIAGIGAALIEHWQR"
+
 const BetaLactamaseTopTokens = () => {
   const svgRef = useRef(null)
   const yAxisRef = useRef(null)
+  const containerRef = useRef(null)
+  const [isFullScreen, setIsFullScreen] = useState(false)
+
+  const toggleFullScreen = () => {
+    setIsFullScreen(!isFullScreen)
+  }
 
   const renderHeatmap = (tokens, logits) => {
     if (!tokens || !tokens.length || !logits || !logits.length) return
@@ -272,7 +279,7 @@ const BetaLactamaseTopTokens = () => {
     }
 
     processData()
-  }, [])
+  }, [isFullScreen]) // Re-render when fullscreen state changes
 
   // Helper function to determine text color based on background color
   const getContrastColor = backgroundColor => {
@@ -287,11 +294,92 @@ const BetaLactamaseTopTokens = () => {
     return luminance > 0.5 ? "#000000" : "#ffffff"
   }
 
+  const fullScreenStyle = isFullScreen
+    ? {
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: "100vw",
+        height: "100vh",
+        zIndex: 1000,
+        backgroundColor: "white",
+        padding: "20px",
+        overflowY: "auto",
+        overflowX: "auto",
+      }
+    : {}
+
   return (
     <div
+      ref={containerRef}
       className="beta-lactamase-heatmap"
-      style={{ position: "relative", width: "100%", overflowX: "auto" }}
+      style={{
+        position: "relative",
+        width: "100%",
+        overflowX: "auto",
+        ...fullScreenStyle,
+      }}
     >
+      <button
+        onClick={toggleFullScreen}
+        style={{
+          position: "absolute",
+          top: "10px",
+          right: "10px",
+          zIndex: 1001,
+          padding: "8px 12px",
+          background: "#4a4a4a",
+          color: "white",
+          border: "none",
+          borderRadius: "4px",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          gap: "5px",
+        }}
+      >
+        {isFullScreen ? (
+          <>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M1 6V1H6M10 1H15V6M15 10V15H10M6 15H1V10"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Exit Full Screen
+          </>
+        ) : (
+          <>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 1H1V6M10 1H15V6M15 10V15H10M6 15H1V10"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Full Screen
+          </>
+        )}
+      </button>
       <div
         style={{
           position: "absolute",
@@ -304,7 +392,10 @@ const BetaLactamaseTopTokens = () => {
       >
         <svg ref={yAxisRef}></svg>
       </div>
-      <svg style={{ height: 720 }} ref={svgRef}></svg>
+      <svg
+        style={{ height: isFullScreen ? "calc(100vh - 40px)" : "720px" }}
+        ref={svgRef}
+      ></svg>
     </div>
   )
 }
