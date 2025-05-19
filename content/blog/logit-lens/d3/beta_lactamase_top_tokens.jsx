@@ -197,6 +197,17 @@ const BetaLactamaseTopTokens = () => {
         }
       }
 
+      // Add position number above every 10th position or at the first/last position
+      if ((j + 1) % 10 === 0 || j === 0 || j === SEQ.length - 1) {
+        svg
+          .append("text")
+          .attr("x", j * cellWidth + cellWidth / 2)
+          .attr("y", -5)
+          .attr("text-anchor", "middle")
+          .attr("font-size", "10px")
+          .text(j + 1)
+      }
+
       svg
         .append("text")
         .attr("x", j * cellWidth + cellWidth / 2)
@@ -214,6 +225,7 @@ const BetaLactamaseTopTokens = () => {
       .attr("y", height + 40)
       .attr("text-anchor", "middle")
       .attr("font-size", "12px")
+      .text("True Amino Acid Sequence")
 
     // Create tooltip
     const tooltip = d3
@@ -252,7 +264,7 @@ const BetaLactamaseTopTokens = () => {
             .on("mouseover", function (event) {
               tooltip.transition().duration(200).style("opacity", 0.9)
               tooltip
-                .html(`Position: ${j}<br>Logit: ${logitValue.toFixed(2)}`)
+                .html(`Position: ${j + 1}<br>Logit: ${logitValue.toFixed(2)}`)
                 .style("left", event.pageX + 10 + "px")
                 .style("top", event.pageY - 28 + "px")
             })
@@ -273,7 +285,7 @@ const BetaLactamaseTopTokens = () => {
             .on("mouseover", function (event) {
               tooltip.transition().duration(200).style("opacity", 0.9)
               tooltip
-                .html(`Position: ${j}<br>Logit: ${logitValue.toFixed(2)}`)
+                .html(`Position: ${j + 1}<br>Logit: ${logitValue.toFixed(2)}`)
                 .style("left", event.pageX + 10 + "px")
                 .style("top", event.pageY - 28 + "px")
             })
@@ -439,6 +451,23 @@ const BetaLactamaseTopTokens = () => {
         >
           <svg ref={svgRef}></svg>
         </div>
+      </div>
+
+      {/* Sticky label for the amino acid sequence */}
+      <div
+        style={{
+          position: "sticky",
+          bottom: isFullScreen ? "10px" : "0",
+          width: "100%",
+          textAlign: "center",
+          backgroundColor: "white",
+          zIndex: 100,
+          fontWeight: 500,
+          fontSize: 12,
+          paddingLeft: 50,
+        }}
+      >
+        True Amino Acid Sequence
       </div>
     </div>
   )
