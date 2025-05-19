@@ -182,14 +182,28 @@ const BetaLactamaseTopTokens = () => {
       .attr("font-size", "12px")
       .text("Layer")
 
+    // Get the last row of tokens to compare against for coloring
+    const lastRowTokens = tokens[tokens.length - 1]
+
     // Add X axis labels (amino acid sequence)
     for (let j = 0; j < Math.min(tokens[0].length, SEQ.length); j++) {
+      let textColor = "#000000" // Default black color
+      if (j < lastRowTokens.length) {
+        for (let i = 0; i < tokens.length - 1; i++) {
+          if (SEQ[j] !== lastRowTokens[j]) {
+            textColor = "#ff0000" // Red color for non-matching tokens
+            break
+          }
+        }
+      }
+
       svg
         .append("text")
         .attr("x", j * cellWidth + cellWidth / 2)
         .attr("y", height + 20)
         .attr("text-anchor", "middle")
         .attr("font-size", "12px")
+        .attr("fill", textColor)
         .text(SEQ[j] || "")
     }
 
