@@ -422,14 +422,13 @@ const BetaLactamaseTopTokens = () => {
       <div
         style={{
           position: "sticky",
-          top: isFullScreen ? "10px" : "0",
           left: 50,
           zIndex: 100,
           backgroundColor: "white",
           padding: "5px",
           boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
           borderRadius: "4px",
-          marginBottom: "10px",
+          marginBottom: 12,
           width: "fit-content",
         }}
       >
