@@ -11,6 +11,7 @@ const BetaLactamaseTopTokens = () => {
   const svgRef = useRef(null)
   const yAxisRef = useRef(null)
   const containerRef = useRef(null)
+  const scrollContainerRef = useRef(null)
   const [isFullScreen, setIsFullScreen] = useState(false)
 
   const toggleFullScreen = () => {
@@ -53,10 +54,10 @@ const BetaLactamaseTopTokens = () => {
     // Create the SVG canvas for main heatmap
     const svg = d3
       .select(svgRef.current)
-      .attr("width", width + margin.left + margin.right)
+      .attr("width", width)
       .attr("height", height + margin.top + margin.bottom)
       .append("g")
-      .attr("transform", `translate(${margin.left}, ${margin.top})`)
+      .attr("transform", `translate(0, ${margin.top})`)
 
     // Create separate SVG for Y axis that will stay fixed
     const yAxisSvg = d3
@@ -163,7 +164,7 @@ const BetaLactamaseTopTokens = () => {
             .attr("text-anchor", "middle")
             .attr("dominant-baseline", "middle")
             .attr("font-size", Math.min(cellWidth, cellHeight) * 0.8)
-            .attr("fill", getContrastColor(colorScale(logitValue)))
+            .attr("fill", "#ffffff")
             .style("cursor", "pointer")
             .text(tokens[i][j])
             .on("mouseover", function (event) {
@@ -281,19 +282,6 @@ const BetaLactamaseTopTokens = () => {
     processData()
   }, [isFullScreen]) // Re-render when fullscreen state changes
 
-  // Helper function to determine text color based on background color
-  const getContrastColor = backgroundColor => {
-    // Convert hex color to RGB
-    const rgb = d3.color(backgroundColor)
-    if (!rgb) return "#000000"
-
-    // Calculate luminance
-    const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255
-
-    // Return black or white depending on background luminance
-    return luminance > 0.5 ? "#000000" : "#ffffff"
-  }
-
   const fullScreenStyle = isFullScreen
     ? {
         position: "fixed",
@@ -317,8 +305,6 @@ const BetaLactamaseTopTokens = () => {
       className="beta-lactamase-heatmap"
       style={{
         position: "relative",
-        width: "100%",
-        overflowX: "auto",
         ...fullScreenStyle,
       }}
     >
@@ -380,22 +366,30 @@ const BetaLactamaseTopTokens = () => {
           </>
         )}
       </button>
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          bottom: 0,
-          zIndex: 10,
-          backgroundColor: "white",
-        }}
-      >
-        <svg ref={yAxisRef}></svg>
+      <div style={{ display: "flex" }}>
+        <div
+          style={{
+            position: "sticky",
+            left: 0,
+            zIndex: 10,
+            backgroundColor: "white",
+          }}
+        >
+          <svg ref={yAxisRef}></svg>
+        </div>
+        <div
+          ref={scrollContainerRef}
+          style={{
+            overflowX: "auto",
+            overflowY: "auto",
+          }}
+        >
+          <svg
+            style={{ height: isFullScreen ? "calc(100vh - 40px)" : "720px" }}
+            ref={svgRef}
+          ></svg>
+        </div>
       </div>
-      <svg
-        style={{ height: isFullScreen ? "calc(100vh - 40px)" : "720px" }}
-        ref={svgRef}
-      ></svg>
     </div>
   )
 }
