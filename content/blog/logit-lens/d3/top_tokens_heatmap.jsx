@@ -1,16 +1,10 @@
 import React, { useEffect, useRef, useState } from "react"
 import * as d3 from "d3"
 import Papa from "papaparse"
-import tokensCSVText from "!!raw-loader!../data/beta_lactamase_top_tokens.csv"
-import logitsCSVText from "!!raw-loader!../data/beta_lactamase_top_logits.csv"
 import { RiFullscreenFill, RiFullscreenExitFill } from "react-icons/ri"
 
-const SEQ =
-  "SPQPLEQIKLSESQLSGRVGMIEMDLASGRTLTAWRADERFPMMSTFKVVLCGAVLARVDAGDEQLERKIHYRQQDLVDYSPVSEKHLADGMTVGELCAAAITMSDNSAANLLLATVGGPAGLTAFLRQIGDNVTRLDRWETELNEALPGDARDTTTPASMAATLRKLLTSQRLSARSQRQLLQWMVDDRVAGPLIRSVLPAGWFIADKTGAGERGARGIVALLGPNNKAERIVVIYLRDTPASMAERNQQIAGIGAALIEHWQR"
-
-// Parse CSV data only once outside the component
-const parseCSVData = () => {
-  // Parse CSV data
+const parseCSVData = (tokensCSVText, logitsCSVText) => {
+  console.log("parsing...")
   const tokens = Papa.parse(tokensCSVText, {
     header: false,
     dynamicTyping: false, // Ensure values are kept as strings
@@ -23,10 +17,22 @@ const parseCSVData = () => {
   return { tokens, logits }
 }
 
-// Parse data once outside the component
-const { tokens, logits } = parseCSVData()
+const fetchCSV = async path => {
+  try {
+    const response = await fetch(path)
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch CSV: ${response.status} ${response.statusText}`
+      )
+    }
+    return await response.text()
+  } catch (error) {
+    console.error(`Error importing CSV from path: ${path}`, error)
+    return null
+  }
+}
 
-const BetaLactamaseTopTokens = () => {
+const TopTokensHeatmap = ({ sequence, tokensPath, logitsPath, title }) => {
   const svgRef = useRef(null)
   const yAxisRef = useRef(null)
   const legendRef = useRef(null)
@@ -37,6 +43,19 @@ const BetaLactamaseTopTokens = () => {
     minLogit: 0,
     maxLogit: 1,
   })
+  const [parsedData, setParsedData] = useState({ tokens: [], logits: [] })
+
+  // Load CSV data from paths if provided
+  useEffect(() => {
+    const loadCSVFromPaths = async () => {
+      const tokensData = await fetchCSV(tokensPath)
+      const logitsData = await fetchCSV(logitsPath)
+      const parsed = parseCSVData(tokensData, logitsData)
+      setParsedData(parsed)
+    }
+
+    loadCSVFromPaths()
+  }, [tokensPath, logitsPath])
 
   const toggleFullScreen = () => {
     setIsFullScreen(!isFullScreen)
@@ -207,11 +226,11 @@ const BetaLactamaseTopTokens = () => {
     const lastRowTokens = tokens[tokens.length - 1]
 
     // Add X axis labels (amino acid sequence)
-    for (let j = 0; j < Math.min(tokens[0].length, SEQ.length); j++) {
+    for (let j = 0; j < Math.min(tokens[0].length, sequence.length); j++) {
       let textColor = "#000000" // Default black color
       if (j < lastRowTokens.length) {
         for (let i = 0; i < tokens.length - 1; i++) {
-          if (SEQ[j] !== lastRowTokens[j]) {
+          if (sequence[j] !== lastRowTokens[j]) {
             textColor = "#ff0000" // Red color for non-matching tokens
             break
           }
@@ -219,7 +238,7 @@ const BetaLactamaseTopTokens = () => {
       }
 
       // Add position number above every 10th position or at the first/last position
-      if ((j + 1) % 10 === 0 || j === 0 || j === SEQ.length - 1) {
+      if ((j + 1) % 10 === 0 || j === 0 || j === sequence.length - 1) {
         svg
           .append("text")
           .attr("x", j * cellWidth + cellWidth / 2)
@@ -236,7 +255,7 @@ const BetaLactamaseTopTokens = () => {
         .attr("text-anchor", "middle")
         .attr("font-size", "12px")
         .attr("fill", textColor)
-        .text(SEQ[j] || "")
+        .text(sequence[j] || "")
     }
 
     // Add X axis label
@@ -320,9 +339,11 @@ const BetaLactamaseTopTokens = () => {
   }
 
   useEffect(() => {
-    // Use the pre-parsed data directly
-    renderHeatmap(tokens, logits)
-  }, [isFullScreen]) // Re-render when fullscreen state changes
+    // Render heatmap when data is available and when fullscreen state changes
+    if (parsedData.tokens.length && parsedData.logits.length) {
+      renderHeatmap(parsedData.tokens, parsedData.logits)
+    }
+  }, [parsedData, isFullScreen, sequence])
 
   // Render the legend whenever colorScaleData changes
   useEffect(() => {
@@ -349,7 +370,7 @@ const BetaLactamaseTopTokens = () => {
   return (
     <div
       ref={containerRef}
-      className="beta-lactamase-heatmap"
+      className="token-logit-heatmap"
       style={{
         position: "relative",
         marginBottom: 10,
@@ -366,7 +387,7 @@ const BetaLactamaseTopTokens = () => {
           fontWeight: "bold",
         }}
       >
-        Beta-Lactamase (PDB 4ZAM) Top Tokens by Logit
+        {title}
       </h2>
 
       <div style={{ display: "flex" }}>
@@ -459,4 +480,18 @@ const BetaLactamaseTopTokens = () => {
   )
 }
 
+// For backward compatibility - uses the original data and sequence
+const BetaLactamaseTopTokens = () => {
+  const BETA_LACTAMASE_SEQ =
+    "SPQPLEQIKLSESQLSGRVGMIEMDLASGRTLTAWRADERFPMMSTFKVVLCGAVLARVDAGDEQLERKIHYRQQDLVDYSPVSEKHLADGMTVGELCAAAITMSDNSAANLLLATVGGPAGLTAFLRQIGDNVTRLDRWETELNEALPGDARDTTTPASMAATLRKLLTSQRLSARSQRQLLQWMVDDRVAGPLIRSVLPAGWFIADKTGAGERGARGIVALLGPNNKAERIVVIYLRDTPASMAERNQQIAGIGAALIEHWQR"
+
+  return (
+    <TopTokensHeatmap
+      sequence={BETA_LACTAMASE_SEQ}
+      title="Beta-Lactamase (PDB 4ZAM) Top Tokens by Logit"
+    />
+  )
+}
+
+export { TopTokensHeatmap }
 export default BetaLactamaseTopTokens

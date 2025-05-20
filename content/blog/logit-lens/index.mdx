@@ -4,7 +4,7 @@ date: "2025-05-19"
 description: TODO
 ---
 
-import BetaLactamaseTopTokens from "./d3/beta_lactamase_top_tokens"
+import { TopTokensHeatmap } from "./d3/top_tokens_heatmap"
 
 The [logit lens](https://www.lesswrong.com/posts/AcKRB8wDpdaN6v6ru/interpreting-gpt-the-logit-lens) is a powerful tool for interpreting LLMs. Can we use it to better understand protein language models?
 
@@ -12,6 +12,11 @@ The [logit lens](https://www.lesswrong.com/posts/AcKRB8wDpdaN6v6ru/interpreting-
 
 hello
 
-<BetaLactamaseTopTokens />
+<TopTokensHeatmap
+  sequence="SPQPLEQIKLSESQLSGRVGMIEMDLASGRTLTAWRADERFPMMSTFKVVLCGAVLARVDAGDEQLERKIHYRQQDLVDYSPVSEKHLADGMTVGELCAAAITMSDNSAANLLLATVGGPAGLTAFLRQIGDNVTRLDRWETELNEALPGDARDTTTPASMAATLRKLLTSQRLSARSQRQLLQWMVDDRVAGPLIRSVLPAGWFIADKTGAGERGARGIVALLGPNNKAERIVVIYLRDTPASMAERNQQIAGIGAALIEHWQR"
+  tokensPath="/data/beta_lactamase_top_tokens.csv"
+  logitsPath="/data/beta_lactamase_top_logits.csv"
+  title="Beta-Lactamase (PDB 4ZAM) Top Tokens by Logit"
+/>
 
 hi
