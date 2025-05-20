@@ -16,16 +16,7 @@ const parseCSVData = (tokensCSVText, logitsCSVText) => {
 
 const fetchCSV = async path => {
   try {
-    // Get the site prefix if it exists (for Gatsby or similar frameworks)
-    const prefix =
-      typeof window !== "undefined" && window.__PATH_PREFIX__
-        ? window.__PATH_PREFIX__
-        : ""
-
-    // Make sure the path is treated as relative to the site root with prefix
-    const absolutePath = `${prefix}${path}`
-
-    const response = await fetch(absolutePath)
+    const response = await fetch(`${window.location.origin}${path}`)
     if (!response.ok) {
       throw new Error(
         `Failed to fetch CSV: ${response.status} ${response.statusText}`

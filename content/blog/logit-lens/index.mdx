@@ -1,7 +1,7 @@
 ---
 title: "Protein language models through the logit lens"
 date: "2025-05-19"
-description: TODO
+description: WIP
 ---
 
 import TopTokensHeatmap from "./d3/top_tokens_heatmap"
@@ -11,8 +11,6 @@ The [logit lens](https://www.lesswrong.com/posts/AcKRB8wDpdaN6v6ru/interpreting-
 
 ## The logit lens
 
-hello
-
 <TopTokensHeatmap
   title="Beta-Lactamase (PDB 4ZAM) top tokens by logit"
   sequence="SPQPLEQIKLSESQLSGRVGMIEMDLASGRTLTAWRADERFPMMSTFKVVLCGAVLARVDAGDEQLERKIHYRQQDLVDYSPVSEKHLADGMTVGELCAAAITMSDNSAANLLLATVGGPAGLTAFLRQIGDNVTRLDRWETELNEALPGDARDTTTPASMAATLRKLLTSQRLSARSQRQLLQWMVDDRVAGPLIRSVLPAGWFIADKTGAGERGARGIVALLGPNNKAERIVVIYLRDTPASMAERNQQIAGIGAALIEHWQR"
@@ -21,10 +19,6 @@ hello
   maxLogit="12.35"
 />
 
-some text
-
-hello
-
 <TopTokensHeatmap
   title="Antibody heavy chain (PDB 5XRQ) top tokens by logit"
   sequence="QVQLVQSGAEVKKPGSSVRVSCKASGDTFSSYSITWVRQAPGHGLQWMGGIFPIFGSTNYAQKFDDRLTITTDDSSRTVYMELTSLRLEDTAVYYCARGASKVEPAAPAYSDAFDMWGQGTLVTVSSASTKGPSVFPLAPSSKSTSGGTAALGCLVKDYFPEPVTVSWNSGALTSGVHTFPAVLQSSGLYSLSSVVTVPSSSLGTQTYICNVNHKPSNTKVDKRVEPKSCHHHHHH"
@@ -32,8 +26,6 @@ hello
   logitsPath="/data/logit-lens/ab_heavy_chain_top_logits.csv"
   maxLogit="12"
 />
-
-hi
 
 <TrueTokensRanksHeatmap
   title="Antibody heavy chain (PDB 5XRQ) top token ranks"
