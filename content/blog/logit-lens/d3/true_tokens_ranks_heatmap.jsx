@@ -18,7 +18,7 @@ const fetchCSV = async path => {
   }
 }
 
-const TrueTokensRanksHeatmap = ({ sequence, ranksPath, title }) => {
+const TrueTokensRanksHeatmap = ({ title, sequence, ranksPath }) => {
   const svgRef = useRef(null)
   const yAxisRef = useRef(null)
   const containerRef = useRef(null)
@@ -26,7 +26,6 @@ const TrueTokensRanksHeatmap = ({ sequence, ranksPath, title }) => {
   const [isFullScreen, setIsFullScreen] = useState(false)
   const [ranks, setRanks] = useState([])
 
-  // Load CSV data from paths if provided
   useEffect(() => {
     const loadCSVFromPaths = async () => {
       const ranksData = await fetchCSV(ranksPath)

@@ -29,17 +29,19 @@ const fetchCSV = async path => {
   }
 }
 
-const TopTokensHeatmap = ({ sequence, tokensPath, logitsPath, title }) => {
+const TopTokensHeatmap = ({
+  title,
+  sequence,
+  tokensPath,
+  logitsPath,
+  maxLogit,
+}) => {
   const svgRef = useRef(null)
   const yAxisRef = useRef(null)
   const legendRef = useRef(null)
   const containerRef = useRef(null)
   const scrollContainerRef = useRef(null)
   const [isFullScreen, setIsFullScreen] = useState(false)
-  const [colorScaleData, setColorScaleData] = useState({
-    minLogit: 0,
-    maxLogit: 1,
-  })
   const [parsedData, setParsedData] = useState({ tokens: [], logits: [] })
 
   // Load CSV data from paths if provided
@@ -59,9 +61,6 @@ const TopTokensHeatmap = ({ sequence, tokensPath, logitsPath, title }) => {
   }
 
   const renderLegend = useCallback(() => {
-    const { minLogit, maxLogit } = colorScaleData
-    if (minLogit === undefined || maxLogit === undefined) return
-
     d3.select(legendRef.current).selectAll("*").remove()
 
     const margin = { top: 20, right: 10, bottom: 20, left: 10 }
@@ -77,7 +76,7 @@ const TopTokensHeatmap = ({ sequence, tokensPath, logitsPath, title }) => {
 
     const legendScale = d3
       .scaleLinear()
-      .domain([minLogit, maxLogit])
+      .domain([0, maxLogit])
       .range([0, legendWidth])
 
     const legendAxis = d3
@@ -85,15 +84,13 @@ const TopTokensHeatmap = ({ sequence, tokensPath, logitsPath, title }) => {
       .ticks(5)
       .tickFormat(d3.format(".1f"))
 
-    // Create color scale
     const colorScale = d3
       .scaleSequential()
-      .domain([minLogit, maxLogit])
+      .domain([0, maxLogit])
       .interpolator(d3.interpolateViridis)
 
     // Create gradient for legend
     const defs = svg.append("defs")
-
     const gradient = defs
       .append("linearGradient")
       .attr("id", "legend-gradient")
@@ -106,7 +103,7 @@ const TopTokensHeatmap = ({ sequence, tokensPath, logitsPath, title }) => {
     const numStops = 10
     for (let i = 0; i <= numStops; i++) {
       const offset = i / numStops
-      const value = minLogit + offset * (maxLogit - minLogit)
+      const value = offset * maxLogit
 
       gradient
         .append("stop")
@@ -137,7 +134,7 @@ const TopTokensHeatmap = ({ sequence, tokensPath, logitsPath, title }) => {
       .attr("text-anchor", "middle")
       .attr("font-size", "12px")
       .text("logit value")
-  }, [colorScaleData])
+  }, [maxLogit])
 
   const renderHeatmap = useCallback(
     (tokens, logits) => {
@@ -153,26 +150,10 @@ const TopTokensHeatmap = ({ sequence, tokensPath, logitsPath, title }) => {
       const height =
         Math.max(tokens.length * 20, 500) - margin.top - margin.bottom
 
-      // Calculate max and min values for color scale
-      let flatLogits = []
-      logits.forEach(row => {
-        row.forEach(val => {
-          if (val && !isNaN(parseFloat(val))) {
-            flatLogits.push(parseFloat(val))
-          }
-        })
-      })
-
-      const minLogit = d3.min(flatLogits)
-      const maxLogit = d3.max(flatLogits)
-
-      // Update color scale data for the legend
-      setColorScaleData({ minLogit, maxLogit })
-
       // Create color scale
       const colorScale = d3
         .scaleSequential()
-        .domain([minLogit, maxLogit])
+        .domain([0, maxLogit])
         .interpolator(d3.interpolateViridis)
 
       // Create the SVG canvas for main heatmap
@@ -338,10 +319,9 @@ const TopTokensHeatmap = ({ sequence, tokensPath, logitsPath, title }) => {
     }
   }, [parsedData, renderHeatmap])
 
-  // Render the legend whenever colorScaleData changes
   useEffect(() => {
     renderLegend()
-  }, [colorScaleData, renderLegend])
+  }, [renderLegend])
 
   const fullScreenStyle = isFullScreen
     ? {
