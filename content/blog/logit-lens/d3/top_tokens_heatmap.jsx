@@ -63,7 +63,7 @@ const TopTokensHeatmap = ({
   const renderLegend = useCallback(() => {
     d3.select(legendRef.current).selectAll("*").remove()
 
-    const margin = { top: 20, right: 10, bottom: 20, left: 10 }
+    const margin = { top: 25, right: 10, bottom: 20, left: 10 }
     const legendWidth = 250
     const legendHeight = 18
 
@@ -79,10 +79,7 @@ const TopTokensHeatmap = ({
       .domain([0, maxLogit])
       .range([0, legendWidth])
 
-    const legendAxis = d3
-      .axisBottom(legendScale)
-      .ticks(5)
-      .tickFormat(d3.format(".1f"))
+    const legendAxis = d3.axisBottom(legendScale).ticks(5)
 
     const colorScale = d3
       .scaleSequential()
@@ -132,7 +129,7 @@ const TopTokensHeatmap = ({
       .attr("x", legendWidth / 2)
       .attr("y", -6)
       .attr("text-anchor", "middle")
-      .attr("font-size", "12px")
+      .attr("font-size", 12)
       .text("logit value")
   }, [maxLogit])
 
