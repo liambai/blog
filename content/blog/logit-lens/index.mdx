@@ -11,6 +11,16 @@ The [logit lens](https://www.lesswrong.com/posts/AcKRB8wDpdaN6v6ru/interpreting-
 
 ## The logit lens
 
+Protein language models like ESM-2 can predict masked tokens (amino acids).
+
+Given a protein sequence:
+
+$$
+\text{Q V Q L V [?] S G A}
+$$
+
+What is the amino acid at the masked position? ...
+
 <TopTokensHeatmap
   title="Beta-Lactamase (PDB 4ZAM) top tokens by logit"
   sequence="SPQPLEQIKLSESQLSGRVGMIEMDLASGRTLTAWRADERFPMMSTFKVVLCGAVLARVDAGDEQLERKIHYRQQDLVDYSPVSEKHLADGMTVGELCAAAITMSDNSAANLLLATVGGPAGLTAFLRQIGDNVTRLDRWETELNEALPGDARDTTTPASMAATLRKLLTSQRLSARSQRQLLQWMVDDRVAGPLIRSVLPAGWFIADKTGAGERGARGIVALLGPNNKAERIVVIYLRDTPASMAERNQQIAGIGAALIEHWQR"

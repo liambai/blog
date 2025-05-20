@@ -16,7 +16,8 @@ const parseCSVData = (tokensCSVText, logitsCSVText) => {
 
 const fetchCSV = async path => {
   try {
-    const response = await fetch(`${window.location.origin}${path}`)
+    const fullPath = `${window.location.origin}${path}`
+    const response = await fetch(fullPath)
     if (!response.ok) {
       throw new Error(
         `Failed to fetch CSV: ${response.status} ${response.statusText}`
@@ -24,7 +25,7 @@ const fetchCSV = async path => {
     }
     return await response.text()
   } catch (error) {
-    console.error(`Error importing CSV from path: ${path}`, error)
+    console.error(`Error importing CSV from path: ${fullPath}`, error)
     return null
   }
 }
