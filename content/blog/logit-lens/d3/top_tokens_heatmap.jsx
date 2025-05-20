@@ -15,8 +15,8 @@ const parseCSVData = (tokensCSVText, logitsCSVText) => {
 }
 
 const fetchCSV = async path => {
+  const fullPath = `${window.location.origin}${path}`
   try {
-    const fullPath = `${window.location.origin}${path}`
     const response = await fetch(fullPath)
     if (!response.ok) {
       throw new Error(
