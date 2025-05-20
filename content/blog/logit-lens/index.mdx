@@ -24,14 +24,14 @@ ESM answers this question with 20 numbers (**logits**), one for each possible am
 
 Here's the idea of the logit lens: logits can be calculated for not only the last layer (ESM's final answers), but also intermediate layers. Intermediate logits give a view into the information flow through the model, and in some limited sense, its "thought process".
 
-## Toy experiments
+## ESM through the logit lens
 
 ### Beta-lactamase
 
 I took a beta-lactamase sequence, masked each position one at a time, and calculated the logits across each layer of ESM-2 (650M):
 
 <TopTokensHeatmap
-  title="Beta-Lactamase (PDB 4ZAM) top tokens by logit"
+  title="Beta-lactamase (PDB 4ZAM) top tokens by logit"
   sequence="SPQPLEQIKLSESQLSGRVGMIEMDLASGRTLTAWRADERFPMMSTFKVVLCGAVLARVDAGDEQLERKIHYRQQDLVDYSPVSEKHLADGMTVGELCAAAITMSDNSAANLLLATVGGPAGLTAFLRQIGDNVTRLDRWETELNEALPGDARDTTTPASMAATLRKLLTSQRLSARSQRQLLQWMVDDRVAGPLIRSVLPAGWFIADKTGAGERGARGIVALLGPNNKAERIVVIYLRDTPASMAERNQQIAGIGAALIEHWQR"
   tokensPath="/data/logit-lens/beta_lactamase_top_tokens.csv"
   logitsPath="/data/logit-lens/beta_lactamase_top_logits.csv"
@@ -53,6 +53,16 @@ Each cell shows the amino acid ESM is more confident in, colored by its logit va
 
 - Sometimes, ESM starts believing in an amino acid in an early layer (e.g. position 29 starting from layer 14). Sometimes, it "changes its mind" at the last layer (position 15).
 
+Of course, looking at the top amino acid has many limitations. What about the other amino acids? If ESM got the final prediction wrong, did it come close by at least giving the true amino acid _one of_ the highest logits?
+
+<TrueTokensRanksHeatmap
+  title="Beta-lactamase (PDB 4ZAM) true token ranks"
+  sequence="SPQPLEQIKLSESQLSGRVGMIEMDLASGRTLTAWRADERFPMMSTFKVVLCGAVLARVDAGDEQLERKIHYRQQDLVDYSPVSEKHLADGMTVGELCAAAITMSDNSAANLLLATVGGPAGLTAFLRQIGDNVTRLDRWETELNEALPGDARDTTTPASMAATLRKLLTSQRLSARSQRQLLQWMVDDRVAGPLIRSVLPAGWFIADKTGAGERGARGIVALLGPNNKAERIVVIYLRDTPASMAERNQQIAGIGAALIEHWQR"
+  ranksPath="/data/logit-lens/beta_lactamase_true_token_ranks.csv"
+/>
+
+We can look at that by plotting the rank of the true amino acid among others. In many cases where ESM made the wrong prediction, the correct amino acid got close to the top.
+
 <TopTokensHeatmap
   title="Antibody heavy chain (PDB 5XRQ) top tokens by logit"
   sequence="QVQLVQSGAEVKKPGSSVRVSCKASGDTFSSYSITWVRQAPGHGLQWMGGIFPIFGSTNYAQKFDDRLTITTDDSSRTVYMELTSLRLEDTAVYYCARGASKVEPAAPAYSDAFDMWGQGTLVTVSSASTKGPSVFPLAPSSKSTSGGTAALGCLVKDYFPEPVTVSWNSGALTSGVHTFPAVLQSSGLYSLSSVVTVPSSSLGTQTYICNVNHKPSNTKVDKRVEPKSCHHHHHH"
@@ -61,8 +71,10 @@ Each cell shows the amino acid ESM is more confident in, colored by its logit va
   maxLogit="12"
 />
 
+### Antibody
+
 <TrueTokensRanksHeatmap
-  title="Antibody heavy chain (PDB 5XRQ) top token ranks"
+  title="Antibody heavy chain (PDB 5XRQ) true token ranks"
   sequence="QVQLVQSGAEVKKPGSSVRVSCKASGDTFSSYSITWVRQAPGHGLQWMGGIFPIFGSTNYAQKFDDRLTITTDDSSRTVYMELTSLRLEDTAVYYCARGASKVEPAAPAYSDAFDMWGQGTLVTVSSASTKGPSVFPLAPSSKSTSGGTAALGCLVKDYFPEPVTVSWNSGALTSGVHTFPAVLQSSGLYSLSSVVTVPSSSLGTQTYICNVNHKPSNTKVDKRVEPKSCHHHHHH"
   ranksPath="/data/logit-lens/ab_heavy_chain_true_token_ranks.csv"
 />

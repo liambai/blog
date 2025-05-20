@@ -301,6 +301,7 @@ const TrueTokensRanksHeatmap = ({ title, sequence, ranksPath }) => {
           justifyContent: "flex-end",
           alignItems: "center",
           marginTop: 10,
+          marginBottom: 20,
           paddingLeft: 50,
           backgroundColor: "white",
         }}
