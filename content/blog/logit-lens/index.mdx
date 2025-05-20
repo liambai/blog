@@ -4,6 +4,7 @@ date: "2025-05-19"
 description: WIP
 ---
 
+import Image from "../../../src/components/image.jsx"
 import TopTokensHeatmap from "./d3/top_tokens_heatmap"
 import TrueTokensRanksHeatmap from "./d3/true_tokens_ranks_heatmap"
 
@@ -11,15 +12,25 @@ The [logit lens](https://www.lesswrong.com/posts/AcKRB8wDpdaN6v6ru/interpreting-
 
 ## The logit lens
 
-Protein language models like ESM-2 are trained with the following masked token prediction task:
+Protein language models like ESM-2 are trained with the following masked token prediction task.
 
-Given a protein sequence
+Given a protein sequence:
 
 $$
 \text{Q V Q L V [?] S G A}
 $$
 
 What is the amino acid at the masked position?
+
+ESM answers this question with 20 numbers, one for each possible amino acid and indicates its confidence level in that amino acid being the masked one. To make a concrete prediction, we pick the amino acid which the highest confidence. These numbers are the _logits_.
+
+Logits can be calculated not just for the last layer (ESM's final view), but also the intermediate layers. Intermediate logits give a view into the information flow through ESM.
+
+## Toy experiments
+
+### Beta-lactamase
+
+I took a beta-lactamase sequence, masked each position one at a time, and calculated the logits across each layer of ESM-2 (650M):
 
 <TopTokensHeatmap
   title="Beta-Lactamase (PDB 4ZAM) top tokens by logit"
@@ -28,6 +39,19 @@ What is the amino acid at the masked position?
   logitsPath="/data/logit-lens/beta_lactamase_top_logits.csv"
   maxLogit="12.35"
 />
+
+Each cell shows the amino acid ESM is more confident in, colored by its logit value (scroll for more positions, mouseover for logit values).
+
+- The true amino acid sequence is show at the bottom. As we progress through the layers, ESM tends to converge on the right answer, but not always (wrong final prediction are in red).
+- By logit values, ESM clearly believes in some positions more than others. For example, it's super confident in position 45 being S––and it's right! Looking in the PDB, we can see that position constitutes a binding site and is therefore likely highly conserved.
+
+<Image path={require("./images/beta-lactamase-45.png")} />
+
+- Similarly, ESM also believes strongly and correctly in position 106 being D. Try checking out more positions at [https://www.rcsb.org/3d-sequence/4ZAM?asymId=A](https://www.rcsb.org/3d-sequence/4ZAM?asymId=A).
+
+<Image path={require("./images/beta-lactamase-106.png")} />
+
+- At the first position, ESM is wrong but made a reasonable guess: Methionine (M) corresponds to the start codon so most proteins start with it.
 
 <TopTokensHeatmap
   title="Antibody heavy chain (PDB 5XRQ) top tokens by logit"

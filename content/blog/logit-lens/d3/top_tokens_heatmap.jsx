@@ -308,7 +308,7 @@ const TopTokensHeatmap = ({
         }
       }
     },
-    [sequence]
+    [sequence, maxLogit]
   )
 
   useEffect(() => {
@@ -399,6 +399,7 @@ const TopTokensHeatmap = ({
           justifyContent: "space-between",
           alignItems: "center",
           marginTop: 10,
+          marginBottom: 20,
           paddingLeft: 50,
           position: "sticky",
           bottom: 0,
