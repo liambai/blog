@@ -12,9 +12,7 @@ The [logit lens](https://www.lesswrong.com/posts/AcKRB8wDpdaN6v6ru/interpreting-
 
 ## The logit lens
 
-Protein language models like ESM-2 are trained with the following masked token prediction task.
-
-Given a protein sequence:
+Protein language models like ESM-2 are trained with the masked token prediction task. Given a protein sequence:
 
 $$
 \text{Q V Q L V [?] S G A}
@@ -22,9 +20,9 @@ $$
 
 What is the amino acid at the masked position?
 
-ESM answers this question with 20 numbers, one for each possible amino acid and indicates its confidence level in that amino acid being the masked one. To make a concrete prediction, we pick the amino acid which the highest confidence. These numbers are the _logits_.
+ESM answers this question with 20 numbers (**logits**), one for each possible amino acid. Each logit indicates ESM's confidence level in that amino acid being the masked one. To make a prediction, we pick the amino acid with the highest logit.
 
-Logits can be calculated not just for the last layer (ESM's final view), but also the intermediate layers. Intermediate logits give a view into the information flow through ESM.
+Here's the idea of the logit lens: logits can be calculated for not only the last layer (ESM's final answers), but also intermediate layers. Intermediate logits give a view into the information flow through the model, and in some limited sense, its "thought process".
 
 ## Toy experiments
 
@@ -40,18 +38,20 @@ I took a beta-lactamase sequence, masked each position one at a time, and calcul
   maxLogit="12.35"
 />
 
-Each cell shows the amino acid ESM is more confident in, colored by its logit value (scroll for more positions, mouseover for logit values).
+Each cell shows the amino acid ESM is more confident in, colored by its logit value (scroll for more positions, mouseover for logit values). The true amino acid sequence is at the bottom. Red positions are ones where ESM's final prediction is wrong.
 
-- The true amino acid sequence is show at the bottom. As we progress through the layers, ESM tends to converge on the right answer, but not always (wrong final prediction are in red).
-- By logit values, ESM clearly believes in some positions more than others. For example, it's super confident in position 45 being S––and it's right! Looking in the PDB, we can see that position constitutes a binding site and is therefore likely highly conserved.
+- Logits in the early layers tend to be wrong. As we move through the layers, ESM often converges on the right answer.
+- By logit values, ESM clearly believes in some positions more than others. For example, it's super confident in position 45 being S––and it's right! The S at position 45 actually constitutes a binding site and is therefore likely highly conserved.
 
 <Image path={require("./images/beta-lactamase-45.png")} />
 
-- Similarly, ESM also believes strongly and correctly in position 106 being D. Try checking out more positions at [https://www.rcsb.org/3d-sequence/4ZAM?asymId=A](https://www.rcsb.org/3d-sequence/4ZAM?asymId=A).
+- Similarly, ESM also believes strongly––and correctly––in D at position 106, another binding site. You can explore more annotations at [https://www.rcsb.org/3d-sequence/4ZAM?asymId=A](https://www.rcsb.org/3d-sequence/4ZAM?asymId=A).
 
 <Image path={require("./images/beta-lactamase-106.png")} />
 
 - At the first position, ESM is wrong but made a reasonable guess: Methionine (M) corresponds to the start codon so most proteins start with it.
+
+- Sometimes, ESM starts believing in an amino acid in an early layer (e.g. position 29 starting from layer 14). Sometimes, it "changes its mind" at the last layer (position 15).
 
 <TopTokensHeatmap
   title="Antibody heavy chain (PDB 5XRQ) top tokens by logit"
