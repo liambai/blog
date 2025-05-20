@@ -3,17 +3,6 @@ import * as d3 from "d3"
 import Papa from "papaparse"
 import { RiFullscreenFill, RiFullscreenExitFill } from "react-icons/ri"
 
-const parseCSVData = (tokensCSVText, logitsCSVText) => {
-  const tokens = Papa.parse(tokensCSVText, {
-    header: false,
-  }).data
-  const logits = Papa.parse(logitsCSVText, {
-    header: false,
-  }).data
-
-  return { tokens, logits }
-}
-
 const fetchCSV = async path => {
   try {
     const response = await fetch(path)
@@ -29,119 +18,34 @@ const fetchCSV = async path => {
   }
 }
 
-const TopTokensHeatmap = ({ sequence, tokensPath, logitsPath, title }) => {
+const TrueTokensRanksHeatmap = ({ sequence, ranksPath, title }) => {
   const svgRef = useRef(null)
   const yAxisRef = useRef(null)
-  const legendRef = useRef(null)
   const containerRef = useRef(null)
   const scrollContainerRef = useRef(null)
   const [isFullScreen, setIsFullScreen] = useState(false)
-  const [colorScaleData, setColorScaleData] = useState({
-    minLogit: 0,
-    maxLogit: 1,
-  })
-  const [parsedData, setParsedData] = useState({ tokens: [], logits: [] })
+  const [ranks, setRanks] = useState([])
 
   // Load CSV data from paths if provided
   useEffect(() => {
     const loadCSVFromPaths = async () => {
-      const tokensData = await fetchCSV(tokensPath)
-      const logitsData = await fetchCSV(logitsPath)
-      const parsed = parseCSVData(tokensData, logitsData)
-      setParsedData(parsed)
+      const ranksData = await fetchCSV(ranksPath)
+      const ranks = Papa.parse(ranksData, {
+        header: false,
+      }).data
+      setRanks(ranks)
     }
 
     loadCSVFromPaths()
-  }, [tokensPath, logitsPath])
+  }, [ranksPath])
 
   const toggleFullScreen = () => {
     setIsFullScreen(!isFullScreen)
   }
 
-  const renderLegend = useCallback(() => {
-    const { minLogit, maxLogit } = colorScaleData
-    if (minLogit === undefined || maxLogit === undefined) return
-
-    d3.select(legendRef.current).selectAll("*").remove()
-
-    const margin = { top: 20, right: 10, bottom: 20, left: 10 }
-    const legendWidth = 250
-    const legendHeight = 18
-
-    const svg = d3
-      .select(legendRef.current)
-      .attr("width", legendWidth + margin.left + margin.right)
-      .attr("height", legendHeight + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform", `translate(${margin.left}, ${margin.top})`)
-
-    const legendScale = d3
-      .scaleLinear()
-      .domain([minLogit, maxLogit])
-      .range([0, legendWidth])
-
-    const legendAxis = d3
-      .axisBottom(legendScale)
-      .ticks(5)
-      .tickFormat(d3.format(".1f"))
-
-    // Create color scale
-    const colorScale = d3
-      .scaleSequential()
-      .domain([minLogit, maxLogit])
-      .interpolator(d3.interpolateViridis)
-
-    // Create gradient for legend
-    const defs = svg.append("defs")
-
-    const gradient = defs
-      .append("linearGradient")
-      .attr("id", "legend-gradient")
-      .attr("x1", "0%")
-      .attr("y1", "0%")
-      .attr("x2", "100%")
-      .attr("y2", "0%")
-
-    // Add gradient stops
-    const numStops = 10
-    for (let i = 0; i <= numStops; i++) {
-      const offset = i / numStops
-      const value = minLogit + offset * (maxLogit - minLogit)
-
-      gradient
-        .append("stop")
-        .attr("offset", `${offset * 100}%`)
-        .attr("stop-color", colorScale(value))
-    }
-
-    // Draw legend rectangle
-    svg
-      .append("rect")
-      .attr("x", 0)
-      .attr("y", 0)
-      .attr("width", legendWidth)
-      .attr("height", legendHeight)
-      .style("fill", "url(#legend-gradient)")
-
-    // Add legend axis
-    svg
-      .append("g")
-      .attr("transform", `translate(0, ${legendHeight})`)
-      .call(legendAxis)
-
-    // Add legend title
-    svg
-      .append("text")
-      .attr("x", legendWidth / 2)
-      .attr("y", -6)
-      .attr("text-anchor", "middle")
-      .attr("font-size", "12px")
-      .text("logit value")
-  }, [colorScaleData])
-
   const renderHeatmap = useCallback(
-    (tokens, logits) => {
-      if (!tokens || !tokens.length || !logits || !logits.length) return
+    ranks => {
+      if (!ranks || !ranks.length) return
 
       // Clear previous SVG content
       d3.select(svgRef.current).selectAll("*").remove()
@@ -149,31 +53,15 @@ const TopTokensHeatmap = ({ sequence, tokensPath, logitsPath, title }) => {
 
       const margin = { top: 20, right: 25, bottom: 25, left: 50 }
       const width =
-        Math.max(tokens[0].length * 20, 800) - margin.left - margin.right
+        Math.max(ranks[0].length * 20, 800) - margin.left - margin.right
       const height =
-        Math.max(tokens.length * 20, 500) - margin.top - margin.bottom
-
-      // Calculate max and min values for color scale
-      let flatLogits = []
-      logits.forEach(row => {
-        row.forEach(val => {
-          if (val && !isNaN(parseFloat(val))) {
-            flatLogits.push(parseFloat(val))
-          }
-        })
-      })
-
-      const minLogit = d3.min(flatLogits)
-      const maxLogit = d3.max(flatLogits)
-
-      // Update color scale data for the legend
-      setColorScaleData({ minLogit, maxLogit })
+        Math.max(ranks.length * 20, 500) - margin.top - margin.bottom
 
       // Create color scale
       const colorScale = d3
         .scaleSequential()
-        .domain([minLogit, maxLogit])
-        .interpolator(d3.interpolateViridis)
+        .domain([0, 20])
+        .interpolator(t => d3.interpolateViridis(1 - t))
 
       // Create the SVG canvas for main heatmap
       const svg = d3
@@ -192,13 +80,13 @@ const TopTokensHeatmap = ({ sequence, tokensPath, logitsPath, title }) => {
         .attr("transform", `translate(${margin.left - 1}, ${margin.top})`)
 
       // Create cell size based on available space
-      const cellWidth = width / tokens[0].length
-      const cellHeight = height / tokens.length
+      const cellWidth = width / ranks[0].length
+      const cellHeight = height / ranks.length
 
       // Add Y axis labels manually at the center of each cell
-      for (let i = 0; i < tokens.length; i++) {
+      for (let i = 0; i < ranks.length; i++) {
         // Show label only for first, last, and every 5th layer
-        if (i === 0 || i === tokens.length - 1 || (i + 1) % 5 === 0) {
+        if (i === 0 || i === ranks.length - 1 || (i + 1) % 5 === 0) {
           yAxisSvg
             .append("text")
             .attr("x", -5)
@@ -220,12 +108,11 @@ const TopTokensHeatmap = ({ sequence, tokensPath, logitsPath, title }) => {
         .attr("font-size", "12px")
         .text("Layer")
 
-      const lastRowTokens = tokens[tokens.length - 1]
-
+      const lastRowRanks = ranks[ranks.length - 1]
       for (let j = 0; j < sequence.length; j++) {
         let textColor = "#000000" // Default black color
-        if (sequence[j] !== lastRowTokens[j]) {
-          textColor = "#ff0000" // Red color for non-matching tokens
+        if (parseInt(lastRowRanks[j]) !== 0) {
+          textColor = "#ff0000" // Red color for when the top predicted token is not rank 0
         }
 
         // Add position number above every 10th position or at the first/last position
@@ -273,10 +160,10 @@ const TopTokensHeatmap = ({ sequence, tokensPath, logitsPath, title }) => {
         .style("z-index", 1000)
 
       // Create function to handle tooltip events
-      const handleMouseOver = (event, i, j, logitValue) => {
+      const handleMouseOver = (event, i, j) => {
         tooltip.transition().duration(200).style("opacity", 0.9)
         tooltip
-          .html(`Position: ${j + 1}<br>Layer: ${i + 1}<br>Logit: ${logitValue}`)
+          .html(`Position: ${j + 1}<br>Layer: ${i + 1}`)
           .style("left", event.pageX + 10 + "px")
           .style("top", event.pageY - 28 + "px")
       }
@@ -286,13 +173,13 @@ const TopTokensHeatmap = ({ sequence, tokensPath, logitsPath, title }) => {
       }
 
       // Create heatmap cells
-      for (let i = 0; i < tokens.length; i++) {
-        for (let j = 0; j < tokens[i].length; j++) {
-          if (tokens[i][j] && logits[i] && logits[i][j]) {
-            const logitValue = parseFloat(logits[i][j])
+      for (let i = 0; i < ranks.length; i++) {
+        for (let j = 0; j < ranks[i].length; j++) {
+          if (ranks[i][j]) {
+            const rankValue = parseFloat(ranks[i][j])
 
             // Skip if not a valid number
-            if (isNaN(logitValue)) continue
+            if (isNaN(rankValue)) continue
 
             // Create cell rectangle
             svg
@@ -301,12 +188,12 @@ const TopTokensHeatmap = ({ sequence, tokensPath, logitsPath, title }) => {
               .attr("y", i * cellHeight)
               .attr("width", cellWidth)
               .attr("height", cellHeight)
-              .attr("fill", colorScale(logitValue))
+              .attr("fill", colorScale(rankValue))
               .attr("stroke", "#ccc")
               .attr("stroke-width", 0.5)
               .style("cursor", "pointer")
               .on("mouseover", function (event) {
-                handleMouseOver(event, i, j, logitValue)
+                handleMouseOver(event, i, j)
               })
               .on("mouseout", handleMouseOut)
 
@@ -319,9 +206,9 @@ const TopTokensHeatmap = ({ sequence, tokensPath, logitsPath, title }) => {
               .attr("font-size", Math.min(cellWidth, cellHeight) * 0.8)
               .attr("fill", "#ffffff")
               .style("cursor", "pointer")
-              .text(tokens[i][j])
+              .text(ranks[i][j])
               .on("mouseover", function (event) {
-                handleMouseOver(event, i, j, logitValue)
+                handleMouseOver(event, i, j, rankValue)
               })
               .on("mouseout", handleMouseOut)
           }
@@ -333,15 +220,10 @@ const TopTokensHeatmap = ({ sequence, tokensPath, logitsPath, title }) => {
 
   useEffect(() => {
     // Render heatmap when data is available and when fullscreen state changes
-    if (parsedData.tokens.length && parsedData.logits.length) {
-      renderHeatmap(parsedData.tokens, parsedData.logits)
+    if (ranks.length) {
+      renderHeatmap(ranks)
     }
-  }, [parsedData, renderHeatmap])
-
-  // Render the legend whenever colorScaleData changes
-  useEffect(() => {
-    renderLegend()
-  }, [colorScaleData, renderLegend])
+  }, [ranks, renderHeatmap])
 
   const fullScreenStyle = isFullScreen
     ? {
@@ -417,29 +299,13 @@ const TopTokensHeatmap = ({ sequence, tokensPath, logitsPath, title }) => {
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: "flex-end",
           alignItems: "center",
           marginTop: 10,
           paddingLeft: 50,
-          position: "sticky",
-          bottom: 0,
           backgroundColor: "white",
-          zIndex: 100,
         }}
       >
-        {/* Legend positioned at the bottom */}
-        <div
-          style={{
-            backgroundColor: "white",
-            padding: "5px",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-            borderRadius: "4px",
-            width: "fit-content",
-          }}
-        >
-          <svg ref={legendRef} width="220" height="50"></svg>
-        </div>
-
         {/* Full screen button */}
         <button
           onClick={toggleFullScreen}
@@ -473,4 +339,4 @@ const TopTokensHeatmap = ({ sequence, tokensPath, logitsPath, title }) => {
   )
 }
 
-export default TopTokensHeatmap
+export default TrueTokensRanksHeatmap

@@ -4,7 +4,8 @@ date: "2025-05-19"
 description: TODO
 ---
 
-import { TopTokensHeatmap } from "./d3/top_tokens_heatmap"
+import TopTokensHeatmap from "./d3/top_tokens_heatmap"
+import TrueTokensRanksHeatmap from "./d3/true_tokens_ranks_heatmap"
 
 The [logit lens](https://www.lesswrong.com/posts/AcKRB8wDpdaN6v6ru/interpreting-gpt-the-logit-lens) is a powerful tool for interpreting LLMs. Can we use it to better understand protein language models?
 
@@ -16,7 +17,24 @@ hello
   sequence="SPQPLEQIKLSESQLSGRVGMIEMDLASGRTLTAWRADERFPMMSTFKVVLCGAVLARVDAGDEQLERKIHYRQQDLVDYSPVSEKHLADGMTVGELCAAAITMSDNSAANLLLATVGGPAGLTAFLRQIGDNVTRLDRWETELNEALPGDARDTTTPASMAATLRKLLTSQRLSARSQRQLLQWMVDDRVAGPLIRSVLPAGWFIADKTGAGERGARGIVALLGPNNKAERIVVIYLRDTPASMAERNQQIAGIGAALIEHWQR"
   tokensPath="/data/logit-lens/beta_lactamase_top_tokens.csv"
   logitsPath="/data/logit-lens/beta_lactamase_top_logits.csv"
-  title="Beta-Lactamase (PDB 4ZAM) Top Tokens by Logit"
+  title="Beta-Lactamase (PDB 4ZAM) top tokens by logit"
+/>
+
+some text
+
+hello
+
+<TopTokensHeatmap
+  sequence="QVQLVQSGAEVKKPGSSVRVSCKASGDTFSSYSITWVRQAPGHGLQWMGGIFPIFGSTNYAQKFDDRLTITTDDSSRTVYMELTSLRLEDTAVYYCARGASKVEPAAPAYSDAFDMWGQGTLVTVSSASTKGPSVFPLAPSSKSTSGGTAALGCLVKDYFPEPVTVSWNSGALTSGVHTFPAVLQSSGLYSLSSVVTVPSSSLGTQTYICNVNHKPSNTKVDKRVEPKSCHHHHHH"
+  tokensPath="/data/logit-lens/ab_heavy_chain_top_tokens.csv"
+  logitsPath="/data/logit-lens/ab_heavy_chain_top_logits.csv"
+  title="Antibody Heavy Chain (PDB 5XRQ) top tokens by logit"
 />
 
 hi
+
+<TrueTokensRanksHeatmap
+  sequence="QVQLVQSGAEVKKPGSSVRVSCKASGDTFSSYSITWVRQAPGHGLQWMGGIFPIFGSTNYAQKFDDRLTITTDDSSRTVYMELTSLRLEDTAVYYCARGASKVEPAAPAYSDAFDMWGQGTLVTVSSASTKGPSVFPLAPSSKSTSGGTAALGCLVKDYFPEPVTVSWNSGALTSGVHTFPAVLQSSGLYSLSSVVTVPSSSLGTQTYICNVNHKPSNTKVDKRVEPKSCHHHHHH"
+  ranksPath="/data/logit-lens/ab_heavy_chain_true_token_ranks.csv"
+  title="Antibody Heavy Chain (PDB 5XRQ) top token ranks"
+/>
