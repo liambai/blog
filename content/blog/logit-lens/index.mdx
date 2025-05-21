@@ -4,6 +4,7 @@ date: "2025-05-19"
 description: WIP
 ---
 
+import Figure from "../../../src/components/figure.jsx"
 import Image from "../../../src/components/image.jsx"
 import TopTokensHeatmap from "./d3/top_tokens_heatmap"
 import TrueTokensRanksHeatmap from "./d3/true_tokens_ranks_heatmap"
@@ -43,11 +44,19 @@ Each cell shows the amino acid ESM is more confident in, colored by its logit va
 - Logits in the early layers tend to be wrong. As we move through the layers, ESM often converges on the right answer.
 - By logit values, ESM clearly believes in some positions more than others. For example, it's super confident in position 45 being S––and it's right! The S at position 45 actually constitutes a binding site and is therefore likely highly conserved.
 
-<Image path={require("./images/beta-lactamase-45.png")} />
+<Figure content={<Image path={require("./images/beta-lactamase-45.png")} />}>
+  Beta-lactamse (PDB [4ZAM](https://www.rcsb.org/3d-sequence/4ZAM?asymId=A)) has
+  a binding site annotation at position 45. From the structure, we can see that
+  this position contacts the ligand, which means that it is likely highly
+  conserved.
+</Figure>
 
 - Similarly, ESM also believes strongly––and correctly––in D at position 106, another binding site. You can explore more annotations at [https://www.rcsb.org/3d-sequence/4ZAM?asymId=A](https://www.rcsb.org/3d-sequence/4ZAM?asymId=A).
 
-<Image path={require("./images/beta-lactamase-106.png")} />
+<Figure content={<Image path={require("./images/beta-lactamase-106.png")} />}>
+  Beta-lactamse (PDB [4ZAM](https://www.rcsb.org/3d-sequence/4ZAM?asymId=A)) has
+  another binding site annotation at position 106.
+</Figure>
 
 - At the first position, ESM is wrong but made a reasonable guess: Methionine (M) corresponds to the start codon so most proteins start with it.
 
@@ -61,7 +70,11 @@ Of course, looking at the top amino acid has many limitations. What about the ot
   ranksPath="/data/logit-lens/beta_lactamase_true_token_ranks.csv"
 />
 
-We can look at that by plotting the rank of the true amino acid among others. In many cases where ESM made the wrong prediction, the correct amino acid got close to the top.
+We can look at that by plotting the rank of the true amino acid among others. In many cases where ESM made the wrong prediction, the correct amino acid was close to the top. For example, at position 5, the correct amino acid corresponds to ESM's second highest logit.
+
+### Antibody
+
+I repeated this for an antibody heavy chain sequence.
 
 <TopTokensHeatmap
   title="Antibody heavy chain (PDB 5XRQ) top tokens by logit"
@@ -71,7 +84,13 @@ We can look at that by plotting the rank of the true amino acid among others. In
   maxLogit="12"
 />
 
-### Antibody
+I noticed ESM's high conviction on position 22 and 96 being C. This turned out to be a [disulfide bridge](https://www.creative-proteomics.com/resource/disulfide-bridges-proteins-formation-function-analysis.htm), important for the stability of the structure. At both positions, ESM started developing this conviction around layer 10.
+
+<Figure content={<Image path={require("./images/antibody-bridge-1.png")} />} />
+
+There is another disulfide bridge at positions 154 - 210. ESM seems to have noticed this one starting at layer 9.
+
+<Figure content={<Image path={require("./images/antibody-bridge-2.png")} />} />
 
 <TrueTokensRanksHeatmap
   title="Antibody heavy chain (PDB 5XRQ) true token ranks"
