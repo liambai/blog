@@ -45,6 +45,7 @@ const TopTokensHeatmap = ({
   const scrollContainerRef = useRef(null)
   const [isFullScreen, setIsFullScreen] = useState(false)
   const [parsedData, setParsedData] = useState({ tokens: [], logits: [] })
+  const [isMobile, setIsMobile] = useState(false)
 
   // Load CSV data from paths if provided
   useEffect(() => {
@@ -322,6 +323,15 @@ const TopTokensHeatmap = ({
     renderLegend()
   }, [renderLegend])
 
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768) // Adjust threshold as needed
+    }
+    checkMobile() // Initial check
+    window.addEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", checkMobile)
+  }, [])
+
   const fullScreenStyle = isFullScreen
     ? {
         position: "fixed",
@@ -421,33 +431,35 @@ const TopTokensHeatmap = ({
         </div>
 
         {/* Full screen button */}
-        <button
-          onClick={toggleFullScreen}
-          style={{
-            padding: "8px 12px",
-            background: "#4a4a4a",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: "5px",
-            marginRight: 10,
-          }}
-        >
-          {isFullScreen ? (
-            <>
-              <RiFullscreenExitFill size={16} />
-              Exit Full Screen
-            </>
-          ) : (
-            <>
-              <RiFullscreenFill size={16} />
-              Full Screen
-            </>
-          )}
-        </button>
+        {!isMobile && (
+          <button
+            onClick={toggleFullScreen}
+            style={{
+              padding: "8px 12px",
+              background: "#4a4a4a",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "5px",
+              marginRight: 10,
+            }}
+          >
+            {isFullScreen ? (
+              <>
+                <RiFullscreenExitFill size={16} />
+                Exit Full Screen
+              </>
+            ) : (
+              <>
+                <RiFullscreenFill size={16} />
+                Full Screen
+              </>
+            )}
+          </button>
+        )}
       </div>
     </div>
   )
