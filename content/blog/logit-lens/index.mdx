@@ -30,7 +30,7 @@ Here's the idea of the logit lens: logits can be calculated for not only the las
 
 ### Beta-lactamase
 
-I took a beta-lactamase sequence, masked each position one at a time, and calculated the logits across each layer of ESM-2 (650M):
+I took a [beta-lactamase](https://en.wikipedia.org/wiki/Beta-lactamase) sequence, masked each position one at a time, and calculated the logits across each layer of [ESM-2 (650M)](https://huggingface.co/facebook/esm2_t33_650M_UR50D):
 
 <TopTokensHeatmap
   title="Beta-lactamase (PDB 4ZAM) top tokens by logit"
@@ -40,10 +40,10 @@ I took a beta-lactamase sequence, masked each position one at a time, and calcul
   maxLogit="12.35"
 />
 
-Each cell shows the amino acid ESM is more confident in, colored by its logit value (scroll for more positions, mouseover for logit values). The true amino acid sequence is at the bottom. Red positions are ones where ESM's final prediction is wrong.
+Each cell shows the amino acid ESM is most confident in, colored by its logit value (scroll right for more positions, mouseover for logit values). The true amino acid sequence is at the bottom. Red positions are ones where ESM's final prediction is wrong.
 
-- Logits in the early layers tend to be wrong. As we move through the layers, ESM often converges on the right answer.
-- By logit values, ESM clearly believes in some positions more than others. For example, it's super confident in position 45 being S––and it's right! The S at position 45 actually constitutes a binding site and is therefore likely highly conserved.
+- Logits in earlier layers tend to be wrong. As we move through the layers, ESM often converges on the right answer, but not always.
+- Looking at logit values, ESM clearly believes in some positions more than others. For example, it's super confident in position 45 being S––and it's right! The S at position 45 actually constitutes a binding site and is therefore likely highly conserved.
 
 <Figure content={<Image path={require("./images/beta-lactamase-45.png")} />}>
   Beta-lactamse (PDB [4ZAM](https://www.rcsb.org/3d-sequence/4ZAM?asymId=A)) has
@@ -58,11 +58,11 @@ Each cell shows the amino acid ESM is more confident in, colored by its logit va
   another binding site annotation at position 106.
 </Figure>
 
-- At the first position, ESM is wrong but made a reasonable guess: Methionine (M) corresponds to the start codon so most proteins start with it.
+- At the first position, ESM is wrong but made a reasonable guess: [Methionine (M)](https://en.wikipedia.org/wiki/Methionine) corresponds to the start codon so most proteins start with it.
 
 - Sometimes, ESM starts believing in an amino acid in an early layer (e.g. position 29 starting from layer 14). Sometimes, it "changes its mind" at the last layer (position 15).
 
-Of course, looking at the top amino acid is just one angle. What about the other amino acids? If ESM got the final prediction wrong, did it come close by at least giving the true amino acid _one of_ the highest logits?
+Of course, focusing on top amino acid is limiting. What about the other amino acids? If ESM got the final prediction wrong, did it come close by at least assigning the true amino acid _one of_ the highest logits? We can look at that by plotting the rank of the true amino acid among the 20 options.
 
 <TrueTokensRanksHeatmap
   title="Beta-lactamase (PDB 4ZAM) true token ranks"
@@ -70,11 +70,11 @@ Of course, looking at the top amino acid is just one angle. What about the other
   ranksPath="/data/logit-lens/beta_lactamase_true_token_ranks.csv"
 />
 
-We can look at that by plotting the rank of the true amino acid among all 20. In many cases where ESM made the wrong prediction, the correct amino acid was highly ranked. For example, at position 5, the correct amino acid corresponds to ESM's second highest logit.
+In many cases where ESM made the wrong prediction, the correct amino acid was highly ranked. For example, at position 5, the correct amino acid corresponds to ESM's second highest logit.
 
 ### Antibody
 
-I repeated this for an antibody heavy chain sequence.
+I repeated the above for an antibody heavy chain sequence.
 
 <TopTokensHeatmap
   title="Antibody heavy chain (PDB 5XRQ) top tokens by logit"
@@ -84,7 +84,7 @@ I repeated this for an antibody heavy chain sequence.
   maxLogit="12"
 />
 
-I noticed ESM's high conviction on position 22 and 96 being C. They turned out to be a [disulfide bridge](https://www.creative-proteomics.com/resource/disulfide-bridges-proteins-formation-function-analysis.htm), important for structural stability. Interestingly, ESM started developing this conviction for both positions simultaneously around layer 10.
+I noticed ESM's high conviction on position 22 and 96 being C. They turned out to form a [disulfide bridge](https://www.creative-proteomics.com/resource/disulfide-bridges-proteins-formation-function-analysis.htm), important for an antibody's structural stability. Interestingly, ESM started developing this conviction for both positions simultaneously around layer 10.
 
 <Figure content={<Image path={require("./images/antibody-bridge-1.png")} />}>
   PDB [5XRQ](https://www.rcsb.org/3d-sequence/5XRQ?asymId=A) has a disulfide
@@ -108,24 +108,24 @@ Here's the view of true amino acid ranks:
 
 ## Attention maps
 
-Attention maps of Transformers can be visualized to provide insight into the positions attended to at each layer. Can we use them to explain observations through the logit lens?
+Attention maps of Transformers can be visualized to provide insight into the positions attended to at each layer. Can we use them to explain what we see in the logit lens?
 
-Through the logit lens, we saw that ESM started noticing the disulfide bridge at positions 154 - 210 in antibody sequence starting at layer 9. What are the attention heads doing at that layer? Below are max-pooled attention maps around those positions, comparing layer 8 vs. 9.
+From layer 9, ESM began noticing the disulfide bridge at positions 154 - 210 in the antibody sequence. What are the attention heads cooking at that layer? Below are max-pooled attention maps zoomed in at those positions, comparing layer 8 vs. 9.
 
 <Figure
   content={<Image path={require("./images/bridge-attention-maps.png")} />}
 />
 
-At least one of the attention heads in layer 9 is attending to the positions of the disulfide bridge, which doesn't seem to be the case for layer 8. This may explain why ESM started "seeing" the bridge starting at layer 9.
+At least one of the attention heads in layer 9 is attending to the positions of the disulfide bridge, which doesn't seem to be the case for layer 8. Perhaps this is why ESM started "seeing" the bridge starting at layer 9.
 
 ## Final thoughts
 
-We have quite a few tools in our toolbox now for understanding protein language models: [attention maps](https://arxiv.org/abs/2006.15222), [SAEs](https://www.biorxiv.org/content/10.1101/2024.11.14.623630v1) (plug for [our work](https://www.biorxiv.org/content/10.1101/2025.02.06.636901v1)), and the logit lens. I'm especially excited about ways we could combine them to answer practical questions about these models:
+We have quite a few tools in our toolbox now for interpreting protein language models: [attention maps](https://arxiv.org/abs/2006.15222), [SAEs](https://www.biorxiv.org/content/10.1101/2024.11.14.623630v1) (plug for [our work](https://www.biorxiv.org/content/10.1101/2025.02.06.636901v1)), and the logit lens. I'm particularly excited about ways we might combine them to answer practical questions about these models:
 
 - Can we use these learnings to design better models that more accurately represent biology and avoid common failure modes?
-- If protein models encode some knowledge of biology unknown to us, can we use these tools to learn them?
+- Assuming protein models encode some knowledge of biology unknown to us, can we use these tools to learn them?
 
-Compared to LLMs, protein models are hard to interpret because we didn't invent the language of life and actually barely understand it. But we've got some help too, like <Link to="/protein-evolution">powerful maps of evolution</Link> and [beautiful structures](https://interprot.com/#/sae-viz/SAE4096-L24/4000).
+Compared to LLMs, protein models are hard to interpret because we didn't invent the language of life (and actually barely understand it). But we've got some help too, like <Link to="/protein-evolution">powerful maps of evolution</Link> and [beautiful structures](https://interprot.com/#/sae-viz/SAE4096-L24/4000).
 
 ## Acknowledgements
 
