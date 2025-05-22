@@ -42,16 +42,12 @@ const viridisColorMapRGB = t => {
   ]
 }
 
-const RanksOnStructure = ({
-  pdbId,
-  ranksPath,
-  viewerId = "molstar-viewer",
-}) => {
+const StructureOverlay = ({ pdbId, logitsPath, maxLogit }) => {
   const pluginRef = useRef(null)
-  const [ranksData, setRanksData] = useState([])
+  const [logitData, setLogitData] = useState([])
   const [currentLayer, setCurrentLayer] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
-  const [ranksLoading, setRanksLoading] = useState(true)
+  const [logitsLoading, setLogitsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [isStructureLoaded, setIsStructureLoaded] = useState(false)
 
@@ -59,13 +55,13 @@ const RanksOnStructure = ({
 
   // Fetch and parse CSV data
   useEffect(() => {
-    if (!ranksPath) {
-      setRanksLoading(false)
+    if (!logitsPath) {
+      setLogitsLoading(false)
       return
     }
-    setRanksLoading(true)
-    const loadRanks = async () => {
-      const csvData = await fetchCSV(ranksPath)
+    setLogitsLoading(true)
+    const loadLogits = async () => {
+      const csvData = await fetchCSV(logitsPath)
       if (csvData) {
         const parsedData = Papa.parse(csvData, {
           header: false,
@@ -74,27 +70,19 @@ const RanksOnStructure = ({
           row =>
             row && row.length > 0 && row.some(val => val !== null && val !== "")
         )
-        setRanksData(parsedData)
+        setLogitData(parsedData)
         if (parsedData.length > 0) {
-          let currentMax = 0
-          parsedData.forEach(layer => {
-            layer.forEach(rank => {
-              if (typeof rank === "number" && rank > currentMax) {
-                currentMax = rank
-              }
-            })
-          })
           setCurrentLayer(0) // Default to first layer
         }
       }
-      setRanksLoading(false)
+      setLogitsLoading(false)
     }
-    loadRanks()
-  }, [ranksPath])
+    loadLogits()
+  }, [logitsPath])
 
   const createResidueColorTheme = useCallback(
-    (layerRanks, name = "residue-rank-colors") => {
-      if (!layerRanks || layerRanks.length === 0) {
+    (layerLogits, name = "residue-logit-colors") => {
+      if (!layerLogits || layerLogits.length === 0) {
         return CustomElementProperty.create({
           label: "Default Colors",
           name: name + "_default",
@@ -122,7 +110,7 @@ const RanksOnStructure = ({
       }
 
       return CustomElementProperty.create({
-        label: "Residue Rank Colors",
+        label: "Residue Logit Colors",
         name,
         getData(model) {
           const map = new Map()
@@ -140,28 +128,32 @@ const RanksOnStructure = ({
         coloring: {
           getColor(p) {
             const { residueIdx } = p
-            // layerRanks is 0-indexed based on sequence position from CSV
-            const rank = layerRanks[residueIdx]
+            // layerLogits is 0-indexed based on sequence position from CSV
+            const logit = layerLogits[residueIdx]
 
             if (
-              rank === undefined ||
-              rank === null ||
-              typeof rank !== "number"
+              logit === undefined ||
+              logit === null ||
+              typeof logit !== "number"
             ) {
-              return Color(0xcccccc) // Default color for missing/invalid rank
+              return Color(0xcccccc) // Default color for missing/invalid logit
             }
-            const normalizedRank = rank / 20
-            const rgbColor = viridisColorMapRGB(1 - normalizedRank)
+            // Normalize logit value to range [0, 1] based on maxLogit
+            const normalizedLogit = Math.min(
+              1.0,
+              Math.max(0.0, logit / maxLogit)
+            )
+            const rgbColor = viridisColorMapRGB(normalizedLogit)
             return Color.fromRgb(rgbColor[0], rgbColor[1], rgbColor[2])
           },
           defaultColor: Color(0xffffff), // Default to white if no specific color
         },
         getLabel() {
-          return "Residue Rank Colors"
+          return "Residue Logit Colors"
         },
       })
     },
-    []
+    [maxLogit]
   )
 
   // Initialize Molstar and load structure
@@ -247,28 +239,28 @@ const RanksOnStructure = ({
       !pluginRef.current ||
       !pluginRef.current.managers.structure ||
       !isStructureLoaded || // Added check for structure readiness
-      ranksData.length === 0 ||
-      currentLayer >= ranksData.length ||
+      logitData.length === 0 ||
+      currentLayer >= logitData.length ||
       !pdbId
     ) {
       return
     }
 
     const plugin = pluginRef.current
-    const layerRanks = ranksData[currentLayer]
+    const layerLogits = logitData[currentLayer]
 
-    if (!layerRanks) {
+    if (!layerLogits) {
       return
     }
 
-    const themeName = `residue-rank-theme-layer-${currentLayer}`
-    const ResidueRankTheme = createResidueColorTheme(layerRanks, themeName)
+    const themeName = `residue-logit-theme-layer-${currentLayer}`
+    const ResidueLogitTheme = createResidueColorTheme(layerLogits, themeName)
 
-    if (!ResidueRankTheme || !ResidueRankTheme.colorThemeProvider) {
+    if (!ResidueLogitTheme || !ResidueLogitTheme.colorThemeProvider) {
       return
     }
 
-    const colorThemeProvider = ResidueRankTheme.colorThemeProvider
+    const colorThemeProvider = ResidueLogitTheme.colorThemeProvider
     const actualThemeName = colorThemeProvider.name
 
     if (typeof actualThemeName !== "string" || !actualThemeName.trim()) {
@@ -301,7 +293,7 @@ const RanksOnStructure = ({
     })
   }, [
     currentLayer,
-    ranksData,
+    logitData,
     createResidueColorTheme,
     pdbId,
     isStructureLoaded,
@@ -311,28 +303,28 @@ const RanksOnStructure = ({
     return <div style={{ color: "red", padding: "20px" }}>Error: {error}</div>
   }
 
-  console.log("hi", currentLayer)
   return (
     <div
       style={{
         position: "relative",
         width: "100%",
-        height: "500px" /* Adjust as needed */,
+        height: "450px",
+        marginBottom: 20,
       }}
     >
       <div
-        id={viewerId}
+        id={`molstar-viewer-${pdbId}`}
         ref={containerRef}
         style={{
           width: "100%",
           height: "100%",
           position: "absolute",
           backgroundColor:
-            isLoading || error || ranksLoading ? "#f0f0f0" : "transparent", // Optional: dim background when loading/error
+            isLoading || error || logitsLoading ? "#f0f0f0" : "transparent", // Optional: dim background when loading/error
         }}
       />
 
-      {(isLoading || ranksLoading) && !error && (
+      {(isLoading || logitsLoading) && !error && (
         <div
           style={{
             position: "absolute",
@@ -345,13 +337,7 @@ const RanksOnStructure = ({
             zIndex: 20,
           }}
         >
-          {isLoading && ranksLoading
-            ? "Loading structure and ranks..."
-            : isLoading
-            ? "Loading structure..."
-            : ranksLoading
-            ? "Loading ranks data..."
-            : "Loading..."}
+          Loading...
         </div>
       )}
 
@@ -373,7 +359,7 @@ const RanksOnStructure = ({
         </div>
       )}
 
-      {!isLoading && !error && pdbId && ranksData.length > 0 && (
+      {!isLoading && !error && pdbId && logitData.length > 0 && (
         <div
           style={{
             position: "absolute",
@@ -391,35 +377,21 @@ const RanksOnStructure = ({
           <label
             htmlFor="layer-slider"
             style={{ marginRight: "10px", whiteSpace: "nowrap" }}
-          >{`Layer: ${currentLayer + 1} / ${ranksData.length}`}</label>
+          >{`Layer: ${currentLayer + 1}`}</label>
           <input
             type="range"
             id="layer-slider"
             value={currentLayer}
             min={0}
-            max={ranksData.length - 1}
+            max={logitData.length - 1}
             step={1}
             onChange={e => setCurrentLayer(parseInt(e.target.value, 10))}
             style={{ width: "100%" }}
           />
         </div>
       )}
-
-      {!pdbId && !isLoading && !error && (
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            padding: "20px",
-          }}
-        >
-          PDB ID not provided.
-        </div>
-      )}
     </div>
   )
 }
 
-export default RanksOnStructure
+export default StructureOverlay

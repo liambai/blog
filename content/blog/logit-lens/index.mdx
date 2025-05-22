@@ -9,7 +9,7 @@ import Figure from "../../../src/components/figure.jsx"
 import Image from "../../../src/components/image.jsx"
 import TopTokensHeatmap from "./d3/top_tokens_heatmap"
 import TrueTokensRanksHeatmap from "./d3/true_tokens_ranks_heatmap"
-import RanksOnStructure from "./d3/ranks_on_structure"
+import StructureOverlay from "./d3/structure_overlay"
 
 The [logit lens](https://www.lesswrong.com/posts/AcKRB8wDpdaN6v6ru/interpreting-gpt-the-logit-lens) is a powerful tool for interpreting LLMs. Can we use it to better understand protein language models?
 
@@ -63,16 +63,19 @@ Each cell shows the amino acid that ESM is most confident in, colored by its log
 
 - Sometimes, ESM starts believing in an amino acid in an early layer (e.g. position 29 starting from layer 14). Sometimes, it "changes its mind" at the last layer (position 15).
 
+Here's a visualization of the top logit values at each position overlaid on the protein structure. Use the slider to see different layers.
+
+<StructureOverlay
+  pdbId="4ZAM"
+  logitsPath="/data/logit-lens/beta_lactamase_top_logits.csv"
+  maxLogit="12.35"
+/>
+
 Of course, focusing on the top amino acid is limiting. What about the other amino acids? If ESM got the final prediction wrong, did it come close by at least assigning the true amino acid _one of_ the highest logits? We can answer that by plotting the rank of the true amino acid among the 20 options.
 
 <TrueTokensRanksHeatmap
   title="Beta-lactamase (PDB 4ZAM) true token ranks"
   sequence="SPQPLEQIKLSESQLSGRVGMIEMDLASGRTLTAWRADERFPMMSTFKVVLCGAVLARVDAGDEQLERKIHYRQQDLVDYSPVSEKHLADGMTVGELCAAAITMSDNSAANLLLATVGGPAGLTAFLRQIGDNVTRLDRWETELNEALPGDARDTTTPASMAATLRKLLTSQRLSARSQRQLLQWMVDDRVAGPLIRSVLPAGWFIADKTGAGERGARGIVALLGPNNKAERIVVIYLRDTPASMAERNQQIAGIGAALIEHWQR"
-  ranksPath="/data/logit-lens/beta_lactamase_true_token_ranks.csv"
-/>
-
-<RanksOnStructure
-  pdbId="4ZAM"
   ranksPath="/data/logit-lens/beta_lactamase_true_token_ranks.csv"
 />
 
@@ -104,17 +107,20 @@ There is another disulfide bridge spanning positions 154 - 210. ESM seems to hav
   disulfide bridge across positions 154 and 210.
 </Figure>
 
-Here's the view of true amino acid ranks:
+Here is the structure colored by logits (the other chain is in grey).
+
+<StructureOverlay
+  pdbId="5XRQ"
+  logitsPath="/data/logit-lens/ab_heavy_chain_top_logits.csv"
+  maxLogit="12"
+/>
+
+And the true amino acid ranks:
 
 <TrueTokensRanksHeatmap
   title="Antibody heavy chain (PDB 5XRQ) true token ranks"
   sequence="QVQLVQSGAEVKKPGSSVRVSCKASGDTFSSYSITWVRQAPGHGLQWMGGIFPIFGSTNYAQKFDDRLTITTDDSSRTVYMELTSLRLEDTAVYYCARGASKVEPAAPAYSDAFDMWGQGTLVTVSSASTKGPSVFPLAPSSKSTSGGTAALGCLVKDYFPEPVTVSWNSGALTSGVHTFPAVLQSSGLYSLSSVVTVPSSSLGTQTYICNVNHKPSNTKVDKRVEPKSCHHHHHH"
   ranksPath="/data/logit-lens/ab_heavy_chain_true_token_ranks.csv"
-/>
-
-<RanksOnStructure
-  pdbId="5XRQ"
-  ranksPath="/data/logit-lens/beta_lactamase_true_token_ranks.csv"
 />
 
 ## Attention maps
