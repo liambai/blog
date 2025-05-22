@@ -25,7 +25,7 @@ What is the amino acid at the masked position?
 
 ESM answers this question with 20 numbers (**logits**), one for each possible amino acid. Each logit indicates ESM's confidence level in that amino acid being the masked one. To make a prediction, we pick the amino acid with the highest logit.
 
-Here's the idea of the logit lens: logits can be calculated for not only the last layer (ESM's final answers), but also intermediate layers. Intermediate logits give a view into the model's information flow, and in some limited sense, its "thought process".
+Here's the idea: logits can be calculated for not only the last layer (ESM's final answers), but also intermediate layers. Intermediate logits give a view into the model's information flow, and in some limited sense, its "thought process".
 
 ## ESM through the logit lens
 
@@ -41,7 +41,7 @@ I took a [beta-lactamase](https://en.wikipedia.org/wiki/Beta-lactamase) sequence
   maxLogit="12.35"
 />
 
-Each cell shows the amino acid that ESM is most confident in, colored by its logit value (scroll right for more positions, mouseover for logit values). The true amino acid sequence is at the bottom; ones that don't match ESM's final prediction are red.
+Each cell shows the amino acid that ESM is most confident in, colored by its logit value (scroll right for more positions, mouseover for logit values). The true amino acid sequence is shown at the bottom, where the ones that don't match ESM's final prediction are red.
 
 - Logits in earlier layers tend to be wrong. As we move through the layers, ESM often converges on the right answer, but not always.
 - By logit values, ESM clearly believes in some positions more than others. For example, it's super confident in position 45 being S––and it's right! As it turns out, the S at position 45 constitutes a binding site, which means that it is likely highly conserved.
@@ -63,7 +63,7 @@ Each cell shows the amino acid that ESM is most confident in, colored by its log
 
 - Sometimes, ESM starts believing in an amino acid in an early layer (e.g. position 29 starting from layer 14). Sometimes, it "changes its mind" at the last layer (position 15).
 
-Here's a visualization of the top logit values at each position overlaid on the protein structure. Use the slider to see different layers.
+Here's a visualization of the top logit values at each position overlaid on the protein's structure. Use the slider to adjust the layer.
 
 <StructureOverlay
   title="Beta-lactamase (PDB 4ZAM) structure colored by top logit"
@@ -80,7 +80,7 @@ Of course, focusing on the top amino acid is limiting. What about the other amin
   ranksPath="/data/logit-lens/beta_lactamase_true_token_ranks.csv"
 />
 
-In many cases where ESM made the wrong prediction, the correct amino acid was highly ranked. It got so close! For example, at position 5, the correct amino acid corresponds to ESM's second highest logit.
+In many cases where ESM made the wrong prediction, the correct amino acid was quite highly ranked. It got so close! For example, at position 5, the correct amino acid corresponds to ESM's second highest logit.
 
 ### Antibody
 
@@ -139,13 +139,13 @@ At least one of the attention heads in layer 9 is attending to the positions of 
 
 ## Final thoughts
 
-We have quite a few tools in our toolbox now for interpreting protein language models: [attention maps](https://arxiv.org/abs/2006.15222), [SAEs](https://www.biorxiv.org/content/10.1101/2024.11.14.623630v1) (plug for [our work](https://www.biorxiv.org/content/10.1101/2025.02.06.636901v1)), and the logit lens. I'm particularly excited about ways we might combine them to gain deeper, systematic understanding and answer practical questions:
+We have quite a few tools in our toolbox now for interpreting protein language models: [attention maps](https://arxiv.org/abs/2006.15222), [SAEs](https://www.biorxiv.org/content/10.1101/2024.11.14.623630v1) (plug for [our work](https://www.biorxiv.org/content/10.1101/2025.02.06.636901v1)), and the logit lens. I'm particularly excited about ways we might combine them to gain deeper, systematic understanding of how these models work and answer practical questions:
 
-- Can we use these learnings to design better models that more accurately represent biology and avoid common failure modes?
-- Assuming protein models encode some knowledge of biology unknown to us, can we use these tools to learn them?
+- Can design better models that more accurately represent biology and avoid common failure modes?
+- Assuming protein models encode some knowledge of biology unknown to us, can we use these tools to extract that knowledge?
 
 Compared to LLMs, protein models are hard to interpret because we didn't invent the language of life (and actually barely understand it). But we've got help in some other ways, like <Link to="/protein-evolution">powerful maps of evolution</Link> and beautiful structures. The hidden structures of biological models are quite different––and arguably even more exotic and exhilarating.
 
 ## Acknowledgements
 
-Thank you to [Etowah Adams](https://etowahadams.com/) and [Minji Lee](https://haewonc.github.io/) for reading a draft of this post and giving feedback and ideas.
+Thank you to [Etowah Adams](https://etowahadams.com/) for reading a draft of this post and giving feedback and ideas.

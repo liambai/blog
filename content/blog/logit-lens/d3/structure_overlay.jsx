@@ -414,7 +414,7 @@ const StructureOverlay = ({ title, pdbId, logitsPath, maxLogit }) => {
         {!isLoading && !error && pdbId && logitData.length > 0 && (
           <div style={styles.layerControl}>
             <label htmlFor="layer-slider" style={styles.layerLabel}>
-              Layer: {currentLayer + 1}
+              ESM Layer: {currentLayer + 1}
             </label>
             <input
               type="range"
