@@ -9,6 +9,7 @@ import Figure from "../../../src/components/figure.jsx"
 import Image from "../../../src/components/image.jsx"
 import TopTokensHeatmap from "./d3/top_tokens_heatmap"
 import TrueTokensRanksHeatmap from "./d3/true_tokens_ranks_heatmap"
+import RanksOnStructure from "./d3/ranks_on_structure"
 
 The [logit lens](https://www.lesswrong.com/posts/AcKRB8wDpdaN6v6ru/interpreting-gpt-the-logit-lens) is a powerful tool for interpreting LLMs. Can we use it to better understand protein language models?
 
@@ -70,6 +71,11 @@ Of course, focusing on the top amino acid is limiting. What about the other amin
   ranksPath="/data/logit-lens/beta_lactamase_true_token_ranks.csv"
 />
 
+<RanksOnStructure
+  pdbId="4ZAM"
+  ranksPath="/data/logit-lens/beta_lactamase_true_token_ranks.csv"
+/>
+
 In many cases where ESM made the wrong prediction, the correct amino acid was highly ranked. It got so close! For example, at position 5, the correct amino acid corresponds to ESM's second highest logit.
 
 ### Antibody
@@ -104,6 +110,11 @@ Here's the view of true amino acid ranks:
   title="Antibody heavy chain (PDB 5XRQ) true token ranks"
   sequence="QVQLVQSGAEVKKPGSSVRVSCKASGDTFSSYSITWVRQAPGHGLQWMGGIFPIFGSTNYAQKFDDRLTITTDDSSRTVYMELTSLRLEDTAVYYCARGASKVEPAAPAYSDAFDMWGQGTLVTVSSASTKGPSVFPLAPSSKSTSGGTAALGCLVKDYFPEPVTVSWNSGALTSGVHTFPAVLQSSGLYSLSSVVTVPSSSLGTQTYICNVNHKPSNTKVDKRVEPKSCHHHHHH"
   ranksPath="/data/logit-lens/ab_heavy_chain_true_token_ranks.csv"
+/>
+
+<RanksOnStructure
+  pdbId="5XRQ"
+  ranksPath="/data/logit-lens/beta_lactamase_true_token_ranks.csv"
 />
 
 ## Attention maps

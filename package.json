@@ -31,6 +31,7 @@
     "gatsby-transformer-sharp": "^5.12.0",
     "katex": "^0.16.8",
     "littlefoot": "https://github.com/liambai/littlefoot.git",
+    "molstar": "^4.16.0",
     "papaparse": "^5.5.2",
     "prismjs": "^1.29.0",
     "react": "^18.1.0",
