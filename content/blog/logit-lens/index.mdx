@@ -84,7 +84,7 @@ In many cases where ESM made the wrong prediction, the correct amino acid was hi
 
 ### Antibody
 
-I repeated the above for an [antibody heavy chain](https://en.wikipedia.org/wiki/Immunoglobulin_heavy_chain) sequence.
+I repeated this for an [antibody heavy chain](https://en.wikipedia.org/wiki/Immunoglobulin_heavy_chain) sequence.
 
 <TopTokensHeatmap
   title="Antibody heavy chain (PDB 5XRQ) top tokens by logit"
@@ -127,7 +127,7 @@ And the true amino acid ranks:
 
 ## Attention maps
 
-Attention maps of Transformers can be visualized to give insight into the positions attended to at each layer. Can we use them to explain what we see in the logit lens?
+We can visualize a Transformer's attention maps to learn about activities of the attention heads at each layer. Can we use this to explain what we saw in the logit lens?
 
 From layer 9, ESM began noticing the disulfide bridge at positions 154 - 210 in the antibody sequence. What are the attention heads doing at that layer? Below are max-pooled attention maps zoomed in at those positions, comparing layer 8 vs. 9.
 
@@ -144,7 +144,7 @@ We have quite a few tools in our toolbox now for interpreting protein language m
 - Can we use these learnings to design better models that more accurately represent biology and avoid common failure modes?
 - Assuming protein models encode some knowledge of biology unknown to us, can we use these tools to learn them?
 
-Compared to LLMs, protein models are hard to interpret because we didn't invent the language of life (and actually barely understand it). But we've got help in some other ways, like <Link to="/protein-evolution">powerful maps of evolution</Link> and beautiful structures. The hidden structures of biological models are quite different––and I'd argue even more exotic and exhilarating.
+Compared to LLMs, protein models are hard to interpret because we didn't invent the language of life (and actually barely understand it). But we've got help in some other ways, like <Link to="/protein-evolution">powerful maps of evolution</Link> and beautiful structures. The hidden structures of biological models are quite different––and arguably even more exotic and exhilarating.
 
 ## Acknowledgements
 
