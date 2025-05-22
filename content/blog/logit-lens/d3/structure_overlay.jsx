@@ -42,7 +42,7 @@ const viridisColorMapRGB = t => {
   ]
 }
 
-const StructureOverlay = ({ pdbId, logitsPath, maxLogit }) => {
+const StructureOverlay = ({ title, pdbId, logitsPath, maxLogit }) => {
   const pluginRef = useRef(null)
   const [logitData, setLogitData] = useState([])
   const [currentLayer, setCurrentLayer] = useState(0)
@@ -312,15 +312,29 @@ const StructureOverlay = ({ pdbId, logitsPath, maxLogit }) => {
         marginBottom: 20,
       }}
     >
+      <h2
+        style={{
+          textAlign: "center",
+          marginLeft: 50,
+          marginTop: 15,
+          marginBottom: 15,
+          fontSize: "1.2rem",
+          fontWeight: "bold",
+        }}
+      >
+        {title}
+      </h2>
       <div
         id={`molstar-viewer-${pdbId}`}
         ref={containerRef}
         style={{
           width: "100%",
-          height: "100%",
+          height: "calc(100% - 30px)",
           position: "absolute",
+          top: title ? "30px" : "0",
+          left: 0,
           backgroundColor:
-            isLoading || error || logitsLoading ? "#f0f0f0" : "transparent", // Optional: dim background when loading/error
+            isLoading || error || logitsLoading ? "#f0f0f0" : "transparent",
         }}
       />
 
@@ -328,7 +342,7 @@ const StructureOverlay = ({ pdbId, logitsPath, maxLogit }) => {
         <div
           style={{
             position: "absolute",
-            top: "50%",
+            top: title ? "calc(50% + 15px)" : "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
             padding: "20px",
@@ -345,7 +359,7 @@ const StructureOverlay = ({ pdbId, logitsPath, maxLogit }) => {
         <div
           style={{
             position: "absolute",
-            top: "50%",
+            top: title ? "calc(50% + 15px)" : "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
             color: "red",
