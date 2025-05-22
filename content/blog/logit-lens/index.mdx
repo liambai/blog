@@ -31,7 +31,9 @@ Here's the idea: logits can be calculated for not only the last layer (ESM's fin
 
 ### Beta-lactamase
 
-I took a [beta-lactamase](https://en.wikipedia.org/wiki/Beta-lactamase) sequence, masked each position one at a time, and calculated the logits across each layer of [ESM-2 (650M)](https://huggingface.co/facebook/esm2_t33_650M_UR50D):
+I took a [beta-lactamase](https://en.wikipedia.org/wiki/Beta-lactamase) sequence, masked each position one at a time, and calculated the logits across each layer of [ESM-2 (650M)](https://huggingface.co/facebook/esm2_t33_650M_UR50D).
+
+Each cell below shows the amino acid that ESM is most confident in, colored by its logit value (scroll right for more positions, mouseover for logit values). The true amino acid sequence is shown at the bottom, where the ones that don't match ESM's final prediction are red.
 
 <TopTokensHeatmap
   title="Beta-lactamase (PDB 4ZAM) top tokens by logit"
@@ -41,9 +43,7 @@ I took a [beta-lactamase](https://en.wikipedia.org/wiki/Beta-lactamase) sequence
   maxLogit="12.35"
 />
 
-Each cell shows the amino acid that ESM is most confident in, colored by its logit value (scroll right for more positions, mouseover for logit values). The true amino acid sequence is shown at the bottom, where the ones that don't match ESM's final prediction are red.
-
-- Logits in earlier layers tend to be wrong. As we move through the layers, ESM often converges on the right answer, but not always.
+- Logits in earlier layers tend to be uncalibrated. As we move through the layers, ESM often converges on the right answer, but not always.
 - By logit values, ESM clearly believes in some positions more than others. For example, it's super confident in position 45 being S––and it's right! As it turns out, the S at position 45 constitutes a binding site, which means that it is likely highly conserved.
 
 <Figure content={<Image path={require("./images/beta-lactamase-45.png")} />}>
@@ -144,8 +144,8 @@ We have quite a few tools in our toolbox now for interpreting protein language m
 - Can we design better models that more accurately represent biology and avoid common failure modes?
 - Assuming protein models encode some knowledge of biology unknown to us, can we use these tools to extract that knowledge?
 
-Compared to LLMs, protein models are hard to interpret because we didn't invent the language of life (and actually barely understand it). But we've got help in some other ways, like <Link to="/protein-evolution">powerful maps of evolution</Link> and beautiful structures. The hidden structures of biological models are quite different––and arguably even more exotic and exhilarating.
+Compared to LLMs, interpreting protein models is less intuitive because we didn't invent the language of life (and actually barely understand it). But we've got help in some other ways, like <Link to="/protein-evolution">powerful maps of evolution</Link> and beautiful structures. The hidden structures in biological models are quite different––and arguably even more exotic and exhilarating.
 
 ## Acknowledgements
 
-Thank you to [Etowah Adams](https://etowahadams.com/) for reading a draft of this post and giving feedback and ideas.
+Thank you to Etowah Adams, Minji Lee, Malhar Bhide, and Yash Rathod for reading a draft of this post and giving feedback and ideas.
