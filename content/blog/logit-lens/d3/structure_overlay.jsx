@@ -195,8 +195,30 @@ const StructureOverlay = ({ title, pdbId, logitsPath, maxLogit }) => {
         await plugin.init()
 
         const canvas = document.createElement("canvas")
+        canvas.style.width = "100%"
+        canvas.style.height = "100%"
         containerRef.current.appendChild(canvas)
         plugin.initViewer(canvas, containerRef.current)
+
+        // Prevent resizing on interaction - using the correct API
+        if (plugin.layout && plugin.layout.state) {
+          // Check what properties/methods are available
+          try {
+            // Set layout to static size
+            plugin.layout.state.set({
+              isExpanded: false,
+            })
+
+            // Hide controls if the API supports it
+            if (plugin.layout.controls) {
+              plugin.layout.controls.set({
+                visible: false,
+              })
+            }
+          } catch (layoutError) {
+            console.warn("Could not configure layout:", layoutError)
+          }
+        }
 
         const pdbUrl = `https://files.rcsb.org/download/${pdbId.toUpperCase()}.pdb`
         const structureData = await plugin.builders.data.download({
@@ -238,7 +260,7 @@ const StructureOverlay = ({ title, pdbId, logitsPath, maxLogit }) => {
     if (
       !pluginRef.current ||
       !pluginRef.current.managers.structure ||
-      !isStructureLoaded || // Added check for structure readiness
+      !isStructureLoaded ||
       logitData.length === 0 ||
       currentLayer >= logitData.length ||
       !pdbId
@@ -297,121 +319,116 @@ const StructureOverlay = ({ title, pdbId, logitsPath, maxLogit }) => {
     createResidueColorTheme,
     pdbId,
     isStructureLoaded,
-  ]) // Added isStructureLoaded to dependencies
+  ])
 
   if (error) {
     return <div style={{ color: "red", padding: "20px" }}>Error: {error}</div>
   }
 
+  // Define reusable styles as objects
+  const styles = {
+    container: {
+      display: "flex",
+      flexDirection: "column",
+      width: "100%",
+      height: "450px",
+      marginBottom: "20px",
+      overflow: "hidden", // Prevent any content from overflowing
+    },
+    title: {
+      textAlign: "center",
+      margin: "0 0 15px 0",
+      padding: "0",
+      fontSize: "1.2rem",
+      fontWeight: "bold",
+    },
+    viewerContainer: {
+      flex: 1,
+      position: "relative",
+      backgroundColor:
+        isLoading || error || logitsLoading ? "#f0f0f0" : "transparent",
+      overflow: "hidden", // Prevent viewer from growing out of bounds
+    },
+    viewer: {
+      width: "100%",
+      height: "100%",
+      position: "absolute", // Fix the position
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+    },
+    message: {
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      padding: "15px",
+      backgroundColor: "rgba(255,255,255,0.9)",
+      borderRadius: "5px",
+      zIndex: 20,
+    },
+    layerControl: {
+      position: "absolute",
+      bottom: "20px",
+      left: "20px",
+      right: "20px",
+      backgroundColor: "rgba(255, 255, 255, 0.8)",
+      padding: "10px",
+      borderRadius: "5px",
+      zIndex: 10,
+      display: "flex",
+      alignItems: "center",
+    },
+    layerLabel: {
+      marginRight: "10px",
+      whiteSpace: "nowrap",
+      fontWeight: "500",
+      fontSize: "14px",
+      color: "#333",
+    },
+    slider: {
+      width: "100%",
+    },
+  }
+
   return (
-    <div
-      style={{
-        position: "relative",
-        width: "100%",
-        height: "450px",
-        marginBottom: 20,
-      }}
-    >
-      <h2
-        style={{
-          textAlign: "center",
-          marginLeft: 50,
-          marginTop: 15,
-          marginBottom: 15,
-          fontSize: "1.2rem",
-          fontWeight: "bold",
-        }}
-      >
-        {title}
-      </h2>
-      <div
-        id={`molstar-viewer-${pdbId}`}
-        ref={containerRef}
-        style={{
-          width: "100%",
-          height: "calc(100% - 30px)",
-          position: "absolute",
-          top: title ? "30px" : "0",
-          left: 0,
-          backgroundColor:
-            isLoading || error || logitsLoading ? "#f0f0f0" : "transparent",
-        }}
-      />
+    <div style={styles.container}>
+      {title && <h2 style={styles.title}>{title}</h2>}
 
-      {(isLoading || logitsLoading) && !error && (
+      <div style={styles.viewerContainer}>
         <div
-          style={{
-            position: "absolute",
-            top: title ? "calc(50% + 15px)" : "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            padding: "20px",
-            backgroundColor: "rgba(255,255,255,0.9)",
-            borderRadius: "5px",
-            zIndex: 20,
-          }}
-        >
-          Loading...
-        </div>
-      )}
+          id={`molstar-viewer-${pdbId}`}
+          ref={containerRef}
+          style={styles.viewer}
+        />
 
-      {error && (
-        <div
-          style={{
-            position: "absolute",
-            top: title ? "calc(50% + 15px)" : "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            color: "red",
-            padding: "20px",
-            backgroundColor: "rgba(255,255,255,0.9)",
-            borderRadius: "5px",
-            zIndex: 20,
-          }}
-        >
-          Error: {error}
-        </div>
-      )}
+        {(isLoading || logitsLoading) && !error && (
+          <div style={{ ...styles.message }}>Loading...</div>
+        )}
 
-      {!isLoading && !error && pdbId && logitData.length > 0 && (
-        <div
-          style={{
-            position: "absolute",
-            bottom: "20px",
-            left: "20px",
-            right: "20px",
-            backgroundColor: "rgba(255, 255, 255, 0.8)",
-            padding: "10px",
-            borderRadius: "5px",
-            zIndex: 10,
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <label
-            htmlFor="layer-slider"
-            style={{
-              marginRight: "10px",
-              whiteSpace: "nowrap",
-              fontWeight: "500",
-              fontSize: "14px",
-              color: "#333",
-            }}
-          >
-            Layer: {currentLayer + 1}
-          </label>
-          <input
-            type="range"
-            id="layer-slider"
-            value={currentLayer}
-            min={0}
-            max={logitData.length - 1}
-            step={1}
-            onChange={e => setCurrentLayer(parseInt(e.target.value, 10))}
-            style={{ width: "100%" }}
-          />
-        </div>
-      )}
+        {error && (
+          <div style={{ ...styles.message, color: "red" }}>Error: {error}</div>
+        )}
+
+        {!isLoading && !error && pdbId && logitData.length > 0 && (
+          <div style={styles.layerControl}>
+            <label htmlFor="layer-slider" style={styles.layerLabel}>
+              Layer: {currentLayer + 1}
+            </label>
+            <input
+              type="range"
+              id="layer-slider"
+              value={currentLayer}
+              min={0}
+              max={logitData.length - 1}
+              step={1}
+              onChange={e => setCurrentLayer(parseInt(e.target.value, 10))}
+              style={styles.slider}
+            />
+          </div>
+        )}
+      </div>
     </div>
   )
 }
