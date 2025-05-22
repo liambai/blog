@@ -376,8 +376,16 @@ const StructureOverlay = ({ pdbId, logitsPath, maxLogit }) => {
         >
           <label
             htmlFor="layer-slider"
-            style={{ marginRight: "10px", whiteSpace: "nowrap" }}
-          >{`Layer: ${currentLayer + 1}`}</label>
+            style={{
+              marginRight: "10px",
+              whiteSpace: "nowrap",
+              fontWeight: "500",
+              fontSize: "14px",
+              color: "#333",
+            }}
+          >
+            Layer: {currentLayer + 1}
+          </label>
           <input
             type="range"
             id="layer-slider"
