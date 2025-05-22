@@ -53,6 +53,7 @@ const RanksOnStructure = ({
   const [isLoading, setIsLoading] = useState(true)
   const [ranksLoading, setRanksLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [isStructureLoaded, setIsStructureLoaded] = useState(false)
 
   const containerRef = useRef(null)
 
@@ -172,6 +173,7 @@ const RanksOnStructure = ({
         pluginRef.current.dispose()
         pluginRef.current = null
       }
+      setIsStructureLoaded(false) // Ensure structure is marked as not loaded
       return
     }
 
@@ -179,10 +181,12 @@ const RanksOnStructure = ({
     // The actual initialization will check containerRef.current.
     setIsLoading(true)
     setError(null)
+    setIsStructureLoaded(false) // Reset before loading new structure
 
     const initMolstar = async () => {
       if (!containerRef.current) {
         setIsLoading(false) // Can't load if container isn't there
+        setIsStructureLoaded(false) // Ensure consistent state
         return
       }
 
@@ -218,9 +222,11 @@ const RanksOnStructure = ({
           "default"
         )
         setIsLoading(false)
+        setIsStructureLoaded(true) // Structure is now loaded
       } catch (e) {
         setError(`Failed to load PDB ${pdbId}: ${e.message}`)
         setIsLoading(false)
+        setIsStructureLoaded(false) // Structure loading failed
       }
     }
 
@@ -231,6 +237,7 @@ const RanksOnStructure = ({
         pluginRef.current.dispose()
         pluginRef.current = null
       }
+      setIsStructureLoaded(false) // Cleanup, structure no longer considered loaded
     }
   }, [pdbId]) // Only depend on pdbId. The check for containerRef.current handles its availability.
 
@@ -239,6 +246,7 @@ const RanksOnStructure = ({
     if (
       !pluginRef.current ||
       !pluginRef.current.managers.structure ||
+      !isStructureLoaded || // Added check for structure readiness
       ranksData.length === 0 ||
       currentLayer >= ranksData.length ||
       !pdbId
@@ -291,12 +299,19 @@ const RanksOnStructure = ({
         )
       }
     })
-  }, [currentLayer, ranksData, createResidueColorTheme, pdbId])
+  }, [
+    currentLayer,
+    ranksData,
+    createResidueColorTheme,
+    pdbId,
+    isStructureLoaded,
+  ]) // Added isStructureLoaded to dependencies
 
   if (error) {
     return <div style={{ color: "red", padding: "20px" }}>Error: {error}</div>
   }
 
+  console.log("hi", currentLayer)
   return (
     <div
       style={{
