@@ -1,0 +1,76 @@
+---
+title: "Why say lot word when few do trick?"
+date: "2025-06-05"
+description: "The Minimum Description Length (MDL) principle, Kolmogorov complexity, curve fitting, learning as data compression."
+---
+
+import { Link } from "gatsby"
+import Figure from "../../../src/components/figure.jsx"
+import Image from "../../../src/components/image.jsx"
+
+It's almost impossible to watch this classic Kevin clip without coming to the conclusion: he's onto something.
+
+<Figure content={<Image path={require("./images/kevin.jpg")} />} />
+
+His abbreviated sentences seem to contain the same information as their verbose original... Can we rigorously define and measure this "information content"? How _few_ can we go while preserving the same content?
+
+The answer to these questions reveal what is arguably the most profound idea in machine learning: the **Minimum Description Length (MDL) Principle**. It's so important that when Ilya Sutskever gave John Carmack a list of 30 papers and said:
+
+> If you really learn all of these, you'll know 90% of what matters today.
+
+he included 4 on this topic.
+
+It's one of those ideas that gave me a different way to see many familiar things. I hope to convince you of the same!
+
+## Some strings
+
+How _complex_ are the following binary strings?
+
+1. $00000000000000000000$
+2. $10001000100010001000$
+3. $01110100110100100110$
+
+Intuitively, the first one is dead simple: just a bunch of zeros. The second, with $1000$ on repeat, is a bit more complex. The third, with no discernable pattern, is the most complex.
+
+Here's one way to define complexity, called **Kolmogorov complexity**: the length of the _shortest computer program_ that outputs the string. In what programming language? As it turns out, it doesn't really matter. Let's just use Python:
+
+1. To get $00000000000000000000$:
+
+```python
+def f():
+    return "0" * 20
+```
+
+2. To get $10001000100010001000$, we need to type a bit more:
+
+```python
+def f():
+    return "1000" * 5
+```
+
+3. To get $01110100110100100110$, we need to return the whole string as-is:
+
+```python
+def f():
+    return "01110100110100100110"
+```
+
+Making this mathematically precise takes more work, but that's the idea: a string is complex if we need a long Python function to to return it. This function is called a **description** of the string. Its length is the string's **Minimum Description Length (MDL)**.
+
+What's fundamentally different about these strings? For 1 and 2, we can exploit their regularity to represent them in a more compact way; for 3, we can't.
+
+Put another way, a string is complex if it is hard to compress. In some sense, compression is the same thing as _learning_. To learn something is to understand it in terms of its underlying patterns.
+
+## Some points
+
+What is the Kolmogorov complexity of these points?
+
+TODO: image
+
+Let's try to find the minimum description. Of course, we can just return their coordinates as a list, but can we do better?
+
+The points look like they form a curve. What if we try to draw a curve through them and describe each point using the curve? Here are 3 attempts:
+
+TODO: image
+
+My knee-jerk reaction to these curves is: left & right bad, middle good! Under/over-fitting, unseen data, bias/variance tradeoff... you name it. But beyond these common arguments, here's another way to see why the middle one is best: it offers a _shorter description_ of these points.
