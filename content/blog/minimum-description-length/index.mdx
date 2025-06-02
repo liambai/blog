@@ -8,33 +8,33 @@ import { Link } from "gatsby"
 import Figure from "../../../src/components/figure.jsx"
 import Image from "../../../src/components/image.jsx"
 
-It's almost impossible to watch this Kevin clip without coming to the conclusion: he's onto something.
+It's almost impossible to watch this [Kevin clip](https://youtu.be/bctjSvn-OC8?si=Jf1Os9V04MIotRdq&t=48) without coming to the conclusion: he's onto something.
 
 <Figure content={<Image path={require("./images/kevin.jpg")} />} />
 
 His abbreviated sentences do seem to convey the same information as their verbose original––they certainly do trick!
 
-It's natural to ask: can we rigorously define and measure the _information_ in a sentence? How "few" can we go without losing information?
+Can we rigorously define and measure the information in a sentence? How "few" can we go without losing information?
 
-The answer is arguably the most profound idea in machine learning: the **Minimum Description Length (MDL) Principle**. It's so important that when [Ilya Sutskever](https://en.wikipedia.org/wiki/Ilya_Sutskever) gave [John Carmack](https://en.wikipedia.org/wiki/John_Carmack) a list of [30 papers](https://github.com/dzyim/ilya-sutskever-recommended-reading) and said:
+These questions lead to arguably the most profound idea in machine learning: the **Minimum Description Length (MDL) Principle**. It's so important that when [Ilya Sutskever](https://en.wikipedia.org/wiki/Ilya_Sutskever) gave [John Carmack](https://en.wikipedia.org/wiki/John_Carmack) a list of [30 papers](https://github.com/dzyim/ilya-sutskever-recommended-reading) and said:
 
 > If you really learn all of these, you'll know 90% of what matters today.
 
 4 on them were on this topic.
 
-It's one of those ideas that gave me a different way to see many familiar things. I hope to convince you of the same!
+The MLD principle is one of those ideas that fundamentally changed the way I see the world. It's a new perspective on familiar concepts like learning, information, and complexity. Let me show you!
 
 ## Strings
 
-How _complex_ are the following binary strings?
+Let's start with this question: how _complex_ are these binary strings?
 
 1. $00000000000000000000$
 2. $10001000100010001000$
 3. $01110100110100100110$
 
-Intuitively, the first one is dead simple: just a bunch of zeros. The second, with $1000$ on repeat, is a bit more complex. The third, with no discernable pattern, is the most complex.
+Intuitively, the first one is dead simple: just a bunch of zeros. The second is a bit more complex. The third, with no discernable pattern, is the most complex.
 
-Here's one way to define complexity, called **Kolmogorov complexity**: the length of a string is the _shortest computer program_ in some predefined language that outputs it. The choice of programming language turns out to matter very little, so let's illustrate with Python:
+Here's one way to define complexity, called **Kolmogorov complexity**: the length of a string is the _shortest program_ in some programming language that outputs it. Let's illustrate with Python:
 
 1. To get $00000000000000000000$, we'd write:
 
@@ -57,14 +57,14 @@ def f():
     return "01110100110100100110"
 ```
 
-Making this mathematically rigorous takes some work – we need to define the language, measure the length of programs in bits, etc. – and in all but the simplest cases, finding the optimal program and spelling it out is intractable. But that's the basic idea: an object is complex if we need a long Python function to return it. This function is also called a **description** of the string. Assuming we've got the shortest, its length is the string's **minimum description length**.
+Making this mathematically precise takes some work – we need to define the language, measure the length of programs in bits, etc. – and in all but the simplest cases, finding the optimal program and spelling it out is intractable. But that's the basic idea: an object is complex if we need a long Python function to return it. This function is often called a **description** of the string, and Kolmogorov complexity the **minimum description length**.
 
-What separates these strings from each other? For 1 and 2, we can exploit their regularity (the repeating pattern) to represent them in a more compact way; for 3, we can't. Therefore, Kolmogorov complexity can be understood in terms of **data compression**.
+What separates these strings from each other? For 1 and 2, we can exploit their regularity (the repeating pattern) to represent them in a more compact way; for 3, we can't. We can thinking about complexity in terms of **data compression**:
 
 - A string is complex if it is hard to compress.
-- The most optimal compression algorithm gives us a minimum description whose length is the Kolmogorov complexity.
+- Given a string, the most optimal compression algorithm gives us its minimum description, whose length is its Kolmogorov complexity.
 
-Here is a bold claim that I'll back up throughout the rest of this post: compression and _learning_ are the same thing. We have learned the simple essence of the first string by writing it as `"0" * 20`. Having to spell out the third string verbatim, we've learned nothing.
+Here's a claim that I'll back up throughout the rest of this post: compression is actually the same thing as _learning_. In this example, we have learned the essence of the first string by writing it as `"0" * 20`. Having to spell out the third string verbatim, we haven't learned anything.
 
 ## Points
 
