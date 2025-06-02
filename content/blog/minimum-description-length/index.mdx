@@ -20,7 +20,7 @@ The answer is arguably the most profound idea in machine learning: the **Minimum
 
 > If you really learn all of these, you'll know 90% of what matters today.
 
-he included 4 on this topic.
+4 on them were on this topic.
 
 It's one of those ideas that gave me a different way to see many familiar things. I hope to convince you of the same!
 
@@ -34,7 +34,7 @@ How _complex_ are the following binary strings?
 
 Intuitively, the first one is dead simple: just a bunch of zeros. The second, with $1000$ on repeat, is a bit more complex. The third, with no discernable pattern, is the most complex.
 
-Here's one way to define complexity, called **Kolmogorov complexity**: the length of a string is the _shortest computer program_ that outputs it. In what programming language? As it turns out, it doesn't really matter. Let's illustrate with Python:
+Here's one way to define complexity, called **Kolmogorov complexity**: the length of a string is the _shortest computer program_ in some predefined language that outputs it. The choice of programming language turns out to matter very little, so let's illustrate with Python:
 
 1. To get $00000000000000000000$, we'd write:
 
@@ -50,18 +50,21 @@ def f():
     return "1000" * 5
 ```
 
-3. To get $01110100110100100110$, we have to return the whole string as-is:
+3. To get $01110100110100100110$, we have to type out the whole string as-is:
 
 ```python
 def f():
     return "01110100110100100110"
 ```
 
-Making this mathematically rigorous takes some work – we need to define a programming language, measure the length of programs in bits, etc. – and in all but the simplest cases, spelling out the program like we did is impractical. But that's the basic idea: an object is complex if we need a long Python function to return it. This function is called a **description** of the string. Assuming we've found the shortest, its length is the string's **minimum description length**.
+Making this mathematically rigorous takes some work – we need to define the language, measure the length of programs in bits, etc. – and in all but the simplest cases, finding the optimal program and spelling it out is intractable. But that's the basic idea: an object is complex if we need a long Python function to return it. This function is also called a **description** of the string. Assuming we've got the shortest, its length is the string's **minimum description length**.
 
-What separates these strings from each other? For 1 and 2, we can exploit their regularity (the repeating pattern) to represent them in a more compact way; for 3, we can't.
+What separates these strings from each other? For 1 and 2, we can exploit their regularity (the repeating pattern) to represent them in a more compact way; for 3, we can't. Therefore, Kolmogorov complexity can be understood in terms of **data compression**.
 
-Another way to think about this is in terms of **data compression**. A string is complex if it is hard to compress.
+- A string is complex if it is hard to compress.
+- The most optimal compression algorithm gives us a minimum description whose length is the Kolmogorov complexity.
+
+Here is a bold claim that I'll back up throughout the rest of this post: compression and _learning_ are the same thing. We have learned the simple essence of the first string by writing it as `"0" * 20`. Having to spell out the third string verbatim, we've learned nothing.
 
 ## Points
 
@@ -69,13 +72,13 @@ What is the Kolmogorov complexity of these 10 points?
 
 <Figure content={<Image path={require("./images/points.png")} width="60%" />} />
 
-Let's try to find the minimum description. Of course, we can just describe each point by its coordinate, but can we do better?
+That's equivalent to asking: what's the minimum description length of these points? Of course, we can just describe each point by its coordinate, but can we do better?
 
 Let's draw a line through the points and use it do describe each point. Here are 3 attempts:
 
 <Figure content={<Image path={require("./images/polynomials.png")} />} />
 
-My knee-jerk reaction to these lines is: left & right bad, middle good! Under/over-fitting, unseen data, bias/variance tradeoff... you name it. But beyond these statistical arguments, here's another way to see why the middle one is best: it offers the _shortest description_ of these points.
+As a stats major, my knee-jerk reaction to these lines is: left & right bad, middle good! Under/over-fitting, unseen data, bias/variance tradeoff... you name it. But beyond these arguments, there's another way to see why the middle one is best, though the lens of complexity: it offers the _shortest description_ of these points.
 
 The descriptions would look something like:
 
@@ -91,9 +94,7 @@ $$
 L(D)=\min _{H \in \mathcal{H}}(L(H)+L(D|H))
 $$
 
-This is called the **two-part MDL code**.
-
-The descriptions above are all hand-wavy. How do we quantify the intuition that the errors of the degree 1 polynomial are "harder to explain" than the errors of the degree 3 polynomial? The next section uses tools from information theory to make this calculation precise. Feel free to skip it – here's the spoiler: the degree 3 polynomial gives the optimal two-part MDL code.
+The descriptions above are quite hand-wavy. How can we quantify the intuition that the errors of the 1st degree polynomial are "harder to explain" than the errors of the 3rd degree polynomial? The next section uses tools from information theory to make this calculation precise.
 
 ### Coding in bits
 
@@ -103,7 +104,7 @@ Here's a naive way to do it: type in number in Python. The [float](https://en.wi
 
 Floating point numbers represent `0`, `0.1`, and `1.7976931348623157e+308` (the largest possible representation) using the same number of bits. But we know that the coefficients and errors come from some distribution (let's assume [Normal](https://en.wikipedia.org/wiki/Normal_distribution)), and we're far more likely to see `0` and `0.1` than `1.7976931348623157e+308`.
 
-One idea from information theory is to use a shorter code for the more likely outcomes like `0` and `0.1`, and a longer code for the those rare events like `1.7976931348623157e+308`. Claude Shannon even proved that the optimal code length is $-\log_2(p(x))$, where $p(x)$ is the probability of event $x$.
+One idea from information theory is to use a shorter code for the more likely outcomes like `0` and `0.1`, and a longer code for the those rare events like `1.7976931348623157e+308`. [Shannon](https://en.wikipedia.org/wiki/Claude_Shannon) even proved that the optimal code length is $-\log_2(p(x))$, where $p(x)$ is the probability of event $x$.
 
 <Figure
   content={
@@ -111,7 +112,7 @@ One idea from information theory is to use a shorter code for the more likely ou
   }
 />
 
-For example, if you're think a number comes up as often as 50% of the time, you should represent it with only 1 bit.
+For example, if you think a number comes up as often as 50% of the time, you should represent it with only 1 bit.
 
 Assuming the coefficients and errors follow a Normal distribution with mean $0$, we can chop up the real number line into small intervals of size $t$ and assigned each interval with a probability $p(x)$.
 
@@ -167,9 +168,9 @@ L(D|H) &= \sum_{c=1}^{10} -\log p(d_c - y_c) \\
 \end{align*}
 $$
 
-Minimizing the code length of the errors is equivalent to minimizing $\sum_{c=1}^{10} \frac{(d_c - y_c)^2}{2 \sigma_d^2}$, i.e. we want the errors to be small.
+Minimizing the code length of the errors is equivalent to minimizing $\sum_{c=1}^{10} (d_c - y_c)^2$, i.e. we want the errors to be small.
 
-### Regression
+### Regression & Learning
 
 Adding the two terms together, we get a minimization objective $C(D)$ equivalent to minimizing the MDL code:
 
@@ -181,6 +182,11 @@ This fits our intuition that we want to have small coefficients that minimize th
 
 This formula is also the minimization objective of [Ridge Regression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html). We never explicitly thought about [mean-squared error (MSE)](https://en.wikipedia.org/wiki/Mean_squared_error) or [regularization](<https://en.wikipedia.org/wiki/Regularization_(mathematics)>): they fell out of our quest for the shortest description of our data.
 
-Under this interpretation, we can think $\sigma_w$ as a hyperparameters of the model that lets us tweak the regularization strength. In the MDL view, its just the width of the Gaussian we used to discretize our coefficients. A small $\sigma_w$ implies a narrow coefficient distribution and, in turn, a strong regularization.
+Under this interpretation, $\sigma_w$ is a hyperparameters of the model that lets us tweak the regularization strength. In the MDL view, its just the width of the Gaussian we used to discretize our coefficients. A small $\sigma_w$ implies a narrow coefficient distribution and, in turn, a strong regularization.
+
+Back to the claim on compression = learning: perhaps you can agree that these two summaries of this example are two sides of the same coin:
+
+1. We have _compressed_ these points using a 3rd degree polynomial, which lets us describe them in very few bits.
+2. We have _learned_ a good function approximation of these points, a 3rd degree polynomial, which models the underlying distribution.
 
 ## Words
