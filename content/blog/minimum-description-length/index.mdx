@@ -7,20 +7,21 @@ description: "The Minimum Description Length (MDL) principle, Kolmogorov complex
 import { Link } from "gatsby"
 import Figure from "../../../src/components/figure.jsx"
 import Image from "../../../src/components/image.jsx"
+import { Reference, ReferenceList } from "./References.jsx"
 
 It's almost impossible to watch this [Kevin clip](https://youtu.be/bctjSvn-OC8?si=Jf1Os9V04MIotRdq&t=48) without coming to the conclusion: he's onto something.
 
 <Figure content={<Image path={require("./images/kevin.jpg")} />} />
 
-His abbreviated sentences do seem to convey the same information as their verbose original––they certainly do trick!
+His abbreviated sentences do seem to convey the same information as their verbose original. They certainly do trick!
 
 Can we rigorously define and measure the information in a sentence? How "few" can we go without losing information?
 
-These questions lead to arguably the most profound idea in machine learning: the **Minimum Description Length (MDL) Principle**. It's so important that when [Ilya Sutskever](https://en.wikipedia.org/wiki/Ilya_Sutskever) gave [John Carmack](https://en.wikipedia.org/wiki/John_Carmack) a list of [30 papers](https://github.com/dzyim/ilya-sutskever-recommended-reading) and said:
+These questions lead to one of the most profound ideas in machine learning: the **Minimum Description Length (MDL) Principle**. It's so important that when [Ilya Sutskever](https://en.wikipedia.org/wiki/Ilya_Sutskever) gave [John Carmack](https://en.wikipedia.org/wiki/John_Carmack) a list of [30 papers](https://github.com/dzyim/ilya-sutskever-recommended-reading) and said:
 
 > If you really learn all of these, you'll know 90% of what matters today.
 
-4 on them were on this topic.
+4 on them were on this topic <Reference id={1} /> <Reference id={2} /> <Reference id={3} /> <Reference id={4} />.
 
 The MLD principle is one of those ideas that fundamentally changed the way I see the world. It's a new perspective on familiar concepts like learning, information, and complexity. Let me show you!
 
@@ -57,7 +58,7 @@ def f():
     return "01110100110100100110"
 ```
 
-Making this mathematically precise takes some work – we need to define the language, measure the length of programs in bits, etc. – and in all but the simplest cases, finding the optimal program and spelling it out is intractable. But that's the basic idea: an object is complex if we need a long Python function to return it. This function is often called a **description** of the string, and Kolmogorov complexity the **minimum description length**.
+Making this mathematically precise takes some work – we need to define the language, measure the length of programs in bits, etc. – and in all but the simplest cases, finding the optimal program and spelling it out is intractable. But that's the basic idea: an object is complex if we need a long Python function to return it. This function is often called a **description** of the string, and Kolmogorov complexity the **minimum description length**.
 
 What separates these strings from each other? For 1 and 2, we can exploit their regularity (the repeating pattern) to represent them in a more compact way; for 3, we can't. We can thinking about complexity in terms of **data compression**:
 
@@ -98,7 +99,7 @@ The descriptions above are quite hand-wavy. How can we quantify the intuition th
 
 ### Coding in bits
 
-The calculation we need to compare the 3 descriptions essentially boils down to encoding real numbers – coefficients, errors – as bits. Real numbers have an infinite decimal expansion, so we must approximate to some finite decimal point.
+The calculation we need to compare the 3 descriptions essentially boils down to encoding real numbers – coefficients, errors – as bits. Real numbers have an infinite decimal expansion, so we must approximate to some finite decimal point.
 
 Here's a naive way to do it: type in number in Python. The [float](https://en.wikipedia.org/wiki/Floating-point_arithmetic) type uses 64 bits to represent the number. That's quite wasteful! Going after the theoretical limit of "what's the shortest possible code for these numbers?", we need a better system.
 
@@ -190,3 +191,7 @@ Back to the claim on compression = learning: perhaps you can agree that these tw
 2. We have _learned_ a good function approximation of these points, a 3rd degree polynomial, which models the underlying distribution.
 
 ## Words
+
+## References
+
+<ReferenceList />
