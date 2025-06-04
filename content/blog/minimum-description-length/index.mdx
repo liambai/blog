@@ -23,7 +23,7 @@ These questions lead to one of the most profound ideas in machine learning: the 
 
 4 on them were on this topic <Reference id={1} /> <Reference id={2} /> <Reference id={3} /> <Reference id={4} />.
 
-The MLD principle is one of those ideas that fundamentally changed the way I see the world. It's a new perspective on familiar concepts like learning, information, and complexity. Let me show you!
+The MLD principle is one of those ideas that blew my mind and fundamentally changed the way I see the world. It's a new perspective on familiar concepts like learning, information, and complexity. Let me show you!
 
 ## Strings
 
@@ -51,21 +51,21 @@ def f():
     return "1000" * 5
 ```
 
-3. To get $01110100110100100110$, we have to type out the whole string as-is:
+3. To get $01110100110100100110$, we have to type out the whole string:
 
 ```python
 def f():
     return "01110100110100100110"
 ```
 
-Making this mathematically precise takes some work – we need to define the language, measure the length of programs in bits, etc. – and in all but the simplest cases, finding the optimal program and spelling it out is intractable. But that's the basic idea: an object is complex if we need a long Python function to return it. This function is often called a **description** of the string, and Kolmogorov complexity the **minimum description length**.
+Making this mathematically precise takes some work: we need to define the language, measure the length of programs in bits, etc. But that's the basic idea: an object is complex if we need a long Python function to return it. This function is often called a **description** of the string, and Kolmogorov complexity the **minimum description length**.
 
-What separates these strings from each other? For 1 and 2, we can exploit their regularity (the repeating pattern) to represent them in a more compact way; for 3, we can't. We can thinking about complexity in terms of **data compression**:
+What separates these strings from each other? For 1 and 2, we can exploit their repeating pattern to represent them in a more compact way; such a regularity does not exist in 3. Generally, we can think about complexity in terms of **data compression**:
 
 - A string is complex if it is hard to compress.
 - Given a string, the most optimal compression algorithm gives us its minimum description, whose length is its Kolmogorov complexity.
 
-Here's a claim that I'll back up throughout the rest of this post: compression is actually the same thing as _learning_. In this example, we have learned the essence of the first string by writing it as `"0" * 20`. Having to spell out the third string verbatim, we haven't learned anything.
+Here's a claim that I'll back up through the rest of this post: compression is actually the same thing as _learning_. In this example, we have learned the essence of the first string by writing it as `"0" * 20`. Having to spell out the third string verbatim means that we haven't learned anything about it.
 
 ## Points
 
@@ -75,11 +75,13 @@ What is the Kolmogorov complexity of these 10 points?
 
 That's equivalent to asking: what's the minimum description length of these points? Of course, we can just describe each point by its coordinate, but can we do better?
 
-Let's draw a line through the points and use it do describe each point. Here are 3 attempts:
+Here's an idea: let's draw a line through the points and use it do describe each point. That means describing 2 things: the line + how the far each point is from the line.
+
+Here are 3 attempts:
 
 <Figure content={<Image path={require("./images/polynomials.png")} />} />
 
-As a stats major, my knee-jerk reaction to these lines is: left & right bad, middle good! Under/over-fitting, unseen data, bias/variance tradeoff... you name it. But beyond these arguments, there's another way to see why the middle one is best, though the lens of complexity: it offers the _shortest description_ of these points.
+As a stats major, my knee-jerk reaction to these lines is: left & right bad, middle good! Under/over-fitting, unseen data, bias/variance tradeoff... you name it. But there's another way to see why the middle one is best: it gives the _shortest description_ of these points.
 
 The descriptions would look something like:
 
@@ -87,25 +89,23 @@ The descriptions would look something like:
 2. I have a line $y = 5.45x^3 - 5.68x^2 + 1.19x + 0.06$ and it misses the first point by $0.03$, the second by $-0.05$...
 3. I have a line $y = -15348.64x^9 + 67461.06x^8 - 123937.33x^7 + ...$ and it fits each point perfectly.
 
-In the first case, it's easy to describe the line, but it'll take some effort to describe how far each point is from the line, the errors. The third line is very complicated to describe, but we waste no time talking about the errors. The middle line balances the two.
+In the first case, it's easy to describe the line, but it'll take some effort to describe how far each point is from the line, the errors. The third line is very complicated to describe, but we waste no time talking about the errors. The middle one strikes a balance.
 
 More generally, we call the line a **hypothesis** $H$, drawn from a set $\mathcal{H}$ of hypotheses, e.g. all polynomials. There is a tradeoff between the description length $L$ of the hypothesis (the coefficients), and the description length of the data $D$ when encoded with the help of the hypothesis (the errors). We want to minimize the sum of these 2 terms:
 
 $$
-L(D)=\min _{H \in \mathcal{H}}(L(H)+L(D|H))
+L(D)=\min _{H \in \mathcal{H}}(\underbrace{L(H)}_{\text{length of coefficients}}+\underbrace{L(D|H)}_{\text{length of errors}})
 $$
 
-The descriptions above are quite hand-wavy. How can we quantify the intuition that the errors of the 1st degree polynomial are "harder to explain" than the errors of the 3rd degree polynomial? The next section uses tools from information theory to make this calculation precise.
+That was all quite hand-wavy. How can we quantify the intuition that the errors of the 1st degree polynomial are "harder to describe" than the errors of the 3rd degree polynomial? The next section uses tools from information theory to make these calculations precise.
 
 ### Coding in bits
 
-The calculation we need to compare the 3 descriptions essentially boils down to encoding real numbers – coefficients, errors – as bits. Real numbers have an infinite decimal expansion, so we must approximate to some finite decimal point.
+Concretely defining description length essentially boils down to encoding real numbers – coefficients, errors – in bits. Since real numbers have an infinite decimal expansion, so we must approximate to some finite decimal point.
 
-Here's a naive way to do it: type in number in Python. The [float](https://en.wikipedia.org/wiki/Floating-point_arithmetic) type uses 64 bits to represent the number. That's quite wasteful! Going after the theoretical limit of "what's the shortest possible code for these numbers?", we need a better system.
+Here's a naive way to do it: type the number in Python. The [float](https://en.wikipedia.org/wiki/Floating-point_arithmetic) type uses 64 bits to represent every number. It represents `0`, `0.1`, and `1.7976931348623e+308` (the largest possible representation) using the same number of bits. That's quite wasteful. Since we're after the theoretical minimum number of bits, we want to encode each number in as few bits as possible.
 
-Floating point numbers represent `0`, `0.1`, and `1.7976931348623157e+308` (the largest possible representation) using the same number of bits. But we know that the coefficients and errors come from some distribution (let's assume [Normal](https://en.wikipedia.org/wiki/Normal_distribution)), and we're far more likely to see `0` and `0.1` than `1.7976931348623157e+308`.
-
-One idea from information theory is to use a shorter code for the more likely outcomes like `0` and `0.1`, and a longer code for the those rare events like `1.7976931348623157e+308`. [Shannon](https://en.wikipedia.org/wiki/Claude_Shannon) even proved that the optimal code length is $-\log_2(p(x))$, where $p(x)$ is the probability of event $x$.
+In reality, we're far more likely to see `0` and `0.1` than `1.7976931348623e+308` (assuming the coefficients and errors come from, say, a [Normal distribution](https://en.wikipedia.org/wiki/Normal_distribution)). What if we use a shorter code for the more likely numbers like `0` and `0.1`, and a longer code for the those rare events like `1.7976931348623e+308`. Theoretically, the [optimal code length](https://en.wikipedia.org/wiki/Shannon%27s_source_coding_theorem) is $-\log_2(p(x))$, where $p(x)$ is the probability of event $x$.
 
 <Figure
   content={
@@ -113,7 +113,7 @@ One idea from information theory is to use a shorter code for the more likely ou
   }
 />
 
-For example, if you think a number comes up as often as 50% of the time, you should represent it with only 1 bit.
+For example, if a number comes up as often as 50% of the time, you should represent it with only 1 bit.
 
 Assuming the coefficients and errors follow a Normal distribution with mean $0$, we can chop up the real number line into small intervals of size $t$ and assigned each interval with a probability $p(x)$.
 
@@ -124,7 +124,13 @@ Assuming the coefficients and errors follow a Normal distribution with mean $0$,
       width="60%"
     />
   }
-/>
+>
+  Given any real number $v$, we can discretize it by taking a small interval of
+  size $t$ around it. Integrating across that slice of the Gaussian distribution
+  gives us $v$'s assigned probability. This picture is from sections 3 and 4 of{" "}
+  <Reference id={3} />, which also contain a detailed explanation of this
+  method.
+</Figure>
 
 ### Coding the coefficients
 
@@ -140,7 +146,7 @@ $$
 -\log p(w_i) = -\log t + \log \sqrt{2 \pi} + \log \sigma_w + \frac{w_i^2}{2 \sigma_w^2}
 $$
 
-Summing over all weights $w_1, ..., w_n$ to get the full code length of the polynomial:
+Summing over all coefficients $w_1, ..., w_n$ to get the code length of the polynomial:
 
 $$
 \begin{align*}
@@ -173,7 +179,7 @@ Minimizing the code length of the errors is equivalent to minimizing $\sum_{c=1}
 
 ### Regression & Learning
 
-Adding the two terms together, we get a minimization objective $C(D)$ equivalent to minimizing the MDL code:
+Adding the two terms together, we get a minimization objective $C(D)$ equivalent to minimizing the description length $L(D)$:
 
 $$
 C(D) = \underbrace{\frac{1}{{2 \sigma_d^2}} \sum_{c=1}^{10} (d_c - y_c)^2}_{MSE} + \underbrace{\frac{1}{{2 \sigma_w^2}} \sum_{i=1}^n w_i^2}_{regularization}
@@ -185,12 +191,18 @@ This formula is also the minimization objective of [Ridge Regression](https://sc
 
 Under this interpretation, $\sigma_w$ is a hyperparameters of the model that lets us tweak the regularization strength. In the MDL view, its just the width of the Gaussian we used to discretize our coefficients. A small $\sigma_w$ implies a narrow coefficient distribution and, in turn, a strong regularization.
 
-Back to the claim on compression = learning: perhaps you can agree that these two summaries of this example are two sides of the same coin:
+Back to the claim on compression being the same as learning: perhaps you can agree that these two summaries of this example are equivalent:
 
 1. We have _compressed_ these points using a 3rd degree polynomial, which lets us describe them in very few bits.
-2. We have _learned_ a good function approximation of these points, a 3rd degree polynomial, which models the underlying distribution.
+2. We have _learned_ a good model of these points, a 3rd degree polynomial, which approximates the underlying distribution.
 
 ## Words
+
+Can we apply this MDL perspective to understand LLMs? This section will be some of my high-level, imprecise thoughts.
+
+What is the Kolmogorov complexity of all human knowledge?
+
+## Final thoughts
 
 ## References
 
