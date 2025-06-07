@@ -8,6 +8,7 @@ import { Link } from "gatsby"
 import Figure from "../../../src/components/figure.jsx"
 import Image from "../../../src/components/image.jsx"
 import { Reference, ReferenceList } from "./References.jsx"
+import { Note, NoteList } from "./Notes.jsx"
 
 It's almost impossible to watch this [Kevin clip](https://youtu.be/bctjSvn-OC8?si=Jf1Os9V04MIotRdq&t=48) without coming to the conclusion: he's onto something.
 
@@ -94,7 +95,7 @@ In the first case, it's easy to describe the line, but it'll take some effort to
 More generally, we call the line a **hypothesis** $H$, drawn from a set $\mathcal{H}$ of hypotheses, e.g. all polynomials. There is a tradeoff between the description length $L$ of the hypothesis (the coefficients), and the description length of the data $D$ when encoded with the help of the hypothesis (the errors). We want to minimize the sum of these 2 terms:
 
 $$
-L(D)=\min _{H \in \mathcal{H}}(\underbrace{L(H)}_{\text{length of coefficients}}+\underbrace{L(D|H)}_{\text{length of errors}})
+L(D)=\underbrace{L(H)}_{\text{length of coefficients}}+\underbrace{L(D|H)}_{\text{length of errors}}
 $$
 
 That was all quite hand-wavy. How can we quantify the intuition that the errors of the 1st degree polynomial are "harder to describe" than the errors of the 3rd degree polynomial? The next section uses tools from information theory to make these calculations precise.
@@ -105,7 +106,7 @@ Concretely defining description length essentially boils down to encoding real n
 
 Here's a naive way to do it: type the number in Python. The [float](https://en.wikipedia.org/wiki/Floating-point_arithmetic) type uses 64 bits to represent every number. It represents `0`, `0.1`, and `1.7976931348623e+308` (the largest possible representation) using the same number of bits. That's quite wasteful. Since we're after the theoretical minimum number of bits, we want to encode each number in as few bits as possible.
 
-In reality, we're far more likely to see `0` and `0.1` than `1.7976931348623e+308` (assuming the coefficients and errors come from, say, a [Normal distribution](https://en.wikipedia.org/wiki/Normal_distribution)). What if we use a shorter code for the more likely numbers like `0` and `0.1`, and a longer code for the those rare events like `1.7976931348623e+308`. Theoretically, the [optimal code length](https://en.wikipedia.org/wiki/Shannon%27s_source_coding_theorem) is $-\log_2(p(x))$, where $p(x)$ is the probability of event $x$.
+In reality, we're far more likely to see `0` and `0.1` than `1.7976931348623e+308` (assuming the coefficients and errors come from, say, a [Gaussian distribution](https://en.wikipedia.org/wiki/Normal_distribution)). What if we use a shorter code for the more likely numbers like `0` and `0.1`, and a longer code for the those rare events like `1.7976931348623e+308`. Theoretically, the [optimal code length](https://en.wikipedia.org/wiki/Shannon%27s_source_coding_theorem) is $-\log_2(p(x))$, where $p(x)$ is the probability of event $x$.
 
 <Figure
   content={
@@ -115,7 +116,7 @@ In reality, we're far more likely to see `0` and `0.1` than `1.7976931348623e+30
 
 For example, if a number comes up as often as 50% of the time, you should represent it with only 1 bit.
 
-Assuming the coefficients and errors follow a Normal distribution with mean $0$, we can chop up the real number line into small intervals of size $t$ and assigned each interval with a probability $p(x)$.
+Assuming the coefficients and errors follow a Gaussian distribution with mean $0$, we can chop up the real number line into small intervals of size $t$ and assigned each interval with a probability $p(x)$.
 
 <Figure
   content={
@@ -132,15 +133,23 @@ Assuming the coefficients and errors follow a Normal distribution with mean $0$,
   method.
 </Figure>
 
+Once we have a probability, we can assume the optimal code length $-\log_2(p(x))$ and get the minimum number of bits needed to encode our number.
+
+$$
+\text{real number} \rightarrow \text{small interval} \rightarrow \text{probability} \rightarrow \text{bits}
+$$
+
 ### Coding the coefficients
 
-We can now encode each of our polynomial coefficients $w_i$ using its discretized probability:
+Let's try encoding each of our polynomial coefficients $w_i$, starting with its discretized probability:
 
 $$
 p(w_i) = t \frac{1}{\sqrt{2 \pi} \sigma_w} \exp \left(\frac{-w_i^2}{2 \sigma_w^2}\right)
 $$
 
-where $\sigma_w$ is some fixed value we choose. Calculating the optimal code length, in $\log_2 (e)$ bits (or _nats_):
+where $\sigma_w$, the standard deviation of the Gaussian we use, is a parameter we choose.
+
+Calculating the optimal code length, in $\log_2 (e)$ bits (or _nats_):
 
 $$
 -\log p(w_i) = -\log t + \log \sqrt{2 \pi} + \log \sigma_w + \frac{w_i^2}{2 \sigma_w^2}
@@ -156,7 +165,7 @@ L(H) &= \sum_{i=1}^n -\log p(w_i) \\
 \end{align*}
 $$
 
-We see that minimizing the code length of the polynomial is equivalent to minimizing the term $\sum_{i=1}^n w_i^2$, i.e. we want to keep the coefficients small.
+We see that minimizing the code length of the polynomial is equivalent to minimizing the term $\sum_{i=1}^n w_i^2$. In other words, we want to keep the coefficients small.
 
 ### Coding the errors
 
@@ -182,14 +191,14 @@ Minimizing the code length of the errors is equivalent to minimizing $\sum_{c=1}
 Adding the two terms together, we get a minimization objective $C(D)$ equivalent to minimizing the description length $L(D)$:
 
 $$
-C(D) = \underbrace{\frac{1}{{2 \sigma_d^2}} \sum_{c=1}^{10} (d_c - y_c)^2}_{MSE} + \underbrace{\frac{1}{{2 \sigma_w^2}} \sum_{i=1}^n w_i^2}_{regularization}
+C(D) = \underbrace{\frac{1}{{2 \sigma_d^2}} \sum_{c=1}^{10} (d_c - y_c)^2}_{\text{MSE}} + \underbrace{\frac{1}{{2 \sigma_w^2}} \sum_{i=1}^n w_i^2}_{\text{regularization}}
 $$
 
 This fits our intuition that we want to have small coefficients that minimize the errors – the degree 3 polynomial is best!
 
 This formula is also the minimization objective of [Ridge Regression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html). We never explicitly thought about [mean-squared error (MSE)](https://en.wikipedia.org/wiki/Mean_squared_error) or [regularization](<https://en.wikipedia.org/wiki/Regularization_(mathematics)>): they fell out of our quest for the shortest description of our data.
 
-Under this interpretation, $\sigma_w$ is a hyperparameters of the model that lets us tweak the regularization strength. In the MDL view, its just the width of the Gaussian we used to discretize our coefficients. A small $\sigma_w$ implies a narrow coefficient distribution and, in turn, a strong regularization.
+Under this interpretation, $\sigma_w$ is a hyperparameter of the model that lets us tweak the regularization strength. In the MDL view, its just the width of the Gaussian we used to discretize our coefficients. A small $\sigma_w$ implies a narrow coefficient distribution and, in turn, a strong regularization.
 
 Back to the claim on compression being the same as learning: perhaps you can agree that these two summaries of this example are equivalent:
 
@@ -198,12 +207,40 @@ Back to the claim on compression being the same as learning: perhaps you can agr
 
 ## Words
 
-Can we apply this MDL perspective to understand LLMs? This section will be some of my high-level, imprecise thoughts.
+Modern LLMs like GPT are large Transformers with billions of parameters. They can also be understood through the lens of compression.
 
-What is the Kolmogorov complexity of all human knowledge?
+Taken literally, we can use LLMs to losslessly compress text, just like `gzip`. Like the polynomial through the points, an LLM can be used as a guide to encode text. Instead of describing each word literally, we only need to describe "how far" it is from the LLM's predictions. I'll omit the details, but you can read more about this encoding method, called **arithmetic coding**, [here](https://go-compression.github.io/algorithms/arithmetic/).
+
+Researchers found that this compression method using LLMs is far more efficient than tools like `gzip` <Reference id={5} />.
+
+<Figure content={<Image path={require("./images/compression.png")} />}>
+  [enwik9](https://mattmahoney.net/dc/textdata.html) is a file used in the
+  [Large Text Compression Benchmark](https://mattmahoney.net/dc/text.html).
+  ImageNet and LibriSpeech are popular image and speech datasets. Chunk size
+  considers the fact that LLMs have a limited context window whereas gzip can
+  operate on a much larger range and exploit more compressible patterns.
+</Figure>
+
+LLMs like Llama and Chinchilla managed to compress [enwik9](https://mattmahoney.net/dc/textdata.html), a text file used to benchmark compression algorithm, to 10% its original size, compared to `gzip`'s 30%. LLMs have clearly learned patterns in the text that are useful for compression.
+
+As a crude analogy, imagine you are an expert in learning and compression. You know by heart every concept in this blog post. Reproducing this blog post just requires noting the differences between your understanding and my explanations: maybe I've phrased things differently than you would, or made a mistake. Now imagine reproducing a blog post on a topic you know nothing about or, say, in an unknown language. The latter task requires much more effort, and in the worse case, rote memorization.
+
+More remarkably, even though Llama and Chinchilla are not trained primarily trained on text, they are quite good at compressing image patches and audio samples, outperforming specialized algorithms such as [PNG](https://compress-or-die.com/Understanding-PNG).
+Somehow, the word patterns LLMs learn can be used to compress images and audio. This is perhaps less surprising if we see compression as learning: words, images, and audio are all slivers of the same underlying world.
+
+The compression efficiency of LLMs come at a cost: the size of their weights. This is shown on the right half of the table: "Adjusted Compression Rate". Technically, the minimum description length includes these weights in its $L(H)$ term, like we coded the polynomial coefficients in addition to the errors. Practically, we don't want to lug around all the Llama weights (up to 100s of GBs) every time we compress a file. <Note id={1}/>
+
+$$
+\underbrace{L(D)}_{\text{compressed size}}=\underbrace{L(H)}_{\text{size of weights}}+\underbrace{L(D|H)}_{\text{size of errors}}
+$$
+
+Although Llama and Chinchilla are not practical compressors––at least not until the scale of data exceeds terabytes––the authors found that training specialized transformers (`Transformer 200K/800K/3.2M` in the table) on enwik9 did achieve better weight-adjusted compression rate than `gzip`, though they don't generalize as well to other modalities.
+
+If we try to compress all of human knowledge, as these foundation models set out to do, the $L(H)$ term will be negligible. A few GBs of model weights compared to the vastness of the internet, but they pack a whole lot. I felt this viscerally when chatting with [Ollama](https://ollama.com/) on a flight without internet. Somehow, practically all of human knowledge is right in front of me in this piece of metal. That blew my mind.
 
 ## Final thoughts
 
 ## References
 
 <ReferenceList />
+<NoteList />

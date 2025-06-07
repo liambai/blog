@@ -32,6 +32,14 @@ const references = {
     journal: "Shtetl-Optimized",
     year: 2011,
   },
+  5: {
+    title: "Language Modeling Is Compression",
+    author:
+      "Delétang, G., Ruoss, A., Duquenne, P. A., Catt, E., Genewein, T., Mattern, C., Grau-Moya, J., Wenliang, L. K., Aitchison, M., Orseau, L., Hutter, M., & Veness, J.",
+    url: "https://arxiv.org/abs/2309.10668",
+    journal: "arXiv",
+    year: 2024,
+  },
 }
 
 export const { Reference, ReferenceList } = getReferenceComponents(references)
