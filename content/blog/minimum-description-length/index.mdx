@@ -71,7 +71,7 @@ What separates these strings from each other? For 1 and 2, we can exploit their 
 - A string is complex if it is hard to compress.
 - Given a string, the most optimal compression algorithm gives us its minimum description, whose length is its Kolmogorov complexity.
 
-Here's a claim that I'll back up through the rest of this post: compression is actually the same thing as _learning_. In this example, we have learned the essence of the first string by writing it as `"0" * 20`. Having to spell out the third string verbatim means that we haven't learned anything about it.
+Here's a claim that I'll back up through the rest of this post: compression is actually the same thing as _learning_. In this example, we have learned the essence of the first string by writing it as `"0" * 20`. Having to spell out the third string exactly means that we haven't learned anything meaningful about it.
 
 ## Points
 
@@ -83,7 +83,7 @@ That's equivalent to asking: what's the minimum description length of these poin
 
 Here's an idea: let's draw a line through the points and use it to describe each point. That means describing 2 things: the line + how the far each point is from the line.
 
-Here are 3 attempts:
+Here are some attempts:
 
 <Figure content={<Image path={require("./images/polynomials.png")} />} />
 
@@ -95,23 +95,23 @@ The descriptions would look something like:
 2. I have a line $y = 5.45x^3 - 5.68x^2 + 1.19x + 0.06$ and it misses the first point by $0.03$, the second by $-0.05$...
 3. I have a line $y = -15348.64x^9 + 67461.06x^8 - 123937.33x^7 + ...$ and it fits each point perfectly.
 
-In the first case, it's easy to describe the line, but it'll take some effort to describe how far each point is from the line, the errors. The third line is very complicated to describe, but we waste no time talking about the errors. The middle one strikes a balance.
+In the first case, it's easy to describe the line, but it'll take some effort to describe how far each point is from the line, the errors. The third line is very complicated to describe, but don't need to spend any time on the errors. The middle one strikes a balance.
 
-More generally, we call the line a **hypothesis** $H$, drawn from a set $\mathcal{H}$ of hypotheses, e.g. all polynomials. There is a tradeoff between the description length $L$ of the hypothesis (the coefficients), and the description length of the data $D$ when encoded with the help of the hypothesis (the errors). We want to minimize the sum of these 2 terms:
+More generally, we call the line a **hypothesis** $H$, drawn from a set $\mathcal{H}$ of hypotheses, e.g. all polynomials. There is a tradeoff between the description length $L$ of the hypothesis (the coefficients), and the description length of the data $D$ when encoded with the help of the hypothesis (the errors). We want find an $H$ that minimizes the sum of these 2 terms:
 
 $$
 L(D)=\underbrace{L(H)}_{\text{length of coefficients}}+\underbrace{L(D|H)}_{\text{length of errors}}
 $$
 
-That was all quite hand-wavy. How can we quantify the intuition that the errors of the 1st degree polynomial are "harder to describe" than the errors of the 3rd degree polynomial? The next section uses tools from information theory to make these calculations precise.
+That was all quite hand-wavy. How can we quantify the intuition that the errors of the 1st degree polynomial are "harder to describe" than those of the 3rd degree polynomial? The next section uses tools from information theory to make these calculations precise.
 
 ### Coding in bits
 
-Concretely defining description length essentially boils down to encoding real numbers – coefficients, errors – in bits. Since real numbers have an infinite decimal expansion, so we must approximate to some finite decimal point.
+Formally defining description length essentially boils down to encoding real numbers – coefficients, errors – in bits. <Note id={2} />
 
-Here's a naive way to do it: type the number in Python. The [float](https://en.wikipedia.org/wiki/Floating-point_arithmetic) type uses 64 bits to represent every number. It represents `0`, `0.1`, and `1.7976931348623e+308` (the largest possible representation) using the same number of bits. That's quite wasteful. Since we're after the theoretical minimum number of bits, we want to encode each number in as few bits as possible.
+Here's a naive way to do it: type the number in Python. The [float](https://en.wikipedia.org/wiki/Floating-point_arithmetic) type uses 64 bits to represent every number. It represents `0`, `0.1`, and `1.7976931348623e+308` (the largest possible representation) using the same number of bits. That's too wasteful for our purpose of finding the minimum description: we want to encode each number in as few bits as possible.
 
-In reality, we're far more likely to see `0` and `0.1` than `1.7976931348623e+308` (assuming the coefficients and errors come from, say, a [Gaussian distribution](https://en.wikipedia.org/wiki/Normal_distribution)). What if we use a shorter code for the more likely numbers like `0` and `0.1`, and a longer code for the those rare events like `1.7976931348623e+308`. Theoretically, the [optimal code length](https://en.wikipedia.org/wiki/Shannon%27s_source_coding_theorem) is $-\log_2(p(x))$, where $p(x)$ is the probability of event $x$.
+In reality, we're far more likely to see `0` and `0.1` than `1.7976931348623e+308` (assuming the coefficients and errors come from, say, a [Gaussian distribution](https://en.wikipedia.org/wiki/Normal_distribution)). What if we use a shorter code for the more likely numbers like `0` and `0.1`, and a longer code for the those rare events like `1.7976931348623e+308`? Theoretically, the [optimal code length](https://en.wikipedia.org/wiki/Shannon%27s_source_coding_theorem) is $-\log_2(p(x))$, where $p(x)$ is the probability of event $x$.
 
 <Figure
   content={
@@ -121,7 +121,7 @@ In reality, we're far more likely to see `0` and `0.1` than `1.7976931348623e+30
 
 For example, if a number comes up as often as 50% of the time, you should represent it with only 1 bit.
 
-Assuming the coefficients and errors follow a Gaussian distribution with mean $0$, we can chop up the real number line into small intervals of size $t$ and assigned each interval with a probability $p(x)$.
+Assuming the coefficients and errors follow a Gaussian distribution with mean $0$, we can chop up the real number line into small intervals of size $t$ and assign each interval with a discrete probability $p(x)$.
 
 <Figure
   content={
@@ -138,7 +138,7 @@ Assuming the coefficients and errors follow a Gaussian distribution with mean $0
   method.
 </Figure>
 
-Once we have a probability, we can assume the optimal code length $-\log_2(p(x))$ and get the minimum number of bits needed to encode our number.
+Given a probability, we can assume the optimal code length $-\log_2(p(x))$ and calculate the minimum number of bits needed to encode our number <Note id={3} />.
 
 $$
 \text{real number} \rightarrow \text{small interval} \rightarrow \text{probability} \rightarrow \text{bits}
@@ -241,7 +241,7 @@ As a crude analogy, imagine you are an expert in learning and compression. You k
 More remarkably, even though Llama and Chinchilla are trained primarily on text, they are quite good at compressing image patches and audio samples, outperforming specialized algorithms such as [PNG](https://compress-or-die.com/Understanding-PNG).
 Somehow, the word patterns LLMs learn can be used to compress images and audio. This is perhaps less surprising if we see compression as learning: words, images, and audio are all slivers of the same underlying world.
 
-The compression efficiency of LLMs comes at a cost: the size of their weights. This is shown on the right half of the table: "Adjusted Compression Rate". Technically, the minimum description length includes these weights in its $L(H)$ term, like how we coded the polynomial coefficients in addition to the errors. Practically, we don't want to lug around all the Llama weights every time we compress a file. <Note id={2}/>
+The compression efficiency of LLMs comes at a cost: the size of their weights. This is shown on the right half of the table: "Adjusted Compression Rate". Technically, the minimum description length includes these weights in its $L(H)$ term, like how we coded the polynomial coefficients in addition to the errors. Practically, we don't want to lug around all the Llama weights every time we compress a file. <Note id={4}/>
 
 $$
 \underbrace{L(D)}_{\text{compressed size}}=\underbrace{L(H)}_{\text{size of weights}}+\underbrace{L(D|H)}_{\text{size of errors}}
