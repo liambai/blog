@@ -21,17 +21,15 @@ It's almost impossible to watch this [Kevin clip](https://youtu.be/bctjSvn-OC8?s
   }
 />
 
-His abbreviated sentences do seem to convey the same information as their verbose original. They certainly do trick!
-
-Can we rigorously define and measure the information in a sentence? How "few" can we go without losing information?
+His abbreviated sentences do seem to convey the same information as their verbose original. Can we formalize this idea of using fewer words to say the same thing? How "few" can we go without losing information?
 
 These questions lead to one of the most profound ideas in machine learning: the **Minimum Description Length (MDL) Principle**. It's so important that when [Ilya Sutskever](https://en.wikipedia.org/wiki/Ilya_Sutskever) gave [John Carmack](https://en.wikipedia.org/wiki/John_Carmack) a list of [30 papers](https://github.com/dzyim/ilya-sutskever-recommended-reading) and said:
 
 > If you really learn all of these, you'll know 90% of what matters today.
 
-4 on them were on this topic <Reference id={1} /> <Reference id={2} /> <Reference id={3} /> <Reference id={4} />.
+4 of them were on this topic <Reference id={1} /> <Reference id={2} /> <Reference id={3} /> <Reference id={4} />.
 
-The MLD principle is one of those ideas that blew my mind and fundamentally changed the way I see the world. It's a new perspective on familiar concepts like learning, information, and complexity. Let me show you!
+The MLD principle blew my mind and fundamentally changed the way I see the world. It's a new perspective on familiar concepts like learning, information, and complexity. This blog post is a high-level, intuition-first introduction to these ideas.
 
 ## Strings
 
@@ -83,13 +81,13 @@ What is the Kolmogorov complexity of these 10 points?
 
 That's equivalent to asking: what's the minimum description length of these points? Of course, we can just describe each point by its coordinate, but can we do better?
 
-Here's an idea: let's draw a line through the points and use it do describe each point. That means describing 2 things: the line + how the far each point is from the line.
+Here's an idea: let's draw a line through the points and use it to describe each point. That means describing 2 things: the line + how the far each point is from the line.
 
 Here are 3 attempts:
 
 <Figure content={<Image path={require("./images/polynomials.png")} />} />
 
-As a stats major, my knee-jerk reaction to these lines is: left & right bad, middle good! Under/over-fitting, unseen data, bias/variance tradeoff... you name it. But there's another way to see why the middle one is best: it gives the _shortest description_ of these points.
+My knee-jerk reaction to these lines is: left & right bad, middle good! Under/over-fitting, unseen data, bias/variance tradeoff, etc... But there's another way to see why the middle one is best: it gives the _shortest description_ of these points.
 
 The descriptions would look something like:
 
@@ -209,7 +207,7 @@ Under this interpretation, $\sigma_w$ is a hyperparameter of the model that lets
 
 Back to the claim on compression being the same as learning: perhaps you can agree that these two summaries of this example are equivalent:
 
-1. We have _compressed_ these points using a 3rd degree polynomial, which lets us describe them in very few bits.
+1. We have _compressed_ these points using a 3rd degree polynomial, allowing us to describe them in very few bits.
 2. We have _learned_ a good model of these points, a 3rd degree polynomial, which approximates the underlying distribution.
 
 ## Words
@@ -224,18 +222,18 @@ Researchers found that this compression method using LLMs is far more efficient 
   [enwik9](https://mattmahoney.net/dc/textdata.html) is a file used in the
   [Large Text Compression Benchmark](https://mattmahoney.net/dc/text.html).
   ImageNet and LibriSpeech are popular image and speech datasets. Chunk size
-  considers the fact that LLMs have a limited context window whereas gzip can
-  operate on a much larger range and exploit more compressible patterns.
+  accounts for the limited context window of LLMs, whereas `gzip` can operate on
+  a much larger range and exploit more compressible patterns.
 </Figure>
 
 LLMs like Llama and Chinchilla managed to compress [enwik9](https://mattmahoney.net/dc/textdata.html), a text file used to benchmark compression algorithm, to 10% its original size, compared to `gzip`'s 30%. LLMs have clearly learned patterns in the text that are useful for compression.
 
 As a crude analogy, imagine you are an expert in learning and compression. You know by heart every concept in this blog post. Reproducing this blog post just requires noting the differences between your understanding and my explanations: maybe I've phrased things differently than you would, or made a mistake. Now imagine reproducing a blog post on a topic you know nothing about or, say, in an unknown language. The latter task requires much more effort, and in the worse case, rote memorization.
 
-More remarkably, even though Llama and Chinchilla are not trained primarily trained on text, they are quite good at compressing image patches and audio samples, outperforming specialized algorithms such as [PNG](https://compress-or-die.com/Understanding-PNG).
+More remarkably, even though Llama and Chinchilla are trained primarily on text, they are quite good at compressing image patches and audio samples, outperforming specialized algorithms such as [PNG](https://compress-or-die.com/Understanding-PNG).
 Somehow, the word patterns LLMs learn can be used to compress images and audio. This is perhaps less surprising if we see compression as learning: words, images, and audio are all slivers of the same underlying world.
 
-The compression efficiency of LLMs come at a cost: the size of their weights. This is shown on the right half of the table: "Adjusted Compression Rate". Technically, the minimum description length includes these weights in its $L(H)$ term, like we coded the polynomial coefficients in addition to the errors. Practically, we don't want to lug around all the Llama weights (up to 100s of GBs) every time we compress a file. <Note id={1}/>
+The compression efficiency of LLMs comes at a cost: the size of their weights. This is shown on the right half of the table: "Adjusted Compression Rate". Technically, the minimum description length includes these weights in its $L(H)$ term, like we coded the polynomial coefficients in addition to the errors. Practically, we don't want to lug around all the Llama weights (up to 100s of GBs) every time we compress a file. <Note id={1}/>
 
 $$
 \underbrace{L(D)}_{\text{compressed size}}=\underbrace{L(H)}_{\text{size of weights}}+\underbrace{L(D|H)}_{\text{size of errors}}
