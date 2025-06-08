@@ -132,10 +132,11 @@ Assuming the coefficients and errors follow a Gaussian distribution with mean $0
   }
 >
   Given any real number $v$, we can discretize it by taking a small interval of
-  size $t$ around it. Integrating across that slice of the Gaussian distribution
-  gives us $v$'s assigned probability. This picture is from sections 3 and 4 of{" "}
-  <Reference id={3} />, which also contain a detailed explanation of this
-  method.
+  size $t$ around it. For small enough $t$, can approximate the probability
+  density at the interval with $t * g(x)$, where $g(x)$ is the [Gaussian
+  pdf](https://en.wikipedia.org/wiki/Normal_distribution). The picture is from
+  sections 3 and 4 of Hinton et al. <Reference id={3} />, which contain a
+  detailed explanation of this method.
 </Figure>
 
 Given a probability, we can assume the optimal code length $-\log_2(p(x))$ and calculate the minimum number of bits needed to encode our number <Note id={3} />.
@@ -259,7 +260,13 @@ The MDL principle is such a profound perspective because so many powerful ideas 
 
 ### Occam's Razor
 
-[Occam's Razor](https://en.wikipedia.org/wiki/Occam%27s_razor) is the philosophical principle that _the simplest explanation is usually the best_. In statistical modeling, this is literally true in a way that can be made mathematically precise: the model that explains the data in the fewest number of bits is the best.
+[Occam's Razor](https://en.wikipedia.org/wiki/Occam%27s_razor) is the philosophical principle that _the simplest explanation is usually the best_.
+
+<Figure
+  content={<Image path={require("./images/occams-razor.png")} width="60%" />}
+></Figure>
+
+In statistical modeling, this is literally true in a mathematically precise way: the model that explains the data in the fewest number of bits is the best.
 
 ### The Bitter Lesson
 
@@ -271,7 +278,7 @@ For example, the best chess algorithms used to encode human-discovered heuristic
   [https://danieljeffries.substack.com/p/embracing-the-bitter-lesson](https://danieljeffries.substack.com/p/embracing-the-bitter-lesson)
 </Figure>
 
-The story of machine learning is one of the repeated failure of our biases, clever tricks, and desire to teach our models the world in the way _we_ see it. In the MDL perspective, the best model of the world is the one with the minimum description. Removing our biases simplify the description. The simplest description always wins.
+The story of machine learning is one of the repeated failure of our biases, clever tricks, and desire to teach our models the world in the way _we_ see it. From the MDL perspective, the best model of the world is the one with the minimum description. Each bias we remove is a simplification of our description. The simplest description always wins.
 
 ## Acknowledgements
 

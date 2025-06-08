@@ -1,5 +1,5 @@
 import React from "react"
-import { InlineMath, BlockMath } from "react-katex"
+import { InlineMath } from "react-katex"
 
 // Simple markdown renderer for notes
 function renderMarkdown(text) {
