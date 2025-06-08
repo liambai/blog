@@ -1,7 +1,7 @@
 ---
 title: "Why say lot word when few do trick?"
-date: "2025-06-05"
-description: "The Minimum Description Length (MDL) principle, Kolmogorov complexity, curve fitting, learning as data compression."
+date: "2025-06-08"
+description: "The Minimum Description Length (MDL) principle, Kolmogorov complexity, linear regression, data compression and learning."
 ---
 
 import { Link } from "gatsby"
@@ -12,7 +12,14 @@ import { Note, NoteList } from "./Notes.jsx"
 
 It's almost impossible to watch this [Kevin clip](https://youtu.be/bctjSvn-OC8?si=Jf1Os9V04MIotRdq&t=48) without coming to the conclusion: he's onto something.
 
-<Figure content={<Image path={require("./images/kevin.jpg")} />} />
+<Figure
+  content={
+    <Image
+      href="https://www.youtube.com/watch?v=bctjSvn-OC8&t=48s&ab_channel=ComedyBites"
+      path={require("./images/kevin.jpg")}
+    />
+  }
+/>
 
 His abbreviated sentences do seem to convey the same information as their verbose original. They certainly do trick!
 
@@ -239,6 +246,24 @@ Although Llama and Chinchilla are not practical compressors––at least not un
 If we try to compress all of human knowledge, as these foundation models set out to do, the $L(H)$ term will be negligible. A few GBs of model weights compared to the vastness of the internet, but they pack a whole lot. I felt this viscerally when chatting with [Ollama](https://ollama.com/) on a flight without internet. Somehow, practically all of human knowledge is right in front of me in this piece of metal. That blew my mind.
 
 ## Final thoughts
+
+MDL is such a profound perspective because so many powerful ideas can be cast in term of it. We saw a concrete example with linear regression. I'll close with two more.
+
+### Occam's Razor
+
+[Occam's Razor](https://en.wikipedia.org/wiki/Occam%27s_razor) is the philosophical principle that _the simplest explanation is usually the best_. In statistical modeling, this is literally true in a way that can be made mathematically precise: the model that explains the data in the fewest number of bits is the best.
+
+### The Bitter Lesson
+
+[The Bitter Lesson](http://www.incompleteideas.net/IncIdeas/BitterLesson.html) in machine learning is that general methods leveraging increasing compute tends to outperform hand-crafted ones that rely on expert domain knowledge.
+
+For example, the best chess algorithms used to encode human-discovered heuristics and strategies, only to be blown away by a "brute-force" method based only on deep search. Same story with Go. The leading algorithms are not told anything about Go beyond its rules: they discover strategies via deep learning, search, and self-play, even [ones](https://x.com/karpathy/status/1884336943321997800?lang=en) that stun the best Go player in the world. This lesson has played out in every field time and again: computer vision, NLP, even protein structure prediction.
+
+The story of machine learning is one of the repeated failure of our biases, clever tricks, and desire to teach our models the world in the way _we_ see it. In the MDL perspective, each bias we remove is a simplification of the description. The simplest description always wins.
+
+## Acknowledgements
+
+TODO
 
 ## References
 

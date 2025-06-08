@@ -8,9 +8,11 @@ const Image = ({
   mobileWidth = "100%",
   alt = "",
   style = {},
+  href,
 }) => {
   const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
-  return (
+
+  const imageElement = (
     <img
       style={{
         width: isMobile ? mobileWidth : width,
@@ -20,6 +22,14 @@ const Image = ({
       src={path.default}
       alt={alt}
     />
+  )
+
+  return href ? (
+    <a href={href} target="_blank" rel="noopener noreferrer">
+      {imageElement}
+    </a>
+  ) : (
+    imageElement
   )
 }
 
