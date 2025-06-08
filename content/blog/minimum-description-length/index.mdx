@@ -29,7 +29,7 @@ These questions lead to one of the most profound ideas in machine learning: the 
 
 4 of them were on this topic <Reference id={1} /> <Reference id={2} /> <Reference id={3} /> <Reference id={4} />.
 
-The MLD principle blew my mind and fundamentally changed the way I see the world. It's a new perspective on familiar concepts like learning, information, and complexity. This blog post is a high-level, intuition-first introduction to these ideas.
+The MDL principle blew my mind and fundamentally changed the way I see the world. It's a new perspective on familiar concepts like learning, information, and complexity. This blog post is a high-level, intuition-first introduction to these ideas.
 
 ## Strings
 
@@ -64,7 +64,7 @@ def f():
     return "01110100110100100110"
 ```
 
-Making this mathematically precise takes some work: we need to define the language, measure the length of programs in bits, etc. But that's the basic idea: an object is complex if we need a long Python function to return it. This function is often called a **description** of the string, and Kolmogorov complexity the **minimum description length**.
+Making this mathematically precise takes some work: we need to define the language, measure the length of programs in bits, etc. <Note id={1}/>. But that's the basic idea: an object is complex if we need a long Python function to return it. This function is often called a **description** of the string, and Kolmogorov complexity the **minimum description length**.
 
 What separates these strings from each other? For 1 and 2, we can exploit their repeating pattern to represent them in a more compact way; such a regularity does not exist in 3. Generally, we can think about complexity in terms of **data compression**:
 
@@ -233,7 +233,7 @@ As a crude analogy, imagine you are an expert in learning and compression. You k
 More remarkably, even though Llama and Chinchilla are trained primarily on text, they are quite good at compressing image patches and audio samples, outperforming specialized algorithms such as [PNG](https://compress-or-die.com/Understanding-PNG).
 Somehow, the word patterns LLMs learn can be used to compress images and audio. This is perhaps less surprising if we see compression as learning: words, images, and audio are all slivers of the same underlying world.
 
-The compression efficiency of LLMs comes at a cost: the size of their weights. This is shown on the right half of the table: "Adjusted Compression Rate". Technically, the minimum description length includes these weights in its $L(H)$ term, like we coded the polynomial coefficients in addition to the errors. Practically, we don't want to lug around all the Llama weights (up to 100s of GBs) every time we compress a file. <Note id={1}/>
+The compression efficiency of LLMs comes at a cost: the size of their weights. This is shown on the right half of the table: "Adjusted Compression Rate". Technically, the minimum description length includes these weights in its $L(H)$ term, like we coded the polynomial coefficients in addition to the errors. Practically, we don't want to lug around all the Llama weights (up to 100s of GBs) every time we compress a file. <Note id={2}/>
 
 $$
 \underbrace{L(D)}_{\text{compressed size}}=\underbrace{L(H)}_{\text{size of weights}}+\underbrace{L(D|H)}_{\text{size of errors}}

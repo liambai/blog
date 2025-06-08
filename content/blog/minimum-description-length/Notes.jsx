@@ -5,6 +5,18 @@ import { InlineMath } from "react-katex"
 const notes = {
   1: (
     <>
+      <span>
+        As you can probably guess, finding the minimum program is a tough
+        problem in more practical situations. In fact,
+      </span>{" "}
+      <a href="https://en.wikipedia.org/wiki/Kolmogorov_complexity#Uncomputability_of_Kolmogorov_complexity">
+        Kolmogorov complexity is generally not computable
+      </a>
+      <span>.</span>
+    </>
+  ),
+  2: (
+    <>
       <span>For programs like gzip, the </span>
       <InlineMath>L(H)</InlineMath>{" "}
       <span>
