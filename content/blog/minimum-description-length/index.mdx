@@ -229,9 +229,11 @@ Researchers found that this compression method using LLMs is far more efficient 
 <Figure
   content={<Image path={require("./images/LLM-compression-results.png")} />}
 >
-  ImageNet and LibriSpeech are popular image and speech datasets. Chunk size
-  accounts for the limited context window of LLMs, whereas `gzip` can operate on
-  a much larger range and exploit more compressible patterns.
+  [ImageNet](https://en.wikipedia.org/wiki/ImageNet) and
+  [LibriSpeech](https://www.openslr.org/12) are popular image and speech
+  datasets. Chunk size accounts for the limited context window of LLMs, whereas
+  `gzip` can operate on a much larger range and exploit more compressible
+  patterns.
 </Figure>
 
 LLMs like Llama and Chinchilla managed to compress [enwik9](https://mattmahoney.net/dc/textdata.html), a text file used to benchmark compression algorithm, to 10% its original size, compared to `gzip`'s 30%. LLMs have clearly learned patterns in the text that are useful for compression.
