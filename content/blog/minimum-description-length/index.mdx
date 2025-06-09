@@ -200,13 +200,13 @@ $$
 C(D) = \underbrace{\frac{1}{{2 \sigma_d^2}} \sum_{c=1}^{10} (d_c - y_c)^2}_{\text{MSE}} + \underbrace{\frac{1}{{2 \sigma_w^2}} \sum_{i=1}^n w_i^2}_{\text{regularization}}
 $$
 
-This fits our intuition that we want to have small coefficients that minimize the errors – the degree 3 polynomial is best!
+This fits our intuition that we want to have small coefficients that minimize the errors: the degree 3 polynomial is best.
 
-This formula is also the minimization objective of [Ridge Regression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html). We never explicitly thought about [mean-squared error (MSE)](https://en.wikipedia.org/wiki/Mean_squared_error) or L2 [regularization](https://developers.google.com/machine-learning/crash-course/overfitting/regularization): they fell out of our quest for the shortest description of our data.
+This formula is also the minimization objective of [ridge regression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html). We never explicitly thought about [mean-squared error (MSE)](https://en.wikipedia.org/wiki/Mean_squared_error) or L2 [regularization](https://developers.google.com/machine-learning/crash-course/overfitting/regularization): they fell out of our quest for the shortest description of our data.
 
 Under this interpretation, $\sigma_w$ is a hyperparameter of the model that lets us tweak the regularization strength. In the MDL view, its just the width of the Gaussian we used to discretize our coefficients. A small $\sigma_w$ implies a narrow coefficient distribution and, in turn, stronger regularization.
 
-Choosing the Gaussian is reasonable and popular, though somewhat arbitrary. This is called the **noise model**: what distribution do we assume of our coefficients and errors? If we had chosen the [Laplace distribution](https://en.wikipedia.org/wiki/Laplace_distribution), we would have derived [Lasso regression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html) with L1 regularization.
+Choosing the Gaussian is reasonable and popular, though somewhat arbitrary. This is called the **noise model**: what distribution do we assume of our coefficients and errors? If we had chosen the [Laplace distribution](https://en.wikipedia.org/wiki/Laplace_distribution), we would have derived [lasso regression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html) with L1 regularization.
 
 Back to the claim on compression being the same as learning: perhaps you can agree that these two summaries of this example are equivalent:
 
