@@ -134,9 +134,9 @@ Assuming the coefficients and errors follow a Gaussian distribution with mean $0
   Given any real number $v$, we can discretize it by taking a small interval of
   size $t$ around it. For small enough $t$, can approximate the probability
   density at the interval with $t * g(x)$, where $g(x)$ is the [Gaussian
-  pdf](https://en.wikipedia.org/wiki/Normal_distribution). The picture is from
-  sections 3 and 4 of Hinton et al. <Reference id={3} />, which contain a
-  detailed explanation of this method.
+  pdf](https://en.wikipedia.org/wiki/Normal_distribution) with mean $0$. The
+  picture is from sections 3 and 4 of Hinton et al. <Reference id={3} />, which
+  contain a detailed explanation of this method.
 </Figure>
 
 Given a probability, we can assume the optimal code length $-\log_2(p(x))$ and calculate the minimum number of bits needed to encode our number <Note id={3} />.
@@ -147,7 +147,7 @@ $$
 
 ### Coding the coefficients
 
-Let's try encoding each of our polynomial coefficients $w_i$, starting with its discretized probability:
+Let's try encoding each of our polynomial coefficient $w_i$, starting with its discretized probability:
 
 $$
 p(w_i) = t \frac{1}{\sqrt{2 \pi} \sigma_w} \exp \left(\frac{-w_i^2}{2 \sigma_w^2}\right)
@@ -202,9 +202,11 @@ $$
 
 This fits our intuition that we want to have small coefficients that minimize the errors – the degree 3 polynomial is best!
 
-This formula is also the minimization objective of [Ridge Regression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html). We never explicitly thought about [mean-squared error (MSE)](https://en.wikipedia.org/wiki/Mean_squared_error) or [regularization](<https://en.wikipedia.org/wiki/Regularization_(mathematics)>): they fell out of our quest for the shortest description of our data.
+This formula is also the minimization objective of [Ridge Regression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html). We never explicitly thought about [mean-squared error (MSE)](https://en.wikipedia.org/wiki/Mean_squared_error) or L2 [regularization](https://developers.google.com/machine-learning/crash-course/overfitting/regularization): they fell out of our quest for the shortest description of our data.
 
-Under this interpretation, $\sigma_w$ is a hyperparameter of the model that lets us tweak the regularization strength. In the MDL view, its just the width of the Gaussian we used to discretize our coefficients. A small $\sigma_w$ implies a narrow coefficient distribution and, in turn, a strong regularization.
+Under this interpretation, $\sigma_w$ is a hyperparameter of the model that lets us tweak the regularization strength. In the MDL view, its just the width of the Gaussian we used to discretize our coefficients. A small $\sigma_w$ implies a narrow coefficient distribution and, in turn, stronger regularization.
+
+Choosing the Gaussian is reasonable and popular, though somewhat arbitrary. This is called the **noise model**: what distribution do we assume of our coefficients and errors? If we had chosen the [Laplace distribution](https://en.wikipedia.org/wiki/Laplace_distribution), we would have derived [Lasso regression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html) with L1 regularization.
 
 Back to the claim on compression being the same as learning: perhaps you can agree that these two summaries of this example are equivalent:
 
