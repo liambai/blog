@@ -29,7 +29,7 @@ These questions lead to one of the most profound ideas in machine learning: the 
 
 4 of them were on this topic <Reference id={1} /> <Reference id={2} /> <Reference id={3} /> <Reference id={4} />.
 
-The MDL principle blew my mind and fundamentally changed the way I see the world. It's a new perspective on familiar concepts like learning, information, and complexity. This blog post is a high-level, intuition-first introduction to these ideas.
+The MDL principle fundamentally changed the way I see the world. It's a new perspective on familiar concepts like learning, information, and complexity. This blog post is a high-level, intuition-first introduction to this idea.
 
 ## Strings
 
@@ -79,7 +79,7 @@ What is the Kolmogorov complexity of these 10 points?
 
 <Figure content={<Image path={require("./images/points.png")} width="60%" />} />
 
-That's equivalent to asking: what's the minimum description length of these points? Of course, we can just describe each point by its coordinate, but can we do better?
+That's equivalent to asking for the minimum description length of these points. Of course, we can just describe each point by its coordinate, but can we do better?
 
 Here's an idea: let's draw a line through the points and use it to describe each point. That means describing 2 things: the line + how the far each point is from the line.
 
@@ -87,7 +87,7 @@ Here are some attempts:
 
 <Figure content={<Image path={require("./images/polynomials.png")} />} />
 
-My knee-jerk reaction to these lines is: left and right bad, middle good! Under/over-fitting, unseen data, bias/variance tradeoff, etc... But there's another way to see why the middle one is best: it gives the _shortest description_ of these points.
+My knee-jerk reaction to these lines is: left and right bad, middle good! Under/over-fitting, bias/variance tradeoff, generalizing to unseen data, etc... But there's another way to see why the middle one is best: it gives the _shortest description_ of these points.
 
 The descriptions would look something like:
 
@@ -95,15 +95,15 @@ The descriptions would look something like:
 2. I have a line $y = 5.45x^3 - 5.68x^2 + 1.19x + 0.06$ and it misses the first point by $0.03$, the second by $-0.05$...
 3. I have a line $y = -15348.64x^9 + 67461.06x^8 - 123937.33x^7 + ...$ and it fits each point perfectly.
 
-In the first case, it's easy to describe the line, but it'll take some effort to describe how far each point is from the line, the errors. The third line is very complicated to describe, but don't need to spend any time on the errors. The middle one strikes a balance.
+In the first case, it's easy to describe the line, but it'll take some effort to describe how far each point is from the line, the errors. The third line is very complicated to describe, but we don't need to spend any time on the errors. The middle one strikes a balance.
 
-More generally, we call the line a **hypothesis** $H$, drawn from a set $\mathcal{H}$ of hypotheses, e.g. all polynomials. There is a tradeoff between the description length $L$ of the hypothesis (the coefficients), and the description length of the data $D$ when encoded with the help of the hypothesis (the errors). We want find an $H$ that minimizes the sum of these 2 terms:
+More generally, we call the line a **hypothesis** $H$, drawn from a set $\mathcal{H}$ of hypotheses, e.g. all polynomials. There is a tradeoff between the description length $L$ of the hypothesis (the coefficients), and the description length of the data $D$ when encoded with the help of the hypothesis (the errors). We want to find an $H$ that minimizes the sum of these 2 terms:
 
 $$
 L(D)=\underbrace{L(H)}_{\text{length of coefficients}}+\underbrace{L(D|H)}_{\text{length of errors}}
 $$
 
-That was all quite hand-wavy. How can we quantify the intuition that the errors of the 1st degree polynomial are "harder to describe" than those of the 3rd degree polynomial? The next section uses tools from information theory to make these calculations precise.
+That was all quite hand-wavy. How can we formalize the intuition that the errors of the 1st degree polynomial are "harder to describe" than those of the 3rd degree polynomial? The next section uses tools from information theory to make these calculations precise.
 
 ### Coding in bits
 
@@ -145,9 +145,15 @@ $$
 \text{real number} \rightarrow \text{small interval} \rightarrow \text{probability} \rightarrow \text{bits}
 $$
 
-### Coding the coefficients
+Now, we're ready to compute each term of our equation for description length:
 
-Let's try encoding each of our polynomial coefficient $w_i$, starting with its discretized probability:
+$$
+L(D)=\underbrace{L(H)}_{\text{length of coefficients}}+\underbrace{L(D|H)}_{\text{length of errors}}
+$$
+
+### Coding the coefficients, $L(H)$
+
+Let's encode each of our polynomial coefficient $w_i$, starting with its discretized probability:
 
 $$
 p(w_i) = t \frac{1}{\sqrt{2 \pi} \sigma_w} \exp \left(\frac{-w_i^2}{2 \sigma_w^2}\right)
@@ -173,7 +179,7 @@ $$
 
 We see that minimizing the code length of the polynomial is equivalent to minimizing the term $\sum_{i=1}^n w_i^2$. In other words, we want to keep the coefficients small.
 
-### Coding the errors
+### Coding the errors, $L(D|H)$
 
 Applying the same technique to each error term $|d_c - y_c|$, where $d_c$ is the true data point and $y_c$ is our polynomial's approximation:
 
