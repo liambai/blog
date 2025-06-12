@@ -249,8 +249,8 @@ LLMs like Llama and Chinchilla managed to compress [enwik9](https://mattmahoney.
 
 As a crude analogy, imagine you are an expert in learning and compression. You know by heart every concept in this blog post. Reproducing this blog post just requires noting the differences between your understanding and my explanations: maybe I've phrased things differently than you would, or made a mistake. Now imagine reproducing a blog post on a topic you know nothing about or, say, in an unknown language. The latter task requires much more effort, and in the worst case, rote memorization.
 
-More remarkably, even though Llama and Chinchilla are trained primarily on text, they are quite good at compressing image patches and audio samples, outperforming specialized algorithms such as [PNG](https://compress-or-die.com/Understanding-PNG).
-Somehow, the word patterns LLMs learn can be used to compress images and audio. This is perhaps less surprising if we see compression as learning: words, images, and audio are all slivers of the same underlying world.
+More remarkably, even though Llama and Chinchilla are trained primarily on text, they are quite good at compressing image patches and audio samples, outperforming specialized algorithms like [PNG](https://compress-or-die.com/Understanding-PNG).
+Somehow, the word patterns LLMs learn can be used to compress images and audio too. Words, images, audio: all slivers of the same underlying world.
 
 The compression efficiency of LLMs comes at a cost: the size of their weights. This is shown on the right half of the table: "Adjusted Compression Rate". Technically, the minimum description length includes these weights in its $L(H)$ term, like how we coded the polynomial coefficients in addition to the errors. Practically, we don't want to lug around all the Llama weights every time we compress a file. <Note id={4}/>
 
@@ -280,7 +280,7 @@ In statistical modeling, this is literally true in a mathematically precise way:
 
 [The Bitter Lesson](http://www.incompleteideas.net/IncIdeas/BitterLesson.html) in machine learning is that general methods leveraging increasing compute tends to outperform hand-crafted ones that rely on expert domain knowledge.
 
-For example, the best chess algorithms used to encode human-discovered heuristics and strategies, only to be blown away by a "brute-force" method based only on deep search. Same story with Go. The leading algorithms are not told anything about Go beyond its rules: they discover strategies via deep learning, search, and self-play, even [ones](https://x.com/karpathy/status/1884336943321997800?lang=en) that stun the best Go player in the world. This lesson has played out in every field time and again: computer vision, NLP, even protein structure prediction.
+For example, the best chess algorithms used to encode human-discovered heuristics and strategies, only to be blown away by [a "brute-force" method based only on deep search](<https://en.wikipedia.org/wiki/Deep_Blue_(chess_computer)>). Same story with Go. The [leading algorithms](https://en.wikipedia.org/wiki/AlphaZero) are not told anything about Go beyond its rules: they discover strategies via deep learning, search, and self-play, even [ones](https://x.com/karpathy/status/1884336943321997800?lang=en) that stun the best human player in the world. This lesson has played out in many fields time and again: computer vision, NLP, even protein structure prediction.
 
 <Figure content={<Image path={require("./images/bitter-lesson.png")} />}>
   [https://danieljeffries.substack.com/p/embracing-the-bitter-lesson](https://danieljeffries.substack.com/p/embracing-the-bitter-lesson)
@@ -290,7 +290,7 @@ The story of machine learning is one of the repeated failure of our biases, clev
 
 ## Acknowledgements
 
-TODO
+Thank you to Etowah Adams and Daniel Wang for reading a draft of this post and giving feedback.
 
 ## References
 
