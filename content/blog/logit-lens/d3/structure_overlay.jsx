@@ -190,7 +190,26 @@ const StructureOverlay = ({ title, pdbId, logitsPath, maxLogit }) => {
 
         containerRef.current.innerHTML = "" // Clear previous viewer
 
-        const plugin = new PluginContext(DefaultPluginSpec())
+        // Use smaller plugin spec with only essential features for memory optimization
+        const pluginSpec = {
+          ...DefaultPluginSpec(),
+          config: [
+            ...(DefaultPluginSpec().config || []),
+            ["molstar/ui/skin/light", { accent: "rgb(29, 113, 183)" }],
+            [
+              "molstar/ui/layout",
+              {
+                hideControls: true,
+                showLeftPanel: false,
+                showRightPanel: false,
+                showBottomPanel: false,
+                showLog: false,
+              },
+            ],
+          ],
+        }
+
+        const plugin = new PluginContext(pluginSpec)
         pluginRef.current = plugin
         await plugin.init()
 

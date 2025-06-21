@@ -7,6 +7,7 @@ description: Applying the logit lens to ESM-2. Logit visualization & interpretat
 import { Link } from "gatsby"
 import Figure from "../../../src/components/figure.jsx"
 import Image from "../../../src/components/image.jsx"
+import LazyVisualizationWrapper from "../../../src/components/lazy-visualization-wrapper.jsx"
 import TopTokensHeatmap from "./d3/top_tokens_heatmap"
 import TrueTokensRanksHeatmap from "./d3/true_tokens_ranks_heatmap"
 import StructureOverlay from "./d3/structure_overlay"
@@ -35,13 +36,15 @@ I took a [beta-lactamase](https://en.wikipedia.org/wiki/Beta-lactamase) sequence
 
 Each cell below shows the amino acid that ESM is most confident in, colored by its logit value (scroll right for more positions, mouseover for logit values). The true amino acid sequence is shown at the bottom, where the ones that don't match ESM's final prediction are red.
 
-<TopTokensHeatmap
-  title="Beta-lactamase (PDB 4ZAM) top tokens by logit"
-  sequence="SPQPLEQIKLSESQLSGRVGMIEMDLASGRTLTAWRADERFPMMSTFKVVLCGAVLARVDAGDEQLERKIHYRQQDLVDYSPVSEKHLADGMTVGELCAAAITMSDNSAANLLLATVGGPAGLTAFLRQIGDNVTRLDRWETELNEALPGDARDTTTPASMAATLRKLLTSQRLSARSQRQLLQWMVDDRVAGPLIRSVLPAGWFIADKTGAGERGARGIVALLGPNNKAERIVVIYLRDTPASMAERNQQIAGIGAALIEHWQR"
-  tokensPath="/data/logit-lens/beta_lactamase_top_tokens.csv"
-  logitsPath="/data/logit-lens/beta_lactamase_top_logits.csv"
-  maxLogit="12.35"
-/>
+<LazyVisualizationWrapper placeholder="Loading Beta-lactamase heatmap...">
+  <TopTokensHeatmap
+    title="Beta-lactamase (PDB 4ZAM) top tokens by logit"
+    sequence="SPQPLEQIKLSESQLSGRVGMIEMDLASGRTLTAWRADERFPMMSTFKVVLCGAVLARVDAGDEQLERKIHYRQQDLVDYSPVSEKHLADGMTVGELCAAAITMSDNSAANLLLATVGGPAGLTAFLRQIGDNVTRLDRWETELNEALPGDARDTTTPASMAATLRKLLTSQRLSARSQRQLLQWMVDDRVAGPLIRSVLPAGWFIADKTGAGERGARGIVALLGPNNKAERIVVIYLRDTPASMAERNQQIAGIGAALIEHWQR"
+    tokensPath="/data/logit-lens/beta_lactamase_top_tokens.csv"
+    logitsPath="/data/logit-lens/beta_lactamase_top_logits.csv"
+    maxLogit="12.35"
+  />
+</LazyVisualizationWrapper>
 
 - Logits in earlier layers tend to be uncalibrated. As we move through the layers, ESM often converges on the right answer, but not always.
 - By logit values, ESM clearly believes in some positions more than others. For example, it's super confident in position 45 being S––and it's right! As it turns out, the S at position 45 constitutes a binding site, which means that it is likely highly conserved.
@@ -65,20 +68,24 @@ Each cell below shows the amino acid that ESM is most confident in, colored by i
 
 Here's a visualization of the top logit values at each position overlaid on the protein's structure. Use the slider to adjust the layer.
 
-<StructureOverlay
-  title="Beta-lactamase (PDB 4ZAM) structure colored by top logit"
-  pdbId="4ZAM"
-  logitsPath="/data/logit-lens/beta_lactamase_top_logits.csv"
-  maxLogit="12.35"
-/>
+<LazyVisualizationWrapper placeholder="Loading 3D protein structure...">
+  <StructureOverlay
+    title="Beta-lactamase (PDB 4ZAM) structure colored by top logit"
+    pdbId="4ZAM"
+    logitsPath="/data/logit-lens/beta_lactamase_top_logits.csv"
+    maxLogit="12.35"
+  />
+</LazyVisualizationWrapper>
 
 Of course, focusing on the top amino acid is limiting. What about the other amino acids? If ESM got the final prediction wrong, did it come close by at least assigning the true amino acid _one of_ the highest logits? We can answer that by plotting the rank of the true amino acid among the 20 options.
 
-<TrueTokensRanksHeatmap
-  title="Beta-lactamase (PDB 4ZAM) true token ranks"
-  sequence="SPQPLEQIKLSESQLSGRVGMIEMDLASGRTLTAWRADERFPMMSTFKVVLCGAVLARVDAGDEQLERKIHYRQQDLVDYSPVSEKHLADGMTVGELCAAAITMSDNSAANLLLATVGGPAGLTAFLRQIGDNVTRLDRWETELNEALPGDARDTTTPASMAATLRKLLTSQRLSARSQRQLLQWMVDDRVAGPLIRSVLPAGWFIADKTGAGERGARGIVALLGPNNKAERIVVIYLRDTPASMAERNQQIAGIGAALIEHWQR"
-  ranksPath="/data/logit-lens/beta_lactamase_true_token_ranks.csv"
-/>
+<LazyVisualizationWrapper placeholder="Loading true token ranks heatmap...">
+  <TrueTokensRanksHeatmap
+    title="Beta-lactamase (PDB 4ZAM) true token ranks"
+    sequence="SPQPLEQIKLSESQLSGRVGMIEMDLASGRTLTAWRADERFPMMSTFKVVLCGAVLARVDAGDEQLERKIHYRQQDLVDYSPVSEKHLADGMTVGELCAAAITMSDNSAANLLLATVGGPAGLTAFLRQIGDNVTRLDRWETELNEALPGDARDTTTPASMAATLRKLLTSQRLSARSQRQLLQWMVDDRVAGPLIRSVLPAGWFIADKTGAGERGARGIVALLGPNNKAERIVVIYLRDTPASMAERNQQIAGIGAALIEHWQR"
+    ranksPath="/data/logit-lens/beta_lactamase_true_token_ranks.csv"
+  />
+</LazyVisualizationWrapper>
 
 In many cases where ESM made the wrong prediction, the correct amino acid was quite highly ranked. It got so close! For example, at position 5, the correct amino acid corresponds to ESM's second highest logit.
 
@@ -86,13 +93,15 @@ In many cases where ESM made the wrong prediction, the correct amino acid was qu
 
 I repeated this for an [antibody heavy chain](https://en.wikipedia.org/wiki/Immunoglobulin_heavy_chain) sequence.
 
-<TopTokensHeatmap
-  title="Antibody heavy chain (PDB 5XRQ) top tokens by logit"
-  sequence="QVQLVQSGAEVKKPGSSVRVSCKASGDTFSSYSITWVRQAPGHGLQWMGGIFPIFGSTNYAQKFDDRLTITTDDSSRTVYMELTSLRLEDTAVYYCARGASKVEPAAPAYSDAFDMWGQGTLVTVSSASTKGPSVFPLAPSSKSTSGGTAALGCLVKDYFPEPVTVSWNSGALTSGVHTFPAVLQSSGLYSLSSVVTVPSSSLGTQTYICNVNHKPSNTKVDKRVEPKSCHHHHHH"
-  tokensPath="/data/logit-lens/ab_heavy_chain_top_tokens.csv"
-  logitsPath="/data/logit-lens/ab_heavy_chain_top_logits.csv"
-  maxLogit="12"
-/>
+<LazyVisualizationWrapper placeholder="Loading Antibody heatmap...">
+  <TopTokensHeatmap
+    title="Antibody heavy chain (PDB 5XRQ) top tokens by logit"
+    sequence="QVQLVQSGAEVKKPGSSVRVSCKASGDTFSSYSITWVRQAPGHGLQWMGGIFPIFGSTNYAQKFDDRLTITTDDSSRTVYMELTSLRLEDTAVYYCARGASKVEPAAPAYSDAFDMWGQGTLVTVSSASTKGPSVFPLAPSSKSTSGGTAALGCLVKDYFPEPVTVSWNSGALTSGVHTFPAVLQSSGLYSLSSVVTVPSSSLGTQTYICNVNHKPSNTKVDKRVEPKSCHHHHHH"
+    tokensPath="/data/logit-lens/ab_heavy_chain_top_tokens.csv"
+    logitsPath="/data/logit-lens/ab_heavy_chain_top_logits.csv"
+    maxLogit="12"
+  />
+</LazyVisualizationWrapper>
 
 I noticed ESM's high conviction on positions 22 and 96 being C. They form a [disulfide bridge](https://www.creative-proteomics.com/resource/disulfide-bridges-proteins-formation-function-analysis.htm), important for structural stability. Interestingly, ESM started developing this conviction for both positions simultaneously around layer 10.
 
@@ -110,20 +119,24 @@ There is another disulfide bridge spanning positions 154 - 210. ESM seems to hav
 
 Here is the structure colored by logits (the other chain is in grey).
 
-<StructureOverlay
-  title="Antibody heavy chain (PDB 5XRQ) structure colored by top logit"
-  pdbId="5XRQ"
-  logitsPath="/data/logit-lens/ab_heavy_chain_top_logits.csv"
-  maxLogit="12"
-/>
+<LazyVisualizationWrapper placeholder="Loading 3D antibody structure...">
+  <StructureOverlay
+    title="Antibody heavy chain (PDB 5XRQ) structure colored by top logit"
+    pdbId="5XRQ"
+    logitsPath="/data/logit-lens/ab_heavy_chain_top_logits.csv"
+    maxLogit="12"
+  />
+</LazyVisualizationWrapper>
 
 And the true amino acid ranks:
 
-<TrueTokensRanksHeatmap
-  title="Antibody heavy chain (PDB 5XRQ) true token ranks"
-  sequence="QVQLVQSGAEVKKPGSSVRVSCKASGDTFSSYSITWVRQAPGHGLQWMGGIFPIFGSTNYAQKFDDRLTITTDDSSRTVYMELTSLRLEDTAVYYCARGASKVEPAAPAYSDAFDMWGQGTLVTVSSASTKGPSVFPLAPSSKSTSGGTAALGCLVKDYFPEPVTVSWNSGALTSGVHTFPAVLQSSGLYSLSSVVTVPSSSLGTQTYICNVNHKPSNTKVDKRVEPKSCHHHHHH"
-  ranksPath="/data/logit-lens/ab_heavy_chain_true_token_ranks.csv"
-/>
+<LazyVisualizationWrapper placeholder="Loading antibody token ranks heatmap...">
+  <TrueTokensRanksHeatmap
+    title="Antibody heavy chain (PDB 5XRQ) true token ranks"
+    sequence="QVQLVQSGAEVKKPGSSVRVSCKASGDTFSSYSITWVRQAPGHGLQWMGGIFPIFGSTNYAQKFDDRLTITTDDSSRTVYMELTSLRLEDTAVYYCARGASKVEPAAPAYSDAFDMWGQGTLVTVSSASTKGPSVFPLAPSSKSTSGGTAALGCLVKDYFPEPVTVSWNSGALTSGVHTFPAVLQSSGLYSLSSVVTVPSSSLGTQTYICNVNHKPSNTKVDKRVEPKSCHHHHHH"
+    ranksPath="/data/logit-lens/ab_heavy_chain_true_token_ranks.csv"
+  />
+</LazyVisualizationWrapper>
 
 ## Attention maps
 
