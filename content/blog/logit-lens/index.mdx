@@ -26,7 +26,7 @@ What is the amino acid at the masked position?
 
 ESM answers this question with 20 numbers (**logits**), one for each possible amino acid. Each logit indicates ESM's confidence level in that amino acid being the masked one. To make a prediction, we pick the amino acid with the highest logit.
 
-Here's the idea: logits can be calculated for not only the last layer (ESM's final answers), but also intermediate layers. Intermediate logits give a view into the model's information flow, and in some limited sense, its "thought process".
+Here's the idea: logits can be calculated for not only the last layer (ESM's final answers), but also intermediate layers. Intermediate logits give a view into the model's information flow, and in some sense, its "thought process".
 
 ## ESM through the logit lens
 
@@ -46,7 +46,7 @@ Each cell below shows the amino acid that ESM is most confident in, colored by i
   />
 </LazyVisualizationWrapper>
 
-- Logits in earlier layers tend to be uncalibrated. As we move through the layers, ESM often converges on the right answer, but not always.
+- Logits in earlier layers tend to be uncalibrated. As we move through the layers, ESM often converges on the right answer, though not always.
 - By logit values, ESM clearly believes in some positions more than others. For example, it's super confident in position 45 being S––and it's right! As it turns out, the S at position 45 constitutes a binding site, which means that it is likely highly conserved.
 
 <Figure content={<Image path={require("./images/beta-lactamase-45.png")} />}>
@@ -62,7 +62,7 @@ Each cell below shows the amino acid that ESM is most confident in, colored by i
   another binding site annotation at position 106.
 </Figure>
 
-- At the first position, ESM is wrong but made a reasonable guess: [Methionine (M)](https://en.wikipedia.org/wiki/Methionine) corresponds to the start codon so most proteins start with it.
+- At the first position, ESM is wrong but made a reasonable guess: [Methionine (M)](https://en.wikipedia.org/wiki/Methionine) is often the first amino acid in a protein because it is coded by the [start codon](https://en.wikipedia.org/wiki/Start_codon).
 
 - Sometimes, ESM starts believing in an amino acid in an early layer (e.g. position 29 starting from layer 14). Sometimes, it "changes its mind" at the last layer (position 15).
 
@@ -77,7 +77,7 @@ Here's a visualization of the top logit values at each position overlaid on the 
   />
 </LazyVisualizationWrapper>
 
-Of course, focusing on the top amino acid is limiting. What about the other amino acids? If ESM got the final prediction wrong, did it come close by at least assigning the true amino acid _one of_ the highest logits? We can answer that by plotting the rank of the true amino acid among the 20 options.
+Of course, focusing on the top amino acid is limiting. What about the other amino acids? If ESM got the final prediction wrong, did it come close by at least assigning the true amino acid _one of_ the highest logits? We can visualize that by plotting the rank of the true amino acid among the 20 options.
 
 <LazyVisualizationWrapper placeholder="Loading true token ranks heatmap...">
   <TrueTokensRanksHeatmap
@@ -140,7 +140,7 @@ And the true amino acid ranks:
 
 ## Attention maps
 
-We can visualize a Transformer's attention maps to learn about activities of the attention heads at each layer. Can we use this to explain what we saw in the logit lens?
+In transformers, attention maps capture relationships between sequence positions. Can we visualize them to explain what we saw in the logit lens?
 
 From layer 9, ESM began noticing the disulfide bridge at positions 154 - 210 in the antibody sequence. What are the attention heads doing at that layer? Below are max-pooled attention maps zoomed in at those positions, comparing layer 8 vs. 9.
 
@@ -148,7 +148,7 @@ From layer 9, ESM began noticing the disulfide bridge at positions 154 - 210 in 
   content={<Image path={require("./images/bridge-attention-maps.png")} />}
 />
 
-At least one of the attention heads in layer 9 is attending to the positions of the disulfide bridge, which doesn't seem to be the case for layer 8. This might explain why ESM started "seeing" the bridge starting at layer 9.
+At least one of the attention heads in layer 9 is attending to the positions of the disulfide bridge, which doesn't seem to be the case for layer 8. This might explain why ESM started "seeing" the bridge at layer 9.
 
 ## Final thoughts
 
