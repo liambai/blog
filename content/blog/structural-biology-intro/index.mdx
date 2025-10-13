@@ -1,0 +1,12 @@
+---
+title: "A gentle introduction to structural biology by examples"
+date: "2025-10-13"
+description: A quick visual tour of macromolecular structures, starting with a live 3D view of PDB 1YSA.
+---
+
+import LazyVisualizationWrapper from "../../../src/components/lazy-visualization-wrapper.jsx"
+import StructureViewer from "./d3/structure_viewer"
+
+<LazyVisualizationWrapper placeholder="Loading PDB 1YSA..." minHeight="450px">
+  <StructureViewer title="PDB 1YSA" pdbId="1YSA" />
+</LazyVisualizationWrapper>
