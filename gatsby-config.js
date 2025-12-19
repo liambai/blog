@@ -12,9 +12,9 @@ module.exports = {
     title: `Liam's Blog`,
     author: {
       name: `Liam Bai`,
-      summary: `who works on software at Ginkgo Bioworks and writes about math, AI, and biology.`,
+      summary: `who works on software at Generate:Biomedicines and writes about math, AI, and biology.`,
     },
-    description: `Blog about machine learning and proteins.`,
+    description: `Blog about math, AI, and biology.`,
     siteUrl: `https://liambai.com`,
     social: {
       twitter: "liambai21",

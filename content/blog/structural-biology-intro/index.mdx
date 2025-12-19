@@ -1,0 +1,32 @@
+---
+title: "A structure-first introduction to molecular biology"
+date: "2025-10-13"
+description: TODO
+---
+
+import Figure from "../../../src/components/figure.jsx"
+import Image from "../../../src/components/image.jsx"
+import LazyVisualizationWrapper from "../../../src/components/lazy-visualization-wrapper.jsx"
+import StructureViewer from "./d3/structure_viewer"
+
+I loved Legos as a kid. Imagining and manipulating shapes – and seeing how they fit together – feels intuitive, natural, and fun. It's second nature: the sort of intelligence that babies develop long before their first word.
+
+Shapes are also the language of biology. Reasoning about them on the level of molecules is how we discover life-changing medicines.
+
+This blog post is a structure-first introduction to molecular biology. We'll start by looking at three structures – each a small window into vastly complex biological systems – and explore the stories behind them. My goal is to share, through these vignettes, a visceral sense of the miraculous inner workings of life, an appreciation of the beauty of molecules, and a rediscovered joy of playing with Legos.
+
+## The leucine zipper
+
+<LazyVisualizationWrapper placeholder="Loading PDB 1YSA..." minHeight="450px">
+  <StructureViewer title="PDB 1YSA" pdbId="1YSA" />
+</LazyVisualizationWrapper>
+
+The leucine zipper refers to the pink and purple coils that bind to DNA, the double-helix, like a pair of chopsticks. Each coil is a chain of amino acids. Due to their chemical properties, they naturally arrange themselves into this helical shape, called an alpha-helix.
+
+One such property is hydrophobicity. Imagine the environment around the structure, the cell, as a bag of water: water-fearing molecules want to avoid exposure and orient themselves inward. Leucine is an example of such a hydrophobic molecule.
+
+<Figure
+  content={<Image path={require("./images/leucine-zipper.jpg")} width="60%" />}
+/>
+
+This picture highlights leucines in red. On both coils, leucine appears at regular intervals spaced 7 positions apart. Because leucines are hydrophobic, they tend to cluster together inward. This force holds the two coils together, hence the name "leucine zipper".
