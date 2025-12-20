@@ -12,28 +12,28 @@ const IndexPage = ({ data, location }) => {
   return (
     <Layout location={location} title={site.title}>
       <div className="landing-simple">
-        <h1 className="landing-title">Hi, I'm Liam</h1>
         <p className="landing-summary">
-          I'm a software engineer at{" "}
-          <a href="https://generatebiomedicines.com/">Generate:Biomedicines</a>{" "}
-          working on accelerating drug discovery. I am broadly interested in
-          protein design, interpretability, and automating scientific discovery.
+          Hi! I'm Liam. I work on software at{" "}
+          <a href="https://generatebiomedicines.com/">Generate:Biomedicines</a>.
+        </p>
+        <p className="landing-summary">
+          I am interested in protein design, interpretability, and systems for
+          automating scientific discovery. I enjoy writing about things I learn.
+          Check out my <Link to="/blog">blog</Link>!
         </p>
         <div className="landing-links">
-          <Link className="landing-link-blog" to="/blog">
-            Blog
-          </Link>
-          {social?.twitter && (
-            <a href={`https://www.x.com/${social.twitter}`}>Twitter</a>
-          )}
-          {social?.linkedin && (
-            <a href={`https://www.linkedin.com/in/${social.linkedin}`}>
-              LinkedIn
-            </a>
-          )}
+          <Link to="/blog">Blog</Link>
+          <a href={`https://www.x.com/${social.twitter}`}>Twitter</a>
+          <a href="https://github.com/liambai">GitHub</a>
+          <a href="https://scholar.google.com/citations?user=qBKzB2sAAAAJ&hl=en">
+            Google Scholar
+          </a>
+          <a href={`https://www.linkedin.com/in/${social.linkedin}`}>
+            LinkedIn
+          </a>
         </div>
         <section className="landing-work">
-          <h2>Selected work</h2>
+          <h2>My work</h2>
           <ul className="work-list">
             <li className="work-item">
               <a href="https://interprot.com/">InterProt</a>
