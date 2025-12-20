@@ -10,10 +10,10 @@ import {
 
 import Layout from "../components/layout"
 import Seo from "../components/seo"
+import InterProtPreview from "../components/interprot-preview"
 
 const IndexPage = ({ data, location }) => {
   const site = data.site.siteMetadata
-  const author = site.author
   const social = site.social
 
   return (
@@ -52,12 +52,34 @@ const IndexPage = ({ data, location }) => {
         </div>
         <section className="landing-work">
           <ul className="work-list">
-            <li className="work-item">
-              <a href="https://interprot.com/">InterProt</a>
-              <p className="work-description">
-                Protein language models with a focus on interpretability and
-                biological insight.
-              </p>
+            <li className="work-item work-item-paper">
+              <div className="work-item-content">
+                <div className="work-thumbnail">
+                  <InterProtPreview />
+                </div>
+                <div className="work-details">
+                  <a href="https://interprot.com/" className="work-title">
+                    From Mechanistic Interpretability to Mechanistic Biology:
+                    Training, Evaluating, and Interpreting Sparse Autoencoders
+                    on Protein Language Models
+                  </a>
+                  <p className="work-authors">
+                    Etowah Adams*, Liam Bai*, Minji Lee, Yiyang Yu, Mohammed
+                    AlQuraishi
+                  </p>
+                  <p className="work-venue">
+                    International Conference on Machine Learning (ICML), 2025
+                    (Spotlight)
+                  </p>
+                  <div className="work-links">
+                    <a href="https://interprot.com/">Website</a>
+                    <a href="https://www.biorxiv.org/content/10.1101/2025.02.06.636901v2">
+                      Paper
+                    </a>
+                    <a href="https://github.com/etowahadams/interprot">Code</a>
+                  </div>
+                </div>
+              </div>
             </li>
           </ul>
         </section>

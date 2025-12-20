@@ -378,7 +378,7 @@ a:focus {
 }
 
 .landing-simple {
-  max-width: 42rem;
+  max-width: 48rem;
   padding: var(--spacing-8) 0 var(--spacing-16);
 }
 
@@ -407,7 +407,6 @@ a:focus {
   line-height: var(--lineHeight-relaxed);
   color: var(--color-text-light);
   margin-bottom: var(--spacing-6);
-  max-width: 36rem;
 }
 
 .landing-links {
@@ -504,6 +503,108 @@ a:focus {
 .work-description {
   margin-top: var(--spacing-2);
   color: var(--color-text-light);
+}
+
+.work-item-paper {
+  margin-bottom: var(--spacing-8);
+}
+
+.work-item-content {
+  display: flex;
+  gap: var(--spacing-4);
+  align-items: flex-start;
+}
+
+.work-thumbnail {
+  flex-shrink: 0;
+  width: 200px;
+  height: 200px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-accent);
+}
+
+.work-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.work-thumbnail > div {
+  width: 100%;
+  height: 100%;
+}
+
+.work-details {
+  flex: 1;
+}
+
+.work-title {
+  font-family: var(--font-heading);
+  font-weight: var(--fontWeight-bold);
+  font-size: var(--fontSize-2);
+  line-height: var(--lineHeight-tight);
+  color: var(--color-heading);
+  text-decoration: none;
+  display: block;
+  margin-bottom: var(--spacing-2);
+}
+
+.work-title:hover,
+.work-title:focus {
+  color: var(--color-primary);
+}
+
+.work-authors {
+  font-size: var(--fontSize-1);
+  color: var(--color-text-light);
+  margin-bottom: var(--spacing-1);
+}
+
+.work-venue {
+  font-size: var(--fontSize-1);
+  color: var(--color-text-light);
+  margin-bottom: var(--spacing-3);
+  font-style: italic;
+}
+
+.work-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-3);
+  font-size: var(--fontSize-0);
+  font-family: var(--font-heading);
+}
+
+.work-links a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: var(--fontWeight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.work-links a:hover,
+.work-links a:focus {
+  color: var(--color-secondary);
+}
+
+@media (max-width: 42rem) {
+  .work-item-content {
+    flex-direction: column;
+    gap: var(--spacing-4);
+  }
+
+  .work-thumbnail {
+    width: 100%;
+    height: 250px;
+    max-width: 100%;
+  }
+
+  .work-thumbnail > div {
+    width: 100% !important;
+    height: 100% !important;
+  }
 }
 
 .bio {
