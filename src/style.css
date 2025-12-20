@@ -375,7 +375,7 @@ a:focus {
 
 .landing-simple {
   max-width: 48rem;
-  padding: var(--spacing-8) 0 var(--spacing-16);
+  padding-top: var(--spacing-4);
 }
 
 .landing-eyebrow {
@@ -512,8 +512,8 @@ a:focus {
 
 .work-thumbnail {
   flex-shrink: 0;
-  width: 200px;
-  height: 200px;
+  width: 215px;
+  height: 215px;
   border-radius: var(--radius-md);
   overflow: hidden;
   background: var(--color-accent);
@@ -618,6 +618,10 @@ a:focus {
   border-radius: 100%;
 }
 
+.blog-post {
+  font-size: 1.1rem;
+}
+
 .blog-post header h1 {
   margin: var(--spacing-0) var(--spacing-0) var(--spacing-4) var(--spacing-0);
 }
@@ -651,6 +655,25 @@ a:focus {
   font-family: var(--font-body);
   margin: 0;
   padding: 0;
+}
+
+.molstar-interactive-indicator {
+  animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 /* Media queries */

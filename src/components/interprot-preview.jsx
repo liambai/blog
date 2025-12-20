@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react"
+import { FaHandPointer } from "react-icons/fa"
 import { DefaultPluginSpec } from "molstar/lib/mol-plugin/spec"
 import { PluginContext } from "molstar/lib/mol-plugin/context"
 import { CustomElementProperty } from "molstar/lib/mol-model-props/common/custom-element-property"
@@ -29,6 +30,7 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
   const containerRef = useRef(null)
   const pluginRef = useRef(null)
   const [isStructureLoaded, setIsStructureLoaded] = useState(false)
+  const [showIndicator, setShowIndicator] = useState(true)
 
   // Create color theme function that maps white (0) to red (max)
   const createActivationColorTheme = useCallback((values, maxValue) => {
@@ -246,8 +248,8 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
 
   return (
     <div
-      ref={containerRef}
       style={{
+        position: "relative",
         width,
         height,
         borderRadius: "var(--radius-md)",
@@ -255,9 +257,43 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
         background: "var(--color-accent)",
         maxWidth: "100%",
         boxSizing: "border-box",
-        cursor: "pointer",
       }}
-    />
+      onMouseEnter={() => setShowIndicator(false)}
+      onMouseLeave={() => setShowIndicator(true)}
+    >
+      <div
+        ref={containerRef}
+        style={{
+          width: "100%",
+          height: "100%",
+          cursor: "grab",
+        }}
+      />
+      {showIndicator && (
+        <div
+          className="molstar-interactive-indicator"
+          style={{
+            position: "absolute",
+            top: "8px",
+            right: "8px",
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            padding: "6px 10px",
+            background: "rgba(15, 76, 92, 0.9)",
+            color: "white",
+            borderRadius: "20px",
+            fontSize: "0.75rem",
+            fontFamily: "var(--font-heading)",
+            fontWeight: "var(--fontWeight-bold)",
+            pointerEvents: "none",
+            zIndex: 10,
+          }}
+        >
+          <FaHandPointer style={{ fontSize: "0.875rem" }} />
+        </div>
+      )}
+    </div>
   )
 }
 
