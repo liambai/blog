@@ -1,5 +1,12 @@
 import * as React from "react"
 import { Link, graphql } from "gatsby"
+import {
+  FaTwitter,
+  FaGithub,
+  FaGraduationCap,
+  FaLinkedin,
+  FaArrowRight,
+} from "react-icons/fa"
 
 import Layout from "../components/layout"
 import Seo from "../components/seo"
@@ -19,21 +26,31 @@ const IndexPage = ({ data, location }) => {
         <p className="landing-summary">
           I am interested in protein design, interpretability, and systems for
           automating scientific discovery. I enjoy writing about things I learn.
-          Check out my <Link to="/blog">blog</Link>!
         </p>
+        <Link to="/blog" className="blog-cta-button">
+          My blog <FaArrowRight className="arrow-icon" />
+        </Link>
         <div className="landing-links">
-          <Link to="/blog">Blog</Link>
-          <a href={`https://www.x.com/${social.twitter}`}>Twitter</a>
-          <a href="https://github.com/liambai">GitHub</a>
-          <a href="https://scholar.google.com/citations?user=qBKzB2sAAAAJ&hl=en">
-            Google Scholar
+          <a href={`https://www.x.com/${social.twitter}`} aria-label="Twitter">
+            <FaTwitter />
           </a>
-          <a href={`https://www.linkedin.com/in/${social.linkedin}`}>
-            LinkedIn
+          <a href="https://github.com/liambai" aria-label="GitHub">
+            <FaGithub />
+          </a>
+          <a
+            href="https://scholar.google.com/citations?user=qBKzB2sAAAAJ&hl=en"
+            aria-label="Google Scholar"
+          >
+            <FaGraduationCap />
+          </a>
+          <a
+            href={`https://www.linkedin.com/in/${social.linkedin}`}
+            aria-label="LinkedIn"
+          >
+            <FaLinkedin />
           </a>
         </div>
         <section className="landing-work">
-          <h2>My work</h2>
           <ul className="work-list">
             <li className="work-item">
               <a href="https://interprot.com/">InterProt</a>
