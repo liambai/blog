@@ -12,7 +12,7 @@
   --maxWidth-4xl: 56rem;
   --maxWidth-5xl: 64rem;
   --maxWidth-full: "100%";
-  --maxWidth-wrapper: var(--maxWidth-2xl);
+  --maxWidth-wrapper: var(--maxWidth-3xl);
   --spacing-px: "1px";
   --spacing-0: 0;
   --spacing-1: 0.25rem;
@@ -260,10 +260,6 @@ a:focus {
   padding: var(--spacing-10) var(--spacing-5);
 }
 
-.global-wrapper[data-is-root-path="true"] {
-  max-width: var(--maxWidth-5xl);
-}
-
 .global-wrapper[data-is-root-path="true"] .bio {
   margin-bottom: var(--spacing-20);
 }
@@ -405,7 +401,6 @@ a:focus {
 .landing-summary {
   font-size: var(--fontSize-2);
   line-height: var(--lineHeight-relaxed);
-  color: var(--color-text-light);
   margin-bottom: var(--spacing-6);
 }
 
