@@ -1,92 +1,167 @@
 import * as React from "react"
 import { Link, graphql } from "gatsby"
+import {
+  FaTwitter,
+  FaGithub,
+  FaGraduationCap,
+  FaLinkedin,
+  FaArrowRight,
+  FaRss,
+} from "react-icons/fa"
 
-import Bio from "../components/bio"
 import Layout from "../components/layout"
 import Seo from "../components/seo"
+import InterProtPreview from "../components/interprot-preview"
+import Avatar from "../components/avatar"
 
-const BlogIndex = ({ data, location }) => {
-  const siteTitle = data.site.siteMetadata?.title || `Title`
-  const posts = data.allMdx.nodes
-
-  if (posts.length === 0) {
-    return (
-      <Layout location={location} title={siteTitle}>
-        <Bio />
-        <p>
-          No blog posts found. Add markdown posts to "content/blog" (or the
-          directory you specified for the "gatsby-source-filesystem" plugin in
-          gatsby-config.js).
-        </p>
-      </Layout>
-    )
-  }
+const IndexPage = ({ data, location }) => {
+  const site = data.site.siteMetadata
+  const social = site.social
 
   return (
-    <Layout location={location} title={siteTitle}>
-      <Bio />
-      <ol style={{ listStyle: `none` }}>
-        {posts.map(post => {
-          const title = post.frontmatter.title || post.fields.slug
-
-          return (
-            <li key={post.fields.slug}>
-              <article
-                className="post-list-item"
-                itemScope
-                itemType="http://schema.org/Article"
+    <Layout location={location} title={site.title}>
+      <div className="landing-simple">
+        <div className="landing-intro">
+          <div className="landing-copy">
+            <p className="landing-summary">
+              Hi! I'm Liam. I work on software at{" "}
+              <a
+                href="https://generatebiomedicines.com/"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <header>
-                  <h2>
-                    <Link to={post.fields.slug} itemProp="url">
-                      <span itemProp="headline">{title}</span>
-                    </Link>
-                  </h2>
-                  <small>{post.frontmatter.date}</small>
-                </header>
-                <section>
-                  <p
-                    dangerouslySetInnerHTML={{
-                      __html: post.frontmatter.description || post.excerpt,
-                    }}
-                    itemProp="description"
-                  />
-                </section>
-              </article>
+                Generate:Biomedicines
+              </a>
+              .
+            </p>
+            <p className="landing-summary">
+              I am interested in protein design, interpretability, and systems
+              for automating scientific discovery. I enjoy writing about cool
+              things I learn.
+            </p>
+          </div>
+          <div className="landing-avatar-wrapper">
+            <Avatar className="landing-avatar" alt="Liam Bai" size={160} />
+          </div>
+        </div>
+        <Link to="/blog" className="blog-cta-button">
+          My blog <FaArrowRight className="arrow-icon" />
+        </Link>
+        <div className="landing-links">
+          <a
+            href={`https://www.x.com/${social.twitter}`}
+            aria-label="Twitter"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FaTwitter />
+          </a>
+          <a
+            href="https://github.com/liambai"
+            aria-label="GitHub"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FaGithub />
+          </a>
+          <a
+            href="https://scholar.google.com/citations?user=qBKzB2sAAAAJ&hl=en"
+            aria-label="Google Scholar"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FaGraduationCap />
+          </a>
+          <a
+            href={`https://www.linkedin.com/in/${social.linkedin}`}
+            aria-label="LinkedIn"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FaLinkedin />
+          </a>
+          <a href="/rss.xml" aria-label="RSS feed">
+            <FaRss />
+          </a>
+        </div>
+        <section className="landing-work">
+          <ul className="work-list">
+            <li className="work-item work-item-paper">
+              <div className="work-item-content">
+                <div className="work-thumbnail">
+                  <InterProtPreview />
+                </div>
+                <div className="work-details">
+                  <a
+                    href="https://interprot.com/"
+                    className="work-title"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    From Mechanistic Interpretability to Mechanistic Biology:
+                    Training, Evaluating, and Interpreting Sparse Autoencoders
+                    on Protein Language Models
+                  </a>
+                  <p className="work-authors">
+                    Etowah Adams*, <u>Liam Bai*</u>, Minji Lee, Yiyang Yu,
+                    Mohammed AlQuraishi
+                  </p>
+                  <p className="work-venue">
+                    International Conference on Machine Learning (ICML), 2025
+                    (Spotlight)
+                  </p>
+                  <div className="work-links">
+                    <a
+                      href="https://interprot.com/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Website
+                    </a>
+                    <a
+                      href="https://www.biorxiv.org/content/10.1101/2025.02.06.636901v2"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Paper
+                    </a>
+                    <a
+                      href="https://github.com/etowahadams/interprot"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Code
+                    </a>
+                  </div>
+                </div>
+              </div>
             </li>
-          )
-        })}
-      </ol>
+          </ul>
+        </section>
+      </div>
     </Layout>
   )
 }
 
-export default BlogIndex
+export default IndexPage
 
-/**
- * Head export to define metadata for the page
- *
- * See: https://www.gatsbyjs.com/docs/reference/built-in-components/gatsby-head/
- */
-export const Head = () => <Seo title="Liam's blog" />
+export const Head = ({ location }) => (
+  <Seo title="Home" pathname={location?.pathname} />
+)
 
 export const pageQuery = graphql`
   {
     site {
       siteMetadata {
         title
-      }
-    }
-    allMdx(sort: { frontmatter: { date: DESC } }) {
-      nodes {
-        excerpt
-        fields {
-          slug
+        description
+        author {
+          name
+          summary
         }
-        frontmatter {
-          date(formatString: "MMMM DD, YYYY")
-          title
-          description
+        social {
+          twitter
+          linkedin
         }
       }
     }

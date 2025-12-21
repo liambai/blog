@@ -45,6 +45,7 @@ const NetworkViz = () => {
 
   useEffect(() => {
     const svg = d3.select(ref.current)
+    const pageBackground = getComputedStyle(document.body).backgroundColor
 
     // Create sequentially connected nodes with an additional edge 2 - 8
     // representing a contact
@@ -99,7 +100,7 @@ const NetworkViz = () => {
       .append("circle")
       .attr("class", "node")
       .attr("r", nodeRadius)
-      .attr("fill", "white")
+      .attr("fill", pageBackground)
       .attr("stroke", "black")
       .attr("stroke-width", nodeBorderWidth)
       .attr("cursor", "pointer")

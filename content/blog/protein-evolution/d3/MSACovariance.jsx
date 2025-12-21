@@ -14,6 +14,7 @@ const MSAViz = ({ focusedColumn, setFocusedColumn }) => {
   const tableRef = useRef()
 
   useEffect(() => {
+    const pageBackground = getComputedStyle(document.body).backgroundColor
     const xScale = d3
       .scaleLinear()
       .domain([0, nodeIds.length - 1])
@@ -45,7 +46,7 @@ const MSAViz = ({ focusedColumn, setFocusedColumn }) => {
       .attr("cx", (d, i) => xScale(i))
       .attr("cy", height / 2)
       .attr("r", 10)
-      .attr("fill", "white")
+      .attr("fill", pageBackground)
       .attr("stroke", "black")
       .attr("stroke-width", 1)
       .on("mouseover", (event, d) => setFocusedColumn(d))
@@ -76,7 +77,9 @@ const MSAViz = ({ focusedColumn, setFocusedColumn }) => {
       .append("td")
       .text(d => d.char)
       .style("text-align", "center")
-      .style("background-color", d => (d.pos === 2 ? "lightgrey" : "white"))
+      .style("background-color", d =>
+        d.pos === 2 ? "lightgrey" : "transparent"
+      )
       .style("cursor", "default")
       .on("mouseover", (event, d) => setFocusedColumn(d.pos))
       .on("mouseout", () => setFocusedColumn(null))
@@ -85,6 +88,7 @@ const MSAViz = ({ focusedColumn, setFocusedColumn }) => {
       if (focusedColumn === d.pos || d.pos === 2) {
         return "lightgrey"
       }
+      return "transparent"
     })
   }, [focusedColumn, setFocusedColumn])
 
@@ -123,7 +127,10 @@ const MSAViz = ({ focusedColumn, setFocusedColumn }) => {
         }}
       >
         <svg ref={headerRef} />
-        <table style={{ tableLayout: "fixed" }} ref={tableRef} />
+        <table
+          style={{ tableLayout: "fixed", backgroundColor: "transparent" }}
+          ref={tableRef}
+        />
       </div>
       <div style={{ margin: "auto", height: isMobile ? 175 : "none" }}>
         {focusedColumn && (

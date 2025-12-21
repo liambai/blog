@@ -294,7 +294,7 @@ const TrueTokensRanksHeatmap = ({ title, sequence, ranksPath }) => {
         style={{
           width: "100%",
           textAlign: "center",
-          backgroundColor: "white",
+          backgroundColor: "transparent",
           fontWeight: 500,
           fontSize: 12,
           paddingLeft: 50,
@@ -313,7 +313,7 @@ const TrueTokensRanksHeatmap = ({ title, sequence, ranksPath }) => {
           marginTop: 10,
           marginBottom: 20,
           paddingLeft: 50,
-          backgroundColor: "white",
+          backgroundColor: "transparent",
         }}
       >
         {/* Full screen button */}

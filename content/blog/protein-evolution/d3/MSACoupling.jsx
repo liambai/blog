@@ -13,6 +13,7 @@ const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
   const tableRef = useRef()
 
   useEffect(() => {
+    const pageBackground = getComputedStyle(document.body).backgroundColor
     const xScale = d3
       .scaleLinear()
       .domain([0, nodeIds.length - 1])
@@ -44,7 +45,7 @@ const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
       .attr("cx", (d, i) => xScale(i))
       .attr("cy", headerHeight / 2)
       .attr("r", 10)
-      .attr("fill", "white")
+      .attr("fill", pageBackground)
       .attr("stroke", "black")
       .attr("stroke-width", 1)
       .on("mouseover", (event, d) => setFocusedNodes([d]))
@@ -79,7 +80,7 @@ const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
     rows
       .selectAll("td")
       .style("background-color", d =>
-        focusedNodes.includes(d.pos) ? "lightgrey" : "white"
+        focusedNodes.includes(d.pos) ? "lightgrey" : "transparent"
       )
   }, [focusedNodes, setFocusedNodes])
 
@@ -94,7 +95,10 @@ const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
     >
       <h5 style={{ margin: "auto" }}>MSA</h5>
       <svg ref={headerRef} />
-      <table style={{ tableLayout: "fixed" }} ref={tableRef} />
+      <table
+        style={{ tableLayout: "fixed", backgroundColor: "transparent" }}
+        ref={tableRef}
+      />
     </div>
   )
 }
@@ -142,6 +146,7 @@ const NetworkViz = ({ focusedNodes, setFocusedNodes }) => {
 
   useEffect(() => {
     const svg = d3.select(ref.current)
+    const pageBackground = getComputedStyle(document.body).backgroundColor
 
     // Create sequentially connected nodes with an additional edge 2 - 8
     // representing a contact
@@ -198,7 +203,7 @@ const NetworkViz = ({ focusedNodes, setFocusedNodes }) => {
       .append("circle")
       .attr("class", "node")
       .attr("r", nodeRadius)
-      .attr("fill", "white")
+      .attr("fill", pageBackground)
       .attr("stroke", "black")
       .attr("stroke-width", nodeBorderWidth)
       .on("mouseover", (event, d) => setFocusedNodes([d.id]))

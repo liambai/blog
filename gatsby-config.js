@@ -9,13 +9,13 @@
  */
 module.exports = {
   siteMetadata: {
-    title: `Liam's Blog`,
+    title: `Liam Bai`,
     author: {
       name: `Liam Bai`,
-      summary: `who works on software at Ginkgo Bioworks and writes about math, AI, and biology.`,
     },
-    description: `Blog about machine learning and proteins.`,
+    description: `Liam Bai's personal website`,
     siteUrl: `https://liambai.com`,
+    defaultImage: `/previews/liam.jpeg`,
     social: {
       twitter: "liambai21",
       linkedin: "liambai",
@@ -109,16 +109,17 @@ module.exports = {
               }
             }`,
             output: "/rss.xml",
-            title: "Liam's Blog RSS Feed",
+            title: "Liam Bai Blog RSS Feed",
           },
         ],
       },
     },
+    `gatsby-plugin-sitemap`,
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
-        name: `Liam's Blog`,
-        short_name: `Liam`,
+        name: `Liam Bai`,
+        short_name: `Liam Bai`,
         start_url: `/`,
         background_color: `#ffffff`,
         // This will impact how browsers show your PWA/website

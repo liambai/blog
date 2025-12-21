@@ -29,6 +29,7 @@ const Embedding = ({
   useEffect(() => {
     const embeddingLength = data[0].embedding.length
     const svg = d3.select(svgRef.current)
+    const pageBackground = getComputedStyle(document.body).backgroundColor
     svg.html("")
 
     const margin = 2
@@ -50,7 +51,9 @@ const Embedding = ({
       .attr("y", margin)
       .attr("width", tokenWidth)
       .attr("height", tokenHeight)
-      .attr("fill", (d, i) => (i === focusedCharIndex ? "lightgrey" : "white"))
+      .attr("fill", (d, i) =>
+        i === focusedCharIndex ? "lightgrey" : pageBackground
+      )
       .on("mouseover", (event, d) => {
         setFocusedCharIndex(d.id)
       })
