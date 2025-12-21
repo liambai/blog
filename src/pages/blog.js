@@ -12,7 +12,16 @@ const BlogPage = ({ data, location }) => {
     <Layout location={location} title={siteTitle}>
       <section className="blog-hero">
         <h1 className="page-title">Liam's Blog</h1>
-        <p className="blog-intro">I write about math, AI, and biology</p>
+        <div className="blog-intro-row">
+          <img
+            className="blog-avatar"
+            src="/previews/liam.jpeg"
+            alt="Liam Bai"
+          />
+          <p className="blog-intro">
+            Exploring machine learning and biology. Come learn with me!
+          </p>
+        </div>
       </section>
       <ol className="post-list">
         {posts.map(post => {

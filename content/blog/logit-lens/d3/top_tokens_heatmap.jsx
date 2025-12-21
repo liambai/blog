@@ -391,7 +391,7 @@ const TopTokensHeatmap = ({
         style={{
           width: "100%",
           textAlign: "center",
-          backgroundColor: "white",
+          backgroundColor: "transparent",
           fontWeight: 500,
           fontSize: 12,
           paddingLeft: 50,
@@ -412,14 +412,14 @@ const TopTokensHeatmap = ({
           paddingLeft: 50,
           position: "sticky",
           bottom: 0,
-          backgroundColor: "white",
+          backgroundColor: "transparent",
           zIndex: 100,
         }}
       >
         {/* Legend positioned at the bottom */}
         <div
           style={{
-            backgroundColor: "white",
+            backgroundColor: "transparent",
             padding: "5px",
             boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
             borderRadius: "4px",

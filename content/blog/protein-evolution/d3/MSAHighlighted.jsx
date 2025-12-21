@@ -13,6 +13,7 @@ const MSAHighlighted = () => {
   const tableRef = useRef()
 
   useEffect(() => {
+    const pageBackground = getComputedStyle(document.body).backgroundColor
     const xScale = d3
       .scaleLinear()
       .domain([0, nodeIds.length - 1])
@@ -44,7 +45,7 @@ const MSAHighlighted = () => {
       .attr("cx", (d, i) => xScale(i))
       .attr("cy", headerHeight / 2)
       .attr("r", 10)
-      .attr("fill", "white")
+      .attr("fill", pageBackground)
       .attr("stroke", "black")
       .attr("stroke-width", d => (d === 1 ? 3 : 1))
   }, [width])
@@ -63,7 +64,9 @@ const MSAHighlighted = () => {
       .append("td")
       .text(d => d.char)
       .style("text-align", "center")
-      .style("background-color", d => (d.pos === 1 ? "lightgrey" : "white"))
+      .style("background-color", d =>
+        d.pos === 1 ? "lightgrey" : "transparent"
+      )
 
     // Exit any rows not in the data
     rows.exit().remove()
@@ -79,7 +82,10 @@ const MSAHighlighted = () => {
       }}
     >
       <svg ref={headerRef} />
-      <table style={{ tableLayout: "fixed" }} ref={tableRef}>
+      <table
+        style={{ tableLayout: "fixed", backgroundColor: "transparent" }}
+        ref={tableRef}
+      >
         <tbody></tbody>
       </table>
     </div>

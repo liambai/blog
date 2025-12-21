@@ -16,6 +16,7 @@ const MSAFrequencies = () => {
   const [focusedColumn, setFocusedColumn] = useState()
 
   useEffect(() => {
+    const pageBackground = getComputedStyle(document.body).backgroundColor
     const xScale = d3
       .scaleLinear()
       .domain([0, nodeIds.length - 1])
@@ -47,7 +48,7 @@ const MSAFrequencies = () => {
       .attr("cx", (d, i) => xScale(i))
       .attr("cy", height / 2)
       .attr("r", 10)
-      .attr("fill", "white")
+      .attr("fill", pageBackground)
       .attr("stroke", "black")
       .attr("stroke-width", 1)
       .on("mouseover", (event, d) => setFocusedColumn(d))
@@ -82,7 +83,7 @@ const MSAFrequencies = () => {
     rows
       .selectAll("td")
       .style("background-color", d =>
-        focusedColumn === d.pos ? "lightgrey" : "white"
+        focusedColumn === d.pos ? "lightgrey" : "transparent"
       )
   }, [width, focusedColumn, setFocusedColumn])
 
@@ -119,7 +120,10 @@ const MSAFrequencies = () => {
         }}
       >
         <svg ref={headerRef} />
-        <table style={{ tableLayout: "fixed" }} ref={tableRef} />
+        <table
+          style={{ tableLayout: "fixed", backgroundColor: "transparent" }}
+          ref={tableRef}
+        />
       </div>
       <div
         style={{

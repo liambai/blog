@@ -37,23 +37,19 @@ const Bio = () => {
         className="bio-avatar"
         layout="fixed"
         formats={["auto", "webp"]}
-        src="../images/profile-pic.png"
+        src="../images/liam.jpeg"
         width={50}
         height={50}
         quality={50}
         alt="Profile picture"
       />
-      {author?.name && (
-        <p>
-          <strong>{author.name}</strong>
-          {` `}
-          <a href={`https://www.linkedin.com/in/${social?.linkedin || ``}`}>
-            LinkedIn
-          </a>
-          {` `} and {` `}
-          <a href={`https://www.x.com/${social?.twitter || ``}`}>Twitter</a>.
-        </p>
-      )}
+      <p>
+        Written by <strong>Liam Bai</strong>, who works on software at{" "}
+        <a href="https://generatebiomedicines.com/">Generate:Biomedicines</a>{" "}
+        and writes about machine learning and biology. He is on{" "}
+        <a href={`https://x.com/${social.twitter}`}>Twitter</a> and{" "}
+        <a href={`https://www.linkedin.com/in/${social.linkedin}`}>LinkedIn</a>.
+      </p>
     </div>
   )
 }
