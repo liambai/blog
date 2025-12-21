@@ -6,8 +6,9 @@
  */
 
 import * as React from "react"
-import { useStaticQuery, graphql, Link } from "gatsby"
-import { StaticImage } from "gatsby-plugin-image"
+import { useStaticQuery, graphql } from "gatsby"
+
+import Avatar from "./avatar"
 
 const Bio = () => {
   const data = useStaticQuery(graphql`
@@ -27,18 +28,7 @@ const Bio = () => {
 
   return (
     <div className="bio">
-      <Link to="/">
-        <StaticImage
-          className="bio-avatar"
-          layout="fixed"
-          formats={["auto", "webp"]}
-          src="../images/liam.jpeg"
-          width={50}
-          height={50}
-          quality={50}
-          alt="Profile picture"
-        />
-      </Link>
+      <Avatar className="bio-avatar" alt="Profile picture" size={50} />
       <p>
         Written by <strong>Liam Bai</strong>, who works on software at{" "}
         <a href="https://generatebiomedicines.com/">Generate:Biomedicines</a>{" "}

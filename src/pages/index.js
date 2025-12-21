@@ -11,6 +11,7 @@ import {
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 import InterProtPreview from "../components/interprot-preview"
+import Avatar from "../components/avatar"
 
 const IndexPage = ({ data, location }) => {
   const site = data.site.siteMetadata
@@ -38,11 +39,7 @@ const IndexPage = ({ data, location }) => {
               things I learn.
             </p>
           </div>
-          <img
-            className="landing-avatar"
-            src="/previews/liam.jpeg"
-            alt="Liam Bai"
-          />
+          <Avatar className="landing-avatar" alt="Liam Bai" size={160} />
         </div>
         <Link to="/blog" className="blog-cta-button">
           My blog <FaArrowRight className="arrow-icon" />

@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Link, graphql } from "gatsby"
 
+import Avatar from "../components/avatar"
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 
@@ -13,11 +14,7 @@ const BlogPage = ({ data, location }) => {
       <section className="blog-hero">
         <h1 className="page-title">Liam's Blog</h1>
         <div className="blog-intro-row">
-          <img
-            className="blog-avatar"
-            src="/previews/liam.jpeg"
-            alt="Liam Bai"
-          />
+          <Avatar className="blog-avatar" alt="Liam Bai" size={56} />
           <p className="blog-intro">
             Exploring machine learning and biology. Come learn with me!
           </p>
