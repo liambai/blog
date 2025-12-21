@@ -6,7 +6,7 @@
  */
 
 import * as React from "react"
-import { useStaticQuery, graphql } from "gatsby"
+import { useStaticQuery, graphql, Link } from "gatsby"
 import { StaticImage } from "gatsby-plugin-image"
 
 const Bio = () => {
@@ -14,10 +14,6 @@ const Bio = () => {
     query BioQuery {
       site {
         siteMetadata {
-          author {
-            name
-            summary
-          }
           social {
             twitter
             linkedin
@@ -27,22 +23,22 @@ const Bio = () => {
     }
   `)
 
-  // Set these values by editing "siteMetadata" in gatsby-config.js
-  const author = data.site.siteMetadata?.author
   const social = data.site.siteMetadata?.social
 
   return (
     <div className="bio">
-      <StaticImage
-        className="bio-avatar"
-        layout="fixed"
-        formats={["auto", "webp"]}
-        src="../images/liam.jpeg"
-        width={50}
-        height={50}
-        quality={50}
-        alt="Profile picture"
-      />
+      <Link to="/">
+        <StaticImage
+          className="bio-avatar"
+          layout="fixed"
+          formats={["auto", "webp"]}
+          src="../images/liam.jpeg"
+          width={50}
+          height={50}
+          quality={50}
+          alt="Profile picture"
+        />
+      </Link>
       <p>
         Written by <strong>Liam Bai</strong>, who works on software at{" "}
         <a href="https://generatebiomedicines.com/">Generate:Biomedicines</a>{" "}
