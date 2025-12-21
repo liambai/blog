@@ -8,7 +8,7 @@
 import * as React from "react"
 import { useStaticQuery, graphql } from "gatsby"
 
-const Seo = ({ description, title, children }) => {
+const Seo = ({ description, title, children, pathname, image, type = "website" }) => {
   const { site } = useStaticQuery(
     graphql`
       query {
@@ -16,6 +16,8 @@ const Seo = ({ description, title, children }) => {
           siteMetadata {
             title
             description
+            siteUrl
+            defaultImage
             social {
               twitter
             }
@@ -27,20 +29,55 @@ const Seo = ({ description, title, children }) => {
 
   const metaDescription = description || site.siteMetadata.description
   const defaultTitle = site.siteMetadata?.title
+  const siteUrl = site.siteMetadata?.siteUrl || ""
+  const defaultImage = site.siteMetadata?.defaultImage || "/favicon.ico"
+  const fullTitle = defaultTitle ? `${title} | ${defaultTitle}` : title
+  const canonicalUrl =
+    siteUrl && pathname ? `${siteUrl}${pathname}` : siteUrl || null
+  const seoImage = image || defaultImage
+  const isAbsoluteImage = seoImage && /^https?:\/\//i.test(seoImage)
+  const imageUrl = seoImage
+    ? isAbsoluteImage
+      ? seoImage
+      : `${siteUrl}${seoImage.startsWith("/") ? "" : "/"}${seoImage}`
+    : null
+  const twitterHandle = site.siteMetadata?.social?.twitter || ""
+  const twitterCreator = twitterHandle
+    ? twitterHandle.startsWith("@")
+      ? twitterHandle
+      : `@${twitterHandle}`
+    : ""
 
   return (
     <>
-      <title>{defaultTitle ? `${title} | ${defaultTitle}` : title}</title>
+      <title>{fullTitle}</title>
+      {canonicalUrl ? <link rel="canonical" href={canonicalUrl} /> : null}
+      {siteUrl ? (
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title={`${defaultTitle || title} RSS Feed`}
+          href={`${siteUrl}/rss.xml`}
+        />
+      ) : null}
       <meta name="description" content={metaDescription} />
-      <meta property="og:title" content={title} />
+      <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={metaDescription} />
-      <meta property="og:type" content="website" />
-      <meta name="twitter:card" content="summary_large_image" />
+      <meta property="og:type" content={type} />
+      {canonicalUrl ? <meta property="og:url" content={canonicalUrl} /> : null}
+      {imageUrl ? <meta property="og:image" content={imageUrl} /> : null}
       <meta
-        name="twitter:creator"
-        content={site.siteMetadata?.social?.twitter || ``}
+        name="twitter:card"
+        content={imageUrl ? "summary_large_image" : "summary"}
       />
-      <meta name="twitter:title" content={title} />
+      {twitterCreator ? (
+        <>
+          <meta name="twitter:creator" content={twitterCreator} />
+          <meta name="twitter:site" content={twitterCreator} />
+        </>
+      ) : null}
+      {imageUrl ? <meta name="twitter:image" content={imageUrl} /> : null}
+      <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={metaDescription} />
       {children}
     </>

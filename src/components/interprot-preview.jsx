@@ -99,10 +99,21 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
         containerRef.current.innerHTML = ""
         setIsStructureLoaded(false)
 
+        const baseSpec = DefaultPluginSpec()
         const pluginSpec = {
-          ...DefaultPluginSpec(),
+          ...baseSpec,
+          canvas3d: {
+            ...(baseSpec.canvas3d || {}),
+            camera: {
+              ...(baseSpec.canvas3d?.camera || {}),
+              helper: {
+                ...(baseSpec.canvas3d?.camera?.helper || {}),
+                axes: { name: "off", params: {} },
+              },
+            },
+          },
           config: [
-            ...(DefaultPluginSpec().config || []),
+            ...(baseSpec.config || []),
             ["molstar/ui/skin/light", { accent: "rgb(29, 113, 183)" }],
             [
               "molstar/ui/layout",

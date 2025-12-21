@@ -15,6 +15,7 @@ module.exports = {
     },
     description: `Liam Bai's personal website`,
     siteUrl: `https://liambai.com`,
+    defaultImage: `/favicon.ico`,
     social: {
       twitter: "liambai21",
       linkedin: "liambai",
@@ -113,6 +114,7 @@ module.exports = {
         ],
       },
     },
+    `gatsby-plugin-sitemap`,
     {
       resolve: `gatsby-plugin-manifest`,
       options: {

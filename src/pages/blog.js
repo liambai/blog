@@ -6,7 +6,6 @@ import Seo from "../components/seo"
 
 const BlogPage = ({ data, location }) => {
   const siteTitle = data.site.siteMetadata?.title || `Title`
-  const siteDescription = data.site.siteMetadata?.description || ``
   const posts = data.allMdx.nodes
 
   return (
@@ -53,7 +52,9 @@ const BlogPage = ({ data, location }) => {
 
 export default BlogPage
 
-export const Head = () => <Seo title="Blog" />
+export const Head = ({ location }) => (
+  <Seo title="Blog" pathname={location?.pathname} />
+)
 
 export const pageQuery = graphql`
   {
