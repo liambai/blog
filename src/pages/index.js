@@ -6,6 +6,7 @@ import {
   FaGraduationCap,
   FaLinkedin,
   FaArrowRight,
+  FaRss,
 } from "react-icons/fa"
 
 import Layout from "../components/layout"
@@ -39,7 +40,9 @@ const IndexPage = ({ data, location }) => {
               things I learn.
             </p>
           </div>
-          <Avatar className="landing-avatar" alt="Liam Bai" size={160} />
+          <div className="landing-avatar-wrapper">
+            <Avatar className="landing-avatar" alt="Liam Bai" size={160} />
+          </div>
         </div>
         <Link to="/blog" className="blog-cta-button">
           My blog <FaArrowRight className="arrow-icon" />
@@ -76,6 +79,9 @@ const IndexPage = ({ data, location }) => {
             rel="noopener noreferrer"
           >
             <FaLinkedin />
+          </a>
+          <a href="/rss.xml" aria-label="RSS feed">
+            <FaRss />
           </a>
         </div>
         <section className="landing-work">

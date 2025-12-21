@@ -338,7 +338,7 @@ a:focus {
 
 .page-title {
   margin-top: var(--spacing-0);
-  margin-bottom: var(--spacing-4);
+  margin-bottom: var(--spacing-6);
   font-size: clamp(2.2rem, 3.2vw, 3rem);
 }
 
@@ -406,6 +406,10 @@ a:focus {
   object-fit: cover;
   flex-shrink: 0;
   box-shadow: var(--shadow-soft);
+}
+
+.landing-avatar-wrapper {
+  flex-shrink: 0;
 }
 
 .landing-copy {
@@ -481,9 +485,12 @@ a:focus {
   .landing-avatar {
     width: min(60vw, 220px);
     height: min(60vw, 220px);
+    margin-bottom: var(--spacing-2);
+  }
+
+  .landing-avatar-wrapper {
     order: -1;
     align-self: center;
-    margin-bottom: var(--spacing-2);
   }
 
   .landing-links {
