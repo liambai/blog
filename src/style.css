@@ -378,6 +378,30 @@ a:focus {
   padding-top: var(--spacing-4);
 }
 
+.landing-intro {
+  display: flex;
+  gap: var(--spacing-6);
+  align-items: flex-start;
+}
+
+.landing-avatar {
+  width: 160px;
+  height: 160px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-soft);
+}
+
+.landing-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.landing-copy .landing-summary {
+  margin-top: var(--spacing-0);
+}
+
 .landing-eyebrow {
   font-size: var(--fontSize-0);
   letter-spacing: 0.2em;
@@ -430,6 +454,18 @@ a:focus {
 .landing-links a:focus {
   color: var(--color-secondary);
   transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .landing-intro {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .landing-avatar {
+    width: 140px;
+    height: 140px;
+  }
 }
 
 .blog-cta-button {

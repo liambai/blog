@@ -19,22 +19,31 @@ const IndexPage = ({ data, location }) => {
   return (
     <Layout location={location} title={site.title}>
       <div className="landing-simple">
-        <p className="landing-summary">
-          Hi! I'm Liam. I work on software at{" "}
-          <a
-            href="https://generatebiomedicines.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Generate:Biomedicines
-          </a>
-          .
-        </p>
-        <p className="landing-summary">
-          I am interested in protein design, interpretability, and systems for
-          automating scientific discovery. I enjoy writing about cool things I
-          learn.
-        </p>
+        <div className="landing-intro">
+          <div className="landing-copy">
+            <p className="landing-summary">
+              Hi! I'm Liam. I work on software at{" "}
+              <a
+                href="https://generatebiomedicines.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Generate:Biomedicines
+              </a>
+              .
+            </p>
+            <p className="landing-summary">
+              I am interested in protein design, interpretability, and systems
+              for automating scientific discovery. I enjoy writing about cool
+              things I learn.
+            </p>
+          </div>
+          <img
+            className="landing-avatar"
+            src="/previews/liam.jpeg"
+            alt="Liam Bai"
+          />
+        </div>
         <Link to="/blog" className="blog-cta-button">
           My blog <FaArrowRight className="arrow-icon" />
         </Link>

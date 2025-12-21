@@ -15,7 +15,7 @@ module.exports = {
     },
     description: `Liam Bai's personal website`,
     siteUrl: `https://liambai.com`,
-    defaultImage: `/favicon.ico`,
+    defaultImage: `/previews/liam.jpeg`,
     social: {
       twitter: "liambai21",
       linkedin: "liambai",
