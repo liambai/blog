@@ -12,7 +12,7 @@ import {
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 import InterProtPreview from "../components/interprot-preview"
-import Avatar from "../components/avatar"
+import profilePic from "../images/liam.jpeg"
 
 const IndexPage = ({ data, location }) => {
   const site = data.site.siteMetadata
@@ -40,9 +40,13 @@ const IndexPage = ({ data, location }) => {
               things I learn.
             </p>
           </div>
-          <div className="landing-avatar-wrapper">
-            <Avatar className="landing-avatar" alt="Liam Bai" size={160} />
-          </div>
+          <img
+            className="landing-profile-pic"
+            src={profilePic}
+            alt="Liam Bai"
+            width={160}
+            height={160}
+          />
         </div>
         <Link to="/blog" className="blog-cta-button">
           My blog <FaArrowRight className="arrow-icon" />
@@ -145,9 +149,7 @@ const IndexPage = ({ data, location }) => {
 
 export default IndexPage
 
-export const Head = ({ location }) => (
-  <Seo pathname={location?.pathname} />
-)
+export const Head = ({ location }) => <Seo pathname={location?.pathname} />
 
 export const pageQuery = graphql`
   {

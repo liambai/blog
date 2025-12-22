@@ -399,17 +399,13 @@ a:focus {
   align-items: flex-start;
 }
 
-.landing-avatar {
+.landing-profile-pic {
   width: 160px;
   height: 160px;
   border-radius: var(--radius-md);
   object-fit: cover;
   flex-shrink: 0;
   box-shadow: var(--shadow-soft);
-}
-
-.landing-avatar-wrapper {
-  flex-shrink: 0;
 }
 
 .landing-copy {
@@ -482,13 +478,10 @@ a:focus {
     gap: var(--spacing-4);
   }
 
-  .landing-avatar {
+  .landing-profile-pic {
     width: min(60vw, 220px);
     height: min(60vw, 220px);
     margin-bottom: var(--spacing-2);
-  }
-
-  .landing-avatar-wrapper {
     order: -1;
     align-self: center;
   }
