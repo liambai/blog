@@ -146,7 +146,7 @@ const IndexPage = ({ data, location }) => {
 export default IndexPage
 
 export const Head = ({ location }) => (
-  <Seo title="Home" pathname={location?.pathname} />
+  <Seo pathname={location?.pathname} />
 )
 
 export const pageQuery = graphql`

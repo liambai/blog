@@ -31,7 +31,9 @@ const Seo = ({ description, title, children, pathname, image, type = "website" }
   const defaultTitle = site.siteMetadata?.title
   const siteUrl = site.siteMetadata?.siteUrl || ""
   const defaultImage = site.siteMetadata?.defaultImage || "/favicon.ico"
-  const fullTitle = defaultTitle ? `${title} | ${defaultTitle}` : title
+  const pageTitle = title || defaultTitle || ""
+  const fullTitle =
+    title && defaultTitle ? `${title} | ${defaultTitle}` : pageTitle
   const canonicalUrl =
     siteUrl && pathname ? `${siteUrl}${pathname}` : siteUrl || null
   const seoImage = image || defaultImage
