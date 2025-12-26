@@ -4,6 +4,19 @@ date: "2025-12-25"
 description: "TODO"
 ---
 
-Rarely in the history of medicine has a single drug created a seismic shift as profound as Keytruda, the miracle cancer drug developed by Merck. Since its approval in 2014, Keytruda has rewritten the survival statistic of over 15 types of cancer, won a Nobel Prize, and reached $30 billion in sales last year alone.
+import LazyVisualizationWrapper from "../../../src/components/lazy-visualization-wrapper.jsx"
+import Pd1Pdl1Viewer from "./d3/pd1_pdl1_viewer"
 
-The story behind Keytruda is a circuitous one of setbacks and breakthroughs, serendipity and resilience. You can read about it in this [excellent article](https://www.forbes.com/sites/davidshaywitz/2017/07/26/the-startling-history-behind-mercks-new-cancer-blockbuster/). In this blog post, I'll focus on the science of how it works, with some interactive illustrations of the molecular mechanisms. My goal is to share, though this example, a sense of wonder at the intricate inner workings of life – and how extraordinary it is that we’ve learned to influence them.
+Rarely in the history of medicine has a single drug created a seismic shift as profound as Keytruda, the cancer drug developed by Merck. Since its approval in 2014, Keytruda has rewritten the survival statistic of over 15 types of cancer, won a Nobel Prize, and reached $30 billion in sales last year alone.
+
+Keytruda's story is a circuitous one of setbacks and breakthroughs, serendipity and resilience. You can read about it in this [excellent article](https://www.forbes.com/sites/davidshaywitz/2017/07/26/the-startling-history-behind-mercks-new-cancer-blockbuster/). This blog post focuses on the science of how it works, grounded in visualizations of the key molecular players. My goal is to share, though this example, a sense of wonder at the intricate inner structures of life – and how extraordinary it is that we’ve learned to influence them.
+
+## Immune checkpoints
+
+T cells detect and destroy cancer cells. They are tightly regulated to prevent misdirected attacks on healthy cells. For example, **PD-1** (programmed cell death protein 1) is a protein on the surface of T cells that acts like an "off-switch". When PD-1 binds to its partner protein, **PD-L1** (programmed death-ligand 1), it signals the T cell to halt its attack.
+
+<LazyVisualizationWrapper placeholder="Loading PD-1/PD-L1 complex...">
+  <Pd1Pdl1Viewer title="PD-1 & PD-L1 (PDB 4ZQK)" />
+</LazyVisualizationWrapper>
+
+Here's a close-up of PD-L1 activating PD-1. Try the selector for some different ways to visualize the interface interactions.
