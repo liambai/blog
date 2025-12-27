@@ -7,6 +7,7 @@ description: "TODO"
 import LazyVisualizationWrapper from "../../../src/components/lazy-visualization-wrapper.jsx"
 import Pd1Pdl1Viewer from "./d3/pd1_pdl1_viewer"
 import Pd1KeytrudaViewer from "./d3/pd1_keytruda_viewer"
+import Pd1PoseOverlayViewer from "./d3/pd1_pose_overlay_viewer"
 
 Rarely in the history of medicine has a single drug created a seismic shift as profound as Keytruda, the cancer drug developed by Merck. Since its approval in 2014, Keytruda has rewritten the survival statistic of over 15 types of cancer, won a Nobel Prize, and reached $30 billion in sales last year alone.
 
@@ -26,4 +27,10 @@ Now compare that with PD-1 bound to Keytruda (pembrolizumab). The antibody grips
 
 <LazyVisualizationWrapper placeholder="Loading PD-1/Keytruda complex...">
   <Pd1KeytrudaViewer title="PD-1 & Keytruda (PDB 5B8C)" />
+</LazyVisualizationWrapper>
+
+Now superpose the two complexes so PD-1 stays fixed in place. Toggle the ligand to see how the Keytruda pose shifts relative to PD-L1.
+
+<LazyVisualizationWrapper placeholder="Loading PD-1 binding pose overlay...">
+  <Pd1PoseOverlayViewer title="Superposed PD-1 binding poses (PD-1 fixed)" />
 </LazyVisualizationWrapper>

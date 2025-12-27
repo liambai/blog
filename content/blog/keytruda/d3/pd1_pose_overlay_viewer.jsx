@@ -2,36 +2,31 @@ import React, { useEffect, useRef, useState } from "react"
 import { DefaultPluginSpec } from "molstar/lib/mol-plugin/spec"
 import { PluginContext } from "molstar/lib/mol-plugin/context"
 import { MolScriptBuilder as MS } from "molstar/lib/mol-script/language/builder"
+import {
+  QueryContext,
+  StructureElement,
+  StructureSelection,
+} from "molstar/lib/mol-model/structure"
+import { alignAndSuperpose } from "molstar/lib/mol-model/structure/structure/util/superposition"
+import { compile } from "molstar/lib/mol-script/runtime/query/compiler"
+import { StateTransforms } from "molstar/lib/mol-plugin-state/transforms"
 
-const PDB_ID = "5B8C"
-const PD_1_CHAIN = "C"
+const PD_L1_PDB_ID = "4ZQK"
+const KEYTRUDA_PDB_ID = "5B8C"
+const PD_L1_CHAIN = "A"
+const PD_1_CHAIN_PD_L1 = "B"
+const PD_1_CHAIN_KEYTRUDA = "C"
 const KEYTRUDA_CHAINS = ["A", "B"]
 
 const PD_1_COLOR = 0x2a9d8f
+const PD_L1_COLOR = 0xe9c46a
 const KEYTRUDA_COLOR = 0xe76f51
-const INTERFACE_STYLE_ID = "interface-style-keytruda"
-const INTERFACE_REP_OPTIONS = [
-  { id: "none", label: "None", type: null },
-  { id: "ball-and-stick", label: "ball & stick", type: "ball-and-stick" },
-  { id: "spacefill", label: "spacefill", type: "spacefill" },
-  {
-    id: "gaussian-surface",
-    label: "surface",
-    type: "gaussian-surface",
-    typeParams: { alpha: 0.6 },
-  },
+
+const LIGAND_SELECT_ID = "pd1-overlay-ligand"
+const LIGAND_OPTIONS = [
+  { id: "pdl1", label: "PD-L1" },
+  { id: "keytruda", label: "Keytruda" },
 ]
-const PD_1_INTERFACE_RESIDUES = [
-  59, 60, 61, 62, 63, 64, 66, 68, 75, 76, 77, 78, 81, 83, 85, 86, 87, 88, 89,
-  90, 126, 128, 129, 130, 131, 132, 134,
-]
-const KEYTRUDA_INTERFACE_RESIDUES = {
-  A: [33, 34, 36, 53, 54, 57, 58, 60, 95, 96, 97, 98, 100],
-  B: [
-    28, 30, 31, 33, 35, 50, 51, 52, 54, 55, 57, 58, 59, 99, 101, 102, 103, 104,
-    105,
-  ],
-}
 
 const chainSelection = chainId =>
   MS.struct.generator.atomGroups({
@@ -59,39 +54,33 @@ const multiChainSelection = chainIds => {
   })
 }
 
-const residueSelection = (chainId, residues) => {
-  if (!residues || residues.length === 0) {
-    return chainSelection(chainId)
-  }
-
-  const residueTests = residues.map(residueId =>
-    MS.core.rel.eq([
-      MS.struct.atomProperty.macromolecular.auth_seq_id(),
-      residueId,
-    ])
+const getChainLoci = (structure, chainId) => {
+  const query = compile(chainSelection(chainId))
+  return StructureSelection.toLociWithCurrentUnits(
+    query(new QueryContext(structure))
   )
-
-  return MS.struct.generator.atomGroups({
-    "chain-test": MS.core.rel.eq([
-      MS.struct.atomProperty.macromolecular.auth_asym_id(),
-      chainId,
-    ]),
-    "residue-test":
-      residueTests.length === 1
-        ? residueTests[0]
-        : MS.core.logic.or(residueTests),
-    "group-by": MS.struct.atomProperty.macromolecular.residueKey(),
-  })
 }
 
-const Pd1KeytrudaViewer = ({ title }) => {
+const applyTransform = (plugin, structure, matrix) => {
+  const builder = plugin.state.data
+    .build()
+    .to(structure)
+    .insert(StateTransforms.Model.TransformStructureConformation, {
+      transform: { name: "matrix", params: { data: matrix, transpose: false } },
+    })
+  return plugin.runTask(plugin.state.data.updateTree(builder))
+}
+
+const Pd1PoseOverlayViewer = ({ title }) => {
   const containerRef = useRef(null)
   const pluginRef = useRef(null)
-  const interfaceComponentsRef = useRef({ pd1: null, keytruda: [] })
-  const interfaceRepsRef = useRef({ pd1: null, keytruda: [] })
+  const pd1ComponentRef = useRef(null)
+  const pdl1ComponentRef = useRef(null)
+  const keytrudaComponentRef = useRef(null)
+  const ligandRepsRef = useRef({ pdl1: null, keytruda: null })
+  const [activeLigand, setActiveLigand] = useState("pdl1")
   const [isLoading, setIsLoading] = useState(true)
   const [isStructureReady, setIsStructureReady] = useState(false)
-  const [interfaceStyle, setInterfaceStyle] = useState("none")
   const [error, setError] = useState(null)
 
   useEffect(() => {
@@ -140,47 +129,67 @@ const Pd1KeytrudaViewer = ({ title }) => {
         containerRef.current.appendChild(canvas)
         plugin.initViewer(canvas, containerRef.current)
 
-        const pdbUrl = `https://files.rcsb.org/download/${PDB_ID}.pdb`
-        const structureData = await plugin.builders.data.download({
-          url: pdbUrl,
+        const pdL1Data = await plugin.builders.data.download({
+          url: `https://files.rcsb.org/download/${PD_L1_PDB_ID}.pdb`,
           isBinary: false,
-          label: `PDB ${PDB_ID}`,
+          label: `PDB ${PD_L1_PDB_ID}`,
+        })
+        const keytrudaData = await plugin.builders.data.download({
+          url: `https://files.rcsb.org/download/${KEYTRUDA_PDB_ID}.pdb`,
+          isBinary: false,
+          label: `PDB ${KEYTRUDA_PDB_ID}`,
         })
 
-        const trajectory = await plugin.builders.structure.parseTrajectory(
-          structureData,
+        const pdL1Trajectory = await plugin.builders.structure.parseTrajectory(
+          pdL1Data,
           "pdb"
         )
-        const model = await plugin.builders.structure.createModel(trajectory)
-        const structure = await plugin.builders.structure.createStructure(model)
+        const keytrudaTrajectory =
+          await plugin.builders.structure.parseTrajectory(keytrudaData, "pdb")
+
+        const pdL1Model =
+          await plugin.builders.structure.createModel(pdL1Trajectory)
+        const keytrudaModel =
+          await plugin.builders.structure.createModel(keytrudaTrajectory)
+
+        const pdL1Structure =
+          await plugin.builders.structure.createStructure(pdL1Model)
+        const keytrudaStructure =
+          await plugin.builders.structure.createStructure(keytrudaModel)
+
+        const pd1RefLoci = getChainLoci(
+          pdL1Structure.cell.obj.data,
+          PD_1_CHAIN_PD_L1
+        )
+        const pd1KeytrudaLoci = getChainLoci(
+          keytrudaStructure.cell.obj.data,
+          PD_1_CHAIN_KEYTRUDA
+        )
+
+        if (
+          StructureElement.Loci.isEmpty(pd1RefLoci) ||
+          StructureElement.Loci.isEmpty(pd1KeytrudaLoci)
+        ) {
+          throw new Error("PD-1 chain not found in one of the structures")
+        }
+
+        const transforms = alignAndSuperpose([pd1RefLoci, pd1KeytrudaLoci])
+        if (!transforms[0]?.bTransform) {
+          throw new Error("Failed to align PD-1 chains")
+        }
+        await applyTransform(plugin, keytrudaStructure, transforms[0].bTransform)
 
         await plugin.dataTransaction(async () => {
-          const keytrudaChains =
+          const pd1Component =
             await plugin.builders.structure.tryCreateComponentFromExpression(
-              structure,
-              multiChainSelection(KEYTRUDA_CHAINS),
-              "Keytruda"
-            )
-          if (keytrudaChains) {
-            await plugin.builders.structure.representation.addRepresentation(
-              keytrudaChains,
-              {
-                type: "cartoon",
-                color: "uniform",
-                colorParams: { value: KEYTRUDA_COLOR },
-              }
-            )
-          }
-
-          const pd1Chain =
-            await plugin.builders.structure.tryCreateComponentFromExpression(
-              structure,
-              chainSelection(PD_1_CHAIN),
+              pdL1Structure,
+              chainSelection(PD_1_CHAIN_PD_L1),
               "PD-1"
             )
-          if (pd1Chain) {
+          pd1ComponentRef.current = pd1Component || null
+          if (pd1Component) {
             await plugin.builders.structure.representation.addRepresentation(
-              pd1Chain,
+              pd1Component,
               {
                 type: "cartoon",
                 color: "uniform",
@@ -189,35 +198,27 @@ const Pd1KeytrudaViewer = ({ title }) => {
             )
           }
 
-          const keytrudaInterfaces = []
-          for (const [chainId, residues] of Object.entries(
-            KEYTRUDA_INTERFACE_RESIDUES
-          )) {
-            const component =
-              await plugin.builders.structure.tryCreateComponentFromExpression(
-                structure,
-                residueSelection(chainId, residues),
-                `Keytruda interface ${chainId}`
-              )
-            if (component) {
-              keytrudaInterfaces.push(component)
-            }
-          }
-          interfaceComponentsRef.current.keytruda = keytrudaInterfaces
-
-          const pd1Interface =
+          const pdl1Component =
             await plugin.builders.structure.tryCreateComponentFromExpression(
-              structure,
-              residueSelection(PD_1_CHAIN, PD_1_INTERFACE_RESIDUES),
-              "PD-1 interface"
+              pdL1Structure,
+              chainSelection(PD_L1_CHAIN),
+              "PD-L1"
             )
-          interfaceComponentsRef.current.pd1 = pd1Interface || null
+          pdl1ComponentRef.current = pdl1Component || null
+
+          const keytrudaComponent =
+            await plugin.builders.structure.tryCreateComponentFromExpression(
+              keytrudaStructure,
+              multiChainSelection(KEYTRUDA_CHAINS),
+              "Keytruda"
+            )
+          keytrudaComponentRef.current = keytrudaComponent || null
         })
 
         setIsStructureReady(true)
         setIsLoading(false)
       } catch (e) {
-        setError(`Failed to load PDB ${PDB_ID}: ${e.message}`)
+        setError(`Failed to load superposed structures: ${e.message}`)
         setIsLoading(false)
       }
     }
@@ -229,8 +230,10 @@ const Pd1KeytrudaViewer = ({ title }) => {
         pluginRef.current.dispose()
         pluginRef.current = null
       }
-      interfaceComponentsRef.current = { pd1: null, keytruda: [] }
-      interfaceRepsRef.current = { pd1: null, keytruda: [] }
+      pd1ComponentRef.current = null
+      pdl1ComponentRef.current = null
+      keytrudaComponentRef.current = null
+      ligandRepsRef.current = { pdl1: null, keytruda: null }
       setIsStructureReady(false)
     }
   }, [])
@@ -241,26 +244,14 @@ const Pd1KeytrudaViewer = ({ title }) => {
     }
 
     const plugin = pluginRef.current
-    const { pd1, keytruda } = interfaceComponentsRef.current
-    const components = [pd1, ...(keytruda || [])].filter(Boolean)
 
-    if (components.length === 0) {
-      return
-    }
-
-    const option = INTERFACE_REP_OPTIONS.find(
-      currentOption => currentOption.id === interfaceStyle
-    )
-
-    plugin.dataTransaction(async () => {
+    const updateLigand = async () => {
       const repsToRemove = []
-      if (interfaceRepsRef.current.pd1?.ref) {
-        repsToRemove.push(interfaceRepsRef.current.pd1.ref)
+      if (ligandRepsRef.current.pdl1?.ref) {
+        repsToRemove.push(ligandRepsRef.current.pdl1.ref)
       }
-      for (const rep of interfaceRepsRef.current.keytruda || []) {
-        if (rep?.ref) {
-          repsToRemove.push(rep.ref)
-        }
+      if (ligandRepsRef.current.keytruda?.ref) {
+        repsToRemove.push(ligandRepsRef.current.keytruda.ref)
       }
 
       if (repsToRemove.length > 0) {
@@ -271,37 +262,35 @@ const Pd1KeytrudaViewer = ({ title }) => {
         await builder.commit()
       }
 
-      interfaceRepsRef.current = { pd1: null, keytruda: [] }
+      ligandRepsRef.current = { pdl1: null, keytruda: null }
 
-      if (!option || !option.type) {
-        return
-      }
-
-      const buildProps = colorValue => ({
-        type: option.type,
-        color: "uniform",
-        colorParams: { value: colorValue },
-        ...(option.typeParams ? { typeParams: option.typeParams } : {}),
-      })
-
-      if (pd1) {
-        interfaceRepsRef.current.pd1 =
+      if (activeLigand === "pdl1" && pdl1ComponentRef.current) {
+        ligandRepsRef.current.pdl1 =
           await plugin.builders.structure.representation.addRepresentation(
-            pd1,
-            buildProps(PD_1_COLOR)
+            pdl1ComponentRef.current,
+            {
+              type: "cartoon",
+              color: "uniform",
+              colorParams: { value: PD_L1_COLOR },
+            }
           )
       }
-      interfaceRepsRef.current.keytruda = []
-      for (const component of keytruda || []) {
-        const rep =
+
+      if (activeLigand === "keytruda" && keytrudaComponentRef.current) {
+        ligandRepsRef.current.keytruda =
           await plugin.builders.structure.representation.addRepresentation(
-            component,
-            buildProps(KEYTRUDA_COLOR)
+            keytrudaComponentRef.current,
+            {
+              type: "cartoon",
+              color: "uniform",
+              colorParams: { value: KEYTRUDA_COLOR },
+            }
           )
-        interfaceRepsRef.current.keytruda.push(rep)
       }
-    })
-  }, [interfaceStyle, isStructureReady])
+    }
+
+    plugin.dataTransaction(updateLigand)
+  }, [activeLigand, isStructureReady])
 
   if (error) {
     return <div style={{ color: "red", padding: "20px" }}>Error: {error}</div>
@@ -394,6 +383,9 @@ const Pd1KeytrudaViewer = ({ title }) => {
     },
   }
 
+  const isPdl1Active = activeLigand === "pdl1"
+  const isKeytrudaActive = activeLigand === "keytruda"
+
   return (
     <div style={styles.container}>
       {title && <h3 style={styles.title}>{title}</h3>}
@@ -414,23 +406,34 @@ const Pd1KeytrudaViewer = ({ title }) => {
             <span
               style={{
                 ...styles.swatch,
+                background: `#${PD_L1_COLOR.toString(16)}`,
+                opacity: isPdl1Active ? 1 : 0.4,
+              }}
+            />
+            PD-L1
+          </div>
+          <div style={styles.legendItem}>
+            <span
+              style={{
+                ...styles.swatch,
                 background: `#${KEYTRUDA_COLOR.toString(16)}`,
+                opacity: isKeytrudaActive ? 1 : 0.4,
               }}
             />
             Keytruda
           </div>
         </div>
         <div style={styles.controlsOverlay}>
-          <label htmlFor={INTERFACE_STYLE_ID} style={styles.controlsLabel}>
-            Interface:
+          <label htmlFor={LIGAND_SELECT_ID} style={styles.controlsLabel}>
+            Ligand:
           </label>
           <select
-            id={INTERFACE_STYLE_ID}
-            value={interfaceStyle}
-            onChange={event => setInterfaceStyle(event.target.value)}
+            id={LIGAND_SELECT_ID}
+            value={activeLigand}
+            onChange={event => setActiveLigand(event.target.value)}
             style={styles.select}
           >
-            {INTERFACE_REP_OPTIONS.map(option => (
+            {LIGAND_OPTIONS.map(option => (
               <option key={option.id} value={option.id}>
                 {option.label}
               </option>
@@ -442,4 +445,4 @@ const Pd1KeytrudaViewer = ({ title }) => {
   )
 }
 
-export default Pd1KeytrudaViewer
+export default Pd1PoseOverlayViewer
