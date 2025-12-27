@@ -3,7 +3,7 @@ import { DefaultPluginSpec } from "molstar/lib/mol-plugin/spec"
 import { PluginContext } from "molstar/lib/mol-plugin/context"
 import { MolScriptBuilder as MS } from "molstar/lib/mol-script/language/builder"
 
-const PDB_ID = "4ZQK"
+const PDB_ID = "3BIK"
 const PD_L1_CHAIN = "A"
 const PD_1_CHAIN = "B"
 
@@ -21,11 +21,10 @@ const INTERFACE_REP_OPTIONS = [
   },
 ]
 const PD_L1_INTERFACE_RESIDUES = [
-  19, 23, 26, 54, 56, 58, 66, 113, 115, 117, 119, 120, 121, 122, 123, 124, 125,
+  19, 26, 54, 56, 66, 113, 115, 121, 122, 123, 125,
 ]
 const PD_1_INTERFACE_RESIDUES = [
-  64, 66, 68, 73, 74, 75, 76, 77, 78, 84, 124, 126, 128, 130, 131, 132, 134,
-  136,
+  64, 66, 68, 73, 74, 75, 76, 78, 126, 128, 130, 132, 134, 136,
 ]
 
 const chainSelection = chainId =>

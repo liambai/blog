@@ -11,7 +11,7 @@ import { alignAndSuperpose } from "molstar/lib/mol-model/structure/structure/uti
 import { compile } from "molstar/lib/mol-script/runtime/query/compiler"
 import { StateTransforms } from "molstar/lib/mol-plugin-state/transforms"
 
-const PD_L1_PDB_ID = "4ZQK"
+const PD_L1_PDB_ID = "3BIK"
 const KEYTRUDA_PDB_ID = "5B8C"
 const PD_L1_CHAIN = "A"
 const PD_1_CHAIN_PD_L1 = "B"
@@ -21,12 +21,6 @@ const KEYTRUDA_CHAINS = ["A", "B"]
 const PD_1_COLOR = 0x2a9d8f
 const PD_L1_COLOR = 0xe9c46a
 const KEYTRUDA_COLOR = 0xe76f51
-
-const LIGAND_SELECT_ID = "pd1-overlay-ligand"
-const LIGAND_OPTIONS = [
-  { id: "pdl1", label: "PD-L1" },
-  { id: "keytruda", label: "Keytruda" },
-]
 
 const chainSelection = chainId =>
   MS.struct.generator.atomGroups({
@@ -338,8 +332,8 @@ const Pd1PoseOverlayViewer = ({ title }) => {
       right: "10px",
       display: "flex",
       alignItems: "center",
-      gap: "8px",
-      padding: "6px 10px",
+      gap: "10px",
+      padding: "6px 12px",
       borderRadius: "999px",
       background: "rgba(255, 255, 255, 0.9)",
       fontSize: "0.8rem",
@@ -348,6 +342,38 @@ const Pd1PoseOverlayViewer = ({ title }) => {
     },
     controlsLabel: {
       fontWeight: 500,
+    },
+    toggleWrapper: {
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+    },
+    toggleText: {
+      fontSize: "0.75rem",
+      fontWeight: 600,
+      letterSpacing: "0.01em",
+    },
+    switchButton: {
+      position: "relative",
+      width: "46px",
+      height: "26px",
+      borderRadius: "999px",
+      border: "1px solid rgba(31, 41, 51, 0.12)",
+      padding: 0,
+      background: "#d6dde5",
+      cursor: "pointer",
+      transition: "background 150ms ease",
+    },
+    switchThumb: {
+      position: "absolute",
+      top: "1px",
+      left: "1px",
+      width: "22px",
+      height: "22px",
+      borderRadius: "50%",
+      background: "#fff",
+      boxShadow: "0 2px 6px rgba(0, 0, 0, 0.18)",
+      transition: "transform 150ms ease",
     },
     legend: {
       display: "flex",
@@ -362,13 +388,6 @@ const Pd1PoseOverlayViewer = ({ title }) => {
       fontSize: "0.85rem",
       color: "#1f2933",
       zIndex: 15,
-    },
-    select: {
-      padding: "4px 18px 4px 8px",
-      borderRadius: "999px",
-      border: "1px solid #cbd2d9",
-      background: "white",
-      fontSize: "0.8rem",
     },
     legendItem: {
       display: "flex",
@@ -424,21 +443,47 @@ const Pd1PoseOverlayViewer = ({ title }) => {
           </div>
         </div>
         <div style={styles.controlsOverlay}>
-          <label htmlFor={LIGAND_SELECT_ID} style={styles.controlsLabel}>
-            Ligand:
-          </label>
-          <select
-            id={LIGAND_SELECT_ID}
-            value={activeLigand}
-            onChange={event => setActiveLigand(event.target.value)}
-            style={styles.select}
-          >
-            {LIGAND_OPTIONS.map(option => (
-              <option key={option.id} value={option.id}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          <span style={styles.controlsLabel}>Ligand</span>
+          <div style={styles.toggleWrapper}>
+            <span
+              style={{
+                ...styles.toggleText,
+                color: isPdl1Active ? "#1f2933" : "#9aa5b1",
+              }}
+            >
+              PD-L1
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={isKeytrudaActive}
+              aria-label="Toggle ligand between PD-L1 and Keytruda"
+              onClick={() =>
+                setActiveLigand(isKeytrudaActive ? "pdl1" : "keytruda")
+              }
+              style={{
+                ...styles.switchButton,
+                background: isKeytrudaActive ? "#1d71b7" : "#d6dde5",
+              }}
+            >
+              <span
+                style={{
+                  ...styles.switchThumb,
+                  transform: isKeytrudaActive
+                    ? "translateX(20px)"
+                    : "translateX(0)",
+                }}
+              />
+            </button>
+            <span
+              style={{
+                ...styles.toggleText,
+                color: isKeytrudaActive ? "#1f2933" : "#9aa5b1",
+              }}
+            >
+              Keytruda
+            </span>
+          </div>
         </div>
       </div>
     </div>

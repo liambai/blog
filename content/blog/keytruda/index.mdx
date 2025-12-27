@@ -1,5 +1,5 @@
 ---
-title: "A visual guide to the miracle cancer drug Keytruda"
+title: "A structural guide to the miracle cancer drug Keytruda"
 date: "2025-12-25"
 description: "TODO"
 ---
@@ -8,20 +8,34 @@ import LazyVisualizationWrapper from "../../../src/components/lazy-visualization
 import Pd1Pdl1Viewer from "./d3/pd1_pdl1_viewer"
 import Pd1KeytrudaViewer from "./d3/pd1_keytruda_viewer"
 import Pd1PoseOverlayViewer from "./d3/pd1_pose_overlay_viewer"
+import Figure from "../../../src/components/figure.jsx"
+import Image from "../../../src/components/image.jsx"
 
 Rarely in the history of medicine has a single drug created a seismic shift as profound as Keytruda, the cancer drug developed by Merck. Since its approval in 2014, Keytruda has rewritten the survival statistic of over 15 types of cancer, won a Nobel Prize, and reached $30 billion in sales last year alone.
 
 Keytruda's story is a circuitous one of setbacks and breakthroughs, serendipity and resilience. You can read about it in this [excellent article](https://www.forbes.com/sites/davidshaywitz/2017/07/26/the-startling-history-behind-mercks-new-cancer-blockbuster/). This blog post focuses on the science of how it works, grounded in visualizations of the key molecular players. My goal is to share, though this example, a sense of wonder at the intricate inner structures of life – and how extraordinary it is that we’ve learned to influence them.
 
-## Immune checkpoints
+## PD-1 & immune regulation
 
 T cells detect and destroy cancer cells. They are tightly regulated to prevent misdirected attacks on healthy cells. For example, **PD-1** (programmed cell death protein 1) is a protein on the surface of T cells that acts like an "off-switch". When PD-1 binds to its partner protein, **PD-L1** (programmed death-ligand 1), it signals the T cell to halt its attack.
 
 <LazyVisualizationWrapper placeholder="Loading PD-1/PD-L1 complex...">
-  <Pd1Pdl1Viewer title="PD-1 & PD-L1 (PDB 4ZQK)" />
+  <Pd1Pdl1Viewer title="PD-1 & PD-L1 (PDB 3BIK)" />
 </LazyVisualizationWrapper>
 
-Here's a close-up of PD-L1 activating PD-1. Try the selector for some different ways to visualize the interface interactions.
+Here's a close-up of PD-L1 binding PD-1. Use the selector to try a few ways of visualization the interface interactions. Notice how the two proteins fit together: molecular recognition is governed by shape complementarity and hydrogen bonding at the interface.
+
+What we've seen is just the extracellular portion of PD-1 and PD-L1. Both are transmembrane proteins anchored in cell membranes, with flexible tails extending into the cell interior.
+
+<Figure
+  content={<Image path={require("./images/PD1_PDL1_with_membranes.png")} />}
+>
+  TODO
+</Figure>
+
+Because these tails are too disordered to capture with current experimental methods...
+
+## Keytruda blocks PD-L1
 
 Now compare that with PD-1 bound to Keytruda (pembrolizumab). The antibody grips a broader, shifted surface on PD-1 compared with PD-L1. Toggle the interface view to see how the Keytruda footprint wraps across a different face.
 
