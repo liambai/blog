@@ -10,6 +10,7 @@ import {
 import { alignAndSuperpose } from "molstar/lib/mol-model/structure/structure/util/superposition"
 import { compile } from "molstar/lib/mol-script/runtime/query/compiler"
 import { StateTransforms } from "molstar/lib/mol-plugin-state/transforms"
+import { Vec3 } from "molstar/lib/mol-math/linear-algebra"
 
 const PD_L1_PDB_ID = "3BIK"
 const KEYTRUDA_PDB_ID = "5B8C"
@@ -65,9 +66,50 @@ const applyTransform = (plugin, structure, matrix) => {
   return plugin.runTask(plugin.state.data.updateTree(builder))
 }
 
+const setCameraWithPd1OnLeft = (plugin, pd1Center, partnerCenter) => {
+  const camera = plugin.canvas3d.camera
+  const currentSnapshot = camera.getSnapshot()
+
+  // Midpoint between PD-1 and partner
+  const target = Vec3.scale(
+    Vec3(),
+    Vec3.add(Vec3(), pd1Center, partnerCenter),
+    0.5
+  )
+
+  // Vector from PD-1 to partner (partner should appear on the right)
+  const pd1ToPartner = Vec3.sub(Vec3(), partnerCenter, pd1Center)
+
+  // We want to look perpendicular to the pd1-to-partner axis
+  // Use cross product with a reference up vector to get view direction
+  const refUp = Vec3.create(0, 1, 0)
+  let viewDir = Vec3.cross(Vec3(), pd1ToPartner, refUp)
+
+  // If pd1ToPartner is nearly parallel to refUp, use a different reference
+  if (Vec3.magnitude(viewDir) < 0.001) {
+    const altRef = Vec3.create(1, 0, 0)
+    viewDir = Vec3.cross(Vec3(), pd1ToPartner, altRef)
+  }
+  Vec3.normalize(viewDir, viewDir)
+
+  // Camera distance based on current view
+  const currentDist = Vec3.distance(currentSnapshot.position, currentSnapshot.target)
+  const position = Vec3.scaleAndAdd(Vec3(), target, viewDir, currentDist)
+
+  // Up vector should be perpendicular to both view direction and pd1-to-partner
+  const up = Vec3.cross(Vec3(), viewDir, pd1ToPartner)
+  Vec3.normalize(up, up)
+
+  camera.setState(
+    { ...currentSnapshot, target: [...target], position: [...position], up: [...up] },
+    0
+  )
+}
+
 const Pd1PoseOverlayViewer = ({ title }) => {
   const containerRef = useRef(null)
   const pluginRef = useRef(null)
+  const chainCentersRef = useRef({ pd1: null, pdl1: null })
   const pd1ComponentRef = useRef(null)
   const pdl1ComponentRef = useRef(null)
   const keytrudaComponentRef = useRef(null)
@@ -190,6 +232,11 @@ const Pd1PoseOverlayViewer = ({ title }) => {
                 colorParams: { value: PD_1_COLOR },
               }
             )
+            // Compute center of PD-1 chain
+            const pd1Data = pd1Component.cell?.obj?.data
+            if (pd1Data) {
+              chainCentersRef.current.pd1 = Vec3.clone(pd1Data.boundary.sphere.center)
+            }
           }
 
           const pdl1Component =
@@ -199,6 +246,13 @@ const Pd1PoseOverlayViewer = ({ title }) => {
               "PD-L1"
             )
           pdl1ComponentRef.current = pdl1Component || null
+          if (pdl1Component) {
+            // Compute center of PD-L1 chain
+            const pdl1Data = pdl1Component.cell?.obj?.data
+            if (pdl1Data) {
+              chainCentersRef.current.pdl1 = Vec3.clone(pdl1Data.boundary.sphere.center)
+            }
+          }
 
           const keytrudaComponent =
             await plugin.builders.structure.tryCreateComponentFromExpression(
@@ -207,6 +261,17 @@ const Pd1PoseOverlayViewer = ({ title }) => {
               "Keytruda"
             )
           keytrudaComponentRef.current = keytrudaComponent || null
+        })
+
+        // Set camera orientation with PD-1 on left after a short delay for rendering
+        requestAnimationFrame(() => {
+          if (chainCentersRef.current.pd1 && chainCentersRef.current.pdl1) {
+            setCameraWithPd1OnLeft(
+              plugin,
+              chainCentersRef.current.pd1,
+              chainCentersRef.current.pdl1
+            )
+          }
         })
 
         setIsStructureReady(true)
@@ -224,6 +289,7 @@ const Pd1PoseOverlayViewer = ({ title }) => {
         pluginRef.current.dispose()
         pluginRef.current = null
       }
+      chainCentersRef.current = { pd1: null, pdl1: null }
       pd1ComponentRef.current = null
       pdl1ComponentRef.current = null
       keytrudaComponentRef.current = null

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { DefaultPluginSpec } from "molstar/lib/mol-plugin/spec"
 import { PluginContext } from "molstar/lib/mol-plugin/context"
 import { MolScriptBuilder as MS } from "molstar/lib/mol-script/language/builder"
+import { Vec3 } from "molstar/lib/mol-math/linear-algebra"
 
 const PDB_ID = "5B8C"
 const PD_1_CHAIN = "C"
@@ -84,9 +85,50 @@ const residueSelection = (chainId, residues) => {
   })
 }
 
+const setCameraWithPd1OnLeft = (plugin, pd1Center, partnerCenter) => {
+  const camera = plugin.canvas3d.camera
+  const currentSnapshot = camera.getSnapshot()
+
+  // Midpoint between PD-1 and partner
+  const target = Vec3.scale(
+    Vec3(),
+    Vec3.add(Vec3(), pd1Center, partnerCenter),
+    0.5
+  )
+
+  // Vector from PD-1 to partner (partner should appear on the right)
+  const pd1ToPartner = Vec3.sub(Vec3(), partnerCenter, pd1Center)
+
+  // We want to look perpendicular to the pd1-to-partner axis
+  // Use cross product with a reference up vector to get view direction
+  const refUp = Vec3.create(0, 1, 0)
+  let viewDir = Vec3.cross(Vec3(), pd1ToPartner, refUp)
+
+  // If pd1ToPartner is nearly parallel to refUp, use a different reference
+  if (Vec3.magnitude(viewDir) < 0.001) {
+    const altRef = Vec3.create(1, 0, 0)
+    viewDir = Vec3.cross(Vec3(), pd1ToPartner, altRef)
+  }
+  Vec3.normalize(viewDir, viewDir)
+
+  // Camera distance based on current view
+  const currentDist = Vec3.distance(currentSnapshot.position, currentSnapshot.target)
+  const position = Vec3.scaleAndAdd(Vec3(), target, viewDir, currentDist)
+
+  // Up vector should be perpendicular to both view direction and pd1-to-partner
+  const up = Vec3.cross(Vec3(), viewDir, pd1ToPartner)
+  Vec3.normalize(up, up)
+
+  camera.setState(
+    { ...currentSnapshot, target: [...target], position: [...position], up: [...up] },
+    0
+  )
+}
+
 const Pd1KeytrudaViewer = ({ title }) => {
   const containerRef = useRef(null)
   const pluginRef = useRef(null)
+  const chainCentersRef = useRef({ pd1: null, keytruda: null })
   const interfaceComponentsRef = useRef({ pd1: null, keytruda: [] })
   const interfaceRepsRef = useRef({ pd1: null, keytruda: [] })
   const [isLoading, setIsLoading] = useState(true)
@@ -170,6 +212,11 @@ const Pd1KeytrudaViewer = ({ title }) => {
                 colorParams: { value: KEYTRUDA_COLOR },
               }
             )
+            // Compute center of Keytruda chains
+            const keytrudaData = keytrudaChains.cell?.obj?.data
+            if (keytrudaData) {
+              chainCentersRef.current.keytruda = Vec3.clone(keytrudaData.boundary.sphere.center)
+            }
           }
 
           const pd1Chain =
@@ -187,6 +234,11 @@ const Pd1KeytrudaViewer = ({ title }) => {
                 colorParams: { value: PD_1_COLOR },
               }
             )
+            // Compute center of PD-1 chain
+            const pd1Data = pd1Chain.cell?.obj?.data
+            if (pd1Data) {
+              chainCentersRef.current.pd1 = Vec3.clone(pd1Data.boundary.sphere.center)
+            }
           }
 
           const keytrudaInterfaces = []
@@ -214,6 +266,17 @@ const Pd1KeytrudaViewer = ({ title }) => {
           interfaceComponentsRef.current.pd1 = pd1Interface || null
         })
 
+        // Set camera orientation with PD-1 on left after a short delay for rendering
+        requestAnimationFrame(() => {
+          if (chainCentersRef.current.pd1 && chainCentersRef.current.keytruda) {
+            setCameraWithPd1OnLeft(
+              plugin,
+              chainCentersRef.current.pd1,
+              chainCentersRef.current.keytruda
+            )
+          }
+        })
+
         setIsStructureReady(true)
         setIsLoading(false)
       } catch (e) {
@@ -229,6 +292,7 @@ const Pd1KeytrudaViewer = ({ title }) => {
         pluginRef.current.dispose()
         pluginRef.current = null
       }
+      chainCentersRef.current = { pd1: null, keytruda: null }
       interfaceComponentsRef.current = { pd1: null, keytruda: [] }
       interfaceRepsRef.current = { pd1: null, keytruda: [] }
       setIsStructureReady(false)
