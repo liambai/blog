@@ -6,6 +6,7 @@ description: "TODO"
 
 import LazyVisualizationWrapper from "../../../src/components/lazy-visualization-wrapper.jsx"
 import Pd1Pdl1Viewer from "./d3/pd1_pdl1_viewer"
+import Pd1KeytrudaViewer from "./d3/pd1_keytruda_viewer"
 
 Rarely in the history of medicine has a single drug created a seismic shift as profound as Keytruda, the cancer drug developed by Merck. Since its approval in 2014, Keytruda has rewritten the survival statistic of over 15 types of cancer, won a Nobel Prize, and reached $30 billion in sales last year alone.
 
@@ -20,3 +21,9 @@ T cells detect and destroy cancer cells. They are tightly regulated to prevent m
 </LazyVisualizationWrapper>
 
 Here's a close-up of PD-L1 activating PD-1. Try the selector for some different ways to visualize the interface interactions.
+
+Now compare that with PD-1 bound to Keytruda (pembrolizumab). The antibody grips a broader, shifted surface on PD-1 compared with PD-L1. Toggle the interface view to see how the Keytruda footprint wraps across a different face.
+
+<LazyVisualizationWrapper placeholder="Loading PD-1/Keytruda complex...">
+  <Pd1KeytrudaViewer title="PD-1 & Keytruda (PDB 5B8C)" />
+</LazyVisualizationWrapper>
