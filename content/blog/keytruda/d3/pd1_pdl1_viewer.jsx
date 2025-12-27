@@ -327,10 +327,17 @@ const Pd1Pdl1Viewer = ({ title }) => {
     },
     legend: {
       display: "flex",
-      flexWrap: "wrap",
-      gap: "12px",
+      alignItems: "center",
+      gap: "10px",
+      position: "absolute",
+      top: "10px",
+      left: "10px",
+      padding: "6px 10px",
+      borderRadius: "999px",
+      background: "rgba(255, 255, 255, 0.9)",
       fontSize: "0.85rem",
       color: "#1f2933",
+      zIndex: 15,
     },
     select: {
       padding: "4px 18px 4px 8px",
@@ -358,6 +365,26 @@ const Pd1Pdl1Viewer = ({ title }) => {
       <div style={styles.viewerWrapper}>
         <div ref={containerRef} style={styles.viewer} />
         {isLoading && <div style={styles.loading}>Loading...</div>}
+        <div style={styles.legend}>
+          <div style={styles.legendItem}>
+            <span
+              style={{
+                ...styles.swatch,
+                background: `#${PD_1_COLOR.toString(16)}`,
+              }}
+            />
+            PD-1
+          </div>
+          <div style={styles.legendItem}>
+            <span
+              style={{
+                ...styles.swatch,
+                background: `#${PD_L1_COLOR.toString(16)}`,
+              }}
+            />
+            PD-L1
+          </div>
+        </div>
         <div style={styles.controlsOverlay}>
           <label htmlFor="interface-style" style={styles.controlsLabel}>
             Interface:
@@ -374,26 +401,6 @@ const Pd1Pdl1Viewer = ({ title }) => {
               </option>
             ))}
           </select>
-        </div>
-      </div>
-      <div style={styles.legend}>
-        <div style={styles.legendItem}>
-          <span
-            style={{
-              ...styles.swatch,
-              background: `#${PD_1_COLOR.toString(16)}`,
-            }}
-          />
-          PD-1
-        </div>
-        <div style={styles.legendItem}>
-          <span
-            style={{
-              ...styles.swatch,
-              background: `#${PD_L1_COLOR.toString(16)}`,
-            }}
-          />
-          PD-L1
         </div>
       </div>
     </div>
