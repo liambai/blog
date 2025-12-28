@@ -1,7 +1,7 @@
-// Protein colors
-export const PD_1_COLOR = 0x2a9d8f
-export const PD_L1_COLOR = 0xe9c46a
-export const KEYTRUDA_COLOR = 0xe76f51
+// Protein colors (matching PD1_PDL1_with_membranes.png)
+export const PD_1_COLOR = 0xe88585 // salmon/coral pink
+export const PD_L1_COLOR = 0x70b8e8 // light blue
+export const KEYTRUDA_COLOR = 0x2a9d8f // teal green
 
 // Interface representation options
 export const INTERFACE_REP_OPTIONS = [
