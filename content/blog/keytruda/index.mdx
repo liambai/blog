@@ -1,6 +1,6 @@
 ---
 title: "A visual guide to the miracle cancer drug Keytruda"
-date: "2025-12-25"
+date: "2025-12-30"
 description: "TODO"
 ---
 
@@ -31,7 +31,8 @@ Above are just the extracellular portion of PD-1 and PD-L1. Both are transmembra
 <Figure
   content={<Image path={require("./images/PD1_PDL1_with_membranes.png")} />}
 >
-  TODO
+  Adapted from
+  [https://pdb101.rcsb.org/motm/204](https://pdb101.rcsb.org/motm/204)
 </Figure>
 
 Though these disordered tails elude our experimental methods of structure determination, we can guess at their structure using computational tools. Here's the [AlphaFold2 prediction](https://alphafold.ebi.ac.uk/entry/Q15116) of the full PD-1 sequence, colored by confidence (pLDDT):
@@ -56,7 +57,7 @@ If we can block cancer cells from activating PD-1, then we can unleash the T cel
 
 ## Keytruda
 
-Keytruda, also known as pembrolizumab, is an antibody that it also binds to PD-1.
+Keytruda, also known as pembrolizumab, is an antibody that also binds to PD-1.
 
 <LazyVisualizationWrapper placeholder="Loading PD-1/Keytruda complex...">
   <Pd1KeytrudaViewer title="PD-1 & Keytruda interface (PDB 5B8C)" />
@@ -69,3 +70,7 @@ Here's a comparison of the binding poses of PD-L1 vs. Keytruda. Use the toggles 
 <LazyVisualizationWrapper placeholder="Loading PD-1 binding pose overlay...">
   <Pd1PoseOverlayViewer title="PD-1 binding PD-L1 vs. Keytruda" />
 </LazyVisualizationWrapper>
+
+## A new era in cancer treatment
+
+(TODO: de-slop) Looking at these molecular structures, I'm struck by how much of medicine comes down to shapes fitting together. The dance between PD-1 and PD-L1, evolved over millions of years, hijacked by cancer, and now interrupted by human ingenuity. It's a reminder that at the smallest scales, life is a mechanical process – and one we're learning to engineer.
