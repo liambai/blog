@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { DefaultPluginSpec } from "molstar/lib/mol-plugin/spec"
 import { PluginContext } from "molstar/lib/mol-plugin/context"
 
-import { chainSelection } from "./shared/selections"
+import { residueRangeSelection } from "./shared/selections"
 import ViewerShell from "./components/ViewerShell"
 import Legend from "./components/Legend"
 import HoverInfo from "./components/HoverInfo"
@@ -13,14 +13,15 @@ const KEYTRUDA_FULL_PDB_ID = "5DK3"
 // Chain identifiers in 5DK3:
 // Light chains: A, F
 // Heavy chains: B, G
-// Fab arm 1 (highlighted, as in 5B8C): A + B
-// Fab arm 2 (muted): F + G
 
-// Colors - Fab arm uses saturated colors, other arm uses muted versions
-const FAB_HEAVY_COLOR = 0x2a9d8f // teal green - same as KEYTRUDA_COLOR
-const FAB_LIGHT_COLOR = 0x8ecae6 // light blue
-const OTHER_HEAVY_COLOR = 0xa8cec8 // muted teal
-const OTHER_LIGHT_COLOR = 0xc9dfe8 // muted light blue
+// Domain boundaries (standard IgG4 numbering)
+const VL_END = 107 // Variable light domain: residues 1-107
+const VH_END = 118 // Variable heavy domain: residues 1-118
+const CHAIN_END = 500 // Large number to capture all constant region residues
+
+// Colors - Fv (variable domains) in saturated color, constant regions muted
+const FV_COLOR = 0x2a9d8f // teal green - Fv region
+const CONST_COLOR = 0xc9d6d3 // muted gray-teal - constant regions
 
 const KeytrudaFullViewer = ({ title }) => {
   const containerRef = useRef(null)
@@ -87,75 +88,54 @@ const KeytrudaFullViewer = ({ title }) => {
         const structure = await plugin.builders.structure.createStructure(model)
 
         await plugin.dataTransaction(async () => {
-          // Fab arm (as in 5B8C): chains A (light) + B (heavy)
-          const fabLight =
-            await plugin.builders.structure.tryCreateComponentFromExpression(
-              structure,
-              chainSelection("A"),
-              "Fab light chain"
-            )
-          if (fabLight) {
-            await plugin.builders.structure.representation.addRepresentation(
-              fabLight,
-              {
-                type: "cartoon",
-                color: "uniform",
-                colorParams: { value: FAB_LIGHT_COLOR },
-              }
-            )
+          // Helper to add Fv and constant region components for a chain
+          const addChainComponents = async (chainId, isHeavy) => {
+            const vEnd = isHeavy ? VH_END : VL_END
+
+            // Fv (variable) region
+            const fvComponent =
+              await plugin.builders.structure.tryCreateComponentFromExpression(
+                structure,
+                residueRangeSelection(chainId, 1, vEnd),
+                `${chainId} V${isHeavy ? "H" : "L"}`
+              )
+            if (fvComponent) {
+              await plugin.builders.structure.representation.addRepresentation(
+                fvComponent,
+                {
+                  type: "cartoon",
+                  color: "uniform",
+                  colorParams: { value: FV_COLOR },
+                }
+              )
+            }
+
+            // Constant region
+            const constComponent =
+              await plugin.builders.structure.tryCreateComponentFromExpression(
+                structure,
+                residueRangeSelection(chainId, vEnd + 1, CHAIN_END),
+                `${chainId} C${isHeavy ? "H" : "L"}`
+              )
+            if (constComponent) {
+              await plugin.builders.structure.representation.addRepresentation(
+                constComponent,
+                {
+                  type: "cartoon",
+                  color: "uniform",
+                  colorParams: { value: CONST_COLOR },
+                }
+              )
+            }
           }
 
-          const fabHeavy =
-            await plugin.builders.structure.tryCreateComponentFromExpression(
-              structure,
-              chainSelection("B"),
-              "Fab heavy chain"
-            )
-          if (fabHeavy) {
-            await plugin.builders.structure.representation.addRepresentation(
-              fabHeavy,
-              {
-                type: "cartoon",
-                color: "uniform",
-                colorParams: { value: FAB_HEAVY_COLOR },
-              }
-            )
-          }
+          // Light chains: A, F
+          await addChainComponents("A", false)
+          await addChainComponents("F", false)
 
-          // Other arm: chains F (light) + G (heavy) in muted colors
-          const otherLight =
-            await plugin.builders.structure.tryCreateComponentFromExpression(
-              structure,
-              chainSelection("F"),
-              "Other light chain"
-            )
-          if (otherLight) {
-            await plugin.builders.structure.representation.addRepresentation(
-              otherLight,
-              {
-                type: "cartoon",
-                color: "uniform",
-                colorParams: { value: OTHER_LIGHT_COLOR },
-              }
-            )
-          }
-
-          const otherHeavy =
-            await plugin.builders.structure.tryCreateComponentFromExpression(
-              structure,
-              chainSelection("G"),
-              "Other heavy chain"
-            )
-          if (otherHeavy) {
-            await plugin.builders.structure.representation.addRepresentation(
-              otherHeavy,
-              {
-                type: "cartoon",
-                color: "uniform",
-                colorParams: { value: OTHER_HEAVY_COLOR },
-              }
-            )
-          }
+          // Heavy chains: B, G
+          await addChainComponents("B", true)
+          await addChainComponents("G", true)
         })
 
         setIsStructureReady(true)
@@ -180,10 +160,8 @@ const KeytrudaFullViewer = ({ title }) => {
   const hoverInfo = useHoverInfo(pluginRef, containerRef, isStructureReady)
 
   const legendItems = [
-    { label: "Fab heavy", color: FAB_HEAVY_COLOR },
-    { label: "Fab light", color: FAB_LIGHT_COLOR },
-    { label: "Heavy chain", color: OTHER_HEAVY_COLOR },
-    { label: "Light chain", color: OTHER_LIGHT_COLOR },
+    { label: "Fv", color: FV_COLOR },
+    { label: "Constant", color: CONST_COLOR },
   ]
 
   const chainNames = {

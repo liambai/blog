@@ -50,3 +50,22 @@ export const residueSelection = (chainId, residues) => {
     "group-by": MS.struct.atomProperty.macromolecular.residueKey(),
   })
 }
+
+export const residueRangeSelection = (chainId, start, end) => {
+  return MS.struct.generator.atomGroups({
+    "chain-test": MS.core.rel.eq([
+      MS.struct.atomProperty.macromolecular.auth_asym_id(),
+      chainId,
+    ]),
+    "residue-test": MS.core.logic.and([
+      MS.core.rel.gre([
+        MS.struct.atomProperty.macromolecular.auth_seq_id(),
+        start,
+      ]),
+      MS.core.rel.lte([
+        MS.struct.atomProperty.macromolecular.auth_seq_id(),
+        end,
+      ]),
+    ]),
+  })
+}
