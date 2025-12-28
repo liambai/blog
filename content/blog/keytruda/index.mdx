@@ -8,6 +8,7 @@ import LazyVisualizationWrapper from "../../../src/components/lazy-visualization
 import Pd1Pdl1Viewer from "./viz/pd1_pdl1_viewer"
 import Pd1KeytrudaViewer from "./viz/pd1_keytruda_viewer"
 import Pd1PoseOverlayViewer from "./viz/pd1_pose_overlay_viewer"
+import KeytrudaFullViewer from "./viz/keytruda_full_viewer"
 import AlphafoldPd1Viewer from "./viz/alphafold_pd1_viewer"
 import Figure from "../../../src/components/figure.jsx"
 import Image from "../../../src/components/image.jsx"
@@ -69,6 +70,12 @@ Here's a comparison of the binding poses of PD-L1 vs. Keytruda. Use the toggles 
 
 <LazyVisualizationWrapper placeholder="Loading PD-1 binding pose overlay...">
   <Pd1PoseOverlayViewer title="PD-1 binding PD-L1 vs. Keytruda" />
+</LazyVisualizationWrapper>
+
+Here's the full Keytruda antibody, consisting of two heavy chains and two light chains arranged in the characteristic Y-shape:
+
+<LazyVisualizationWrapper placeholder="Loading full Keytruda structure...">
+  <KeytrudaFullViewer title="Full Keytruda antibody (PDB 5DK3)" />
 </LazyVisualizationWrapper>
 
 ## A new era in cancer treatment
