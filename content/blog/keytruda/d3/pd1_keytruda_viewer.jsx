@@ -10,7 +10,6 @@ const KEYTRUDA_CHAINS = ["A", "B"]
 
 const PD_1_COLOR = 0x2a9d8f
 const KEYTRUDA_COLOR = 0xe76f51
-const INTERFACE_STYLE_ID = "interface-style-keytruda"
 const INTERFACE_REP_OPTIONS = [
   { id: "none", label: "None", type: null },
   { id: "ball-and-stick", label: "ball & stick", type: "ball-and-stick" },
@@ -388,7 +387,8 @@ const Pd1KeytrudaViewer = ({ title }) => {
     viewerWrapper: {
       position: "relative",
       width: "100%",
-      height: "440px",
+      height: "min(440px, 70vh)",
+      minHeight: "300px",
       borderRadius: "12px",
       overflow: "hidden",
       backgroundColor: "#f5f5f5",
@@ -409,13 +409,13 @@ const Pd1KeytrudaViewer = ({ title }) => {
     },
     controlsOverlay: {
       position: "absolute",
-      top: "10px",
+      bottom: "10px",
       right: "10px",
       display: "flex",
       alignItems: "center",
       gap: "8px",
       padding: "6px 10px",
-      borderRadius: "999px",
+      borderRadius: "8px",
       background: "rgba(255, 255, 255, 0.9)",
       fontSize: "0.8rem",
       color: "#1f2933",
@@ -438,12 +438,28 @@ const Pd1KeytrudaViewer = ({ title }) => {
       color: "#1f2933",
       zIndex: 15,
     },
-    select: {
-      padding: "4px 18px 4px 8px",
-      borderRadius: "999px",
-      border: "1px solid #cbd2d9",
+    segmentedControl: {
+      display: "flex",
+      background: "rgba(0, 0, 0, 0.06)",
+      borderRadius: "6px",
+      padding: "2px",
+    },
+    segment: {
+      padding: "6px 10px",
+      border: "none",
+      background: "transparent",
+      fontSize: "0.75rem",
+      fontWeight: 500,
+      color: "#616e7c",
+      cursor: "pointer",
+      borderRadius: "4px",
+      transition: "all 150ms ease",
+      WebkitTapHighlightColor: "transparent",
+    },
+    segmentActive: {
       background: "white",
-      fontSize: "0.8rem",
+      color: "#1f2933",
+      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
     },
     legendItem: {
       display: "flex",
@@ -485,21 +501,22 @@ const Pd1KeytrudaViewer = ({ title }) => {
           </div>
         </div>
         <div style={styles.controlsOverlay}>
-          <label htmlFor={INTERFACE_STYLE_ID} style={styles.controlsLabel}>
-            Interface:
-          </label>
-          <select
-            id={INTERFACE_STYLE_ID}
-            value={interfaceStyle}
-            onChange={event => setInterfaceStyle(event.target.value)}
-            style={styles.select}
-          >
+          <span style={styles.controlsLabel}>Interface</span>
+          <div style={styles.segmentedControl}>
             {INTERFACE_REP_OPTIONS.map(option => (
-              <option key={option.id} value={option.id}>
+              <button
+                key={option.id}
+                type="button"
+                onClick={() => setInterfaceStyle(option.id)}
+                style={{
+                  ...styles.segment,
+                  ...(interfaceStyle === option.id ? styles.segmentActive : {}),
+                }}
+              >
                 {option.label}
-              </option>
+              </button>
             ))}
-          </select>
+          </div>
         </div>
       </div>
     </div>

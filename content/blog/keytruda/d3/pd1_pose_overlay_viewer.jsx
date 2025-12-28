@@ -23,6 +23,31 @@ const PD_1_COLOR = 0x2a9d8f
 const PD_L1_COLOR = 0xe9c46a
 const KEYTRUDA_COLOR = 0xe76f51
 
+const INTERFACE_REP_OPTIONS = [
+  { id: "none", label: "None", type: null },
+  { id: "ball-and-stick", label: "ball & stick", type: "ball-and-stick" },
+  { id: "spacefill", label: "spacefill", type: "spacefill" },
+  {
+    id: "gaussian-surface",
+    label: "surface",
+    type: "gaussian-surface",
+    typeParams: { alpha: 0.6 },
+  },
+]
+
+// Interface residues for PD-L1 complex (3BIK)
+const PD_L1_INTERFACE_RESIDUES = [19, 26, 54, 56, 66, 113, 115, 121, 122, 123, 125]
+const PD_1_INTERFACE_RESIDUES_PDL1 = [64, 66, 68, 73, 74, 75, 76, 78, 126, 128, 130, 132, 134, 136]
+
+// Interface residues for Keytruda complex (5B8C)
+const KEYTRUDA_INTERFACE_RESIDUES = {
+  A: [33, 34, 36, 53, 54, 57, 58, 60, 95, 96, 97, 98, 100],
+  B: [28, 30, 31, 33, 35, 50, 51, 52, 54, 55, 57, 58, 59, 99, 101, 102, 103, 104, 105],
+}
+const PD_1_INTERFACE_RESIDUES_KEYTRUDA = [
+  59, 60, 61, 62, 63, 64, 66, 68, 75, 76, 77, 78, 81, 83, 85, 86, 87, 88, 89, 90, 126, 128, 129, 130, 131, 132, 134,
+]
+
 const chainSelection = chainId =>
   MS.struct.generator.atomGroups({
     "chain-test": MS.core.rel.eq([
@@ -46,6 +71,31 @@ const multiChainSelection = chainIds => {
   return MS.struct.generator.atomGroups({
     "chain-test":
       chainTests.length === 1 ? chainTests[0] : MS.core.logic.or(chainTests),
+  })
+}
+
+const residueSelection = (chainId, residues) => {
+  if (!residues || residues.length === 0) {
+    return chainSelection(chainId)
+  }
+
+  const residueTests = residues.map(residueId =>
+    MS.core.rel.eq([
+      MS.struct.atomProperty.macromolecular.auth_seq_id(),
+      residueId,
+    ])
+  )
+
+  return MS.struct.generator.atomGroups({
+    "chain-test": MS.core.rel.eq([
+      MS.struct.atomProperty.macromolecular.auth_asym_id(),
+      chainId,
+    ]),
+    "residue-test":
+      residueTests.length === 1
+        ? residueTests[0]
+        : MS.core.logic.or(residueTests),
+    "group-by": MS.struct.atomProperty.macromolecular.residueKey(),
   })
 }
 
@@ -114,7 +164,15 @@ const Pd1PoseOverlayViewer = ({ title }) => {
   const pdl1ComponentRef = useRef(null)
   const keytrudaComponentRef = useRef(null)
   const ligandRepsRef = useRef({ pdl1: null, keytruda: null })
+  const interfaceComponentsRef = useRef({
+    pd1Pdl1: null,
+    pdl1: null,
+    pd1Keytruda: null,
+    keytruda: [],
+  })
+  const interfaceRepsRef = useRef({ pd1: null, ligand: [] })
   const [activeLigand, setActiveLigand] = useState("pdl1")
+  const [interfaceStyle, setInterfaceStyle] = useState("none")
   const [isLoading, setIsLoading] = useState(true)
   const [isStructureReady, setIsStructureReady] = useState(false)
   const [error, setError] = useState(null)
@@ -261,6 +319,46 @@ const Pd1PoseOverlayViewer = ({ title }) => {
               "Keytruda"
             )
           keytrudaComponentRef.current = keytrudaComponent || null
+
+          // Create interface components for PD-L1 complex
+          const pd1Pdl1Interface =
+            await plugin.builders.structure.tryCreateComponentFromExpression(
+              pdL1Structure,
+              residueSelection(PD_1_CHAIN_PD_L1, PD_1_INTERFACE_RESIDUES_PDL1),
+              "PD-1 interface (PD-L1)"
+            )
+          interfaceComponentsRef.current.pd1Pdl1 = pd1Pdl1Interface || null
+
+          const pdl1Interface =
+            await plugin.builders.structure.tryCreateComponentFromExpression(
+              pdL1Structure,
+              residueSelection(PD_L1_CHAIN, PD_L1_INTERFACE_RESIDUES),
+              "PD-L1 interface"
+            )
+          interfaceComponentsRef.current.pdl1 = pdl1Interface || null
+
+          // Create interface components for Keytruda complex
+          const pd1KeytrudaInterface =
+            await plugin.builders.structure.tryCreateComponentFromExpression(
+              keytrudaStructure,
+              residueSelection(PD_1_CHAIN_KEYTRUDA, PD_1_INTERFACE_RESIDUES_KEYTRUDA),
+              "PD-1 interface (Keytruda)"
+            )
+          interfaceComponentsRef.current.pd1Keytruda = pd1KeytrudaInterface || null
+
+          const keytrudaInterfaces = []
+          for (const [chainId, residues] of Object.entries(KEYTRUDA_INTERFACE_RESIDUES)) {
+            const component =
+              await plugin.builders.structure.tryCreateComponentFromExpression(
+                keytrudaStructure,
+                residueSelection(chainId, residues),
+                `Keytruda interface ${chainId}`
+              )
+            if (component) {
+              keytrudaInterfaces.push(component)
+            }
+          }
+          interfaceComponentsRef.current.keytruda = keytrudaInterfaces
         })
 
         // Set camera orientation with PD-1 on left after a short delay for rendering
@@ -294,6 +392,8 @@ const Pd1PoseOverlayViewer = ({ title }) => {
       pdl1ComponentRef.current = null
       keytrudaComponentRef.current = null
       ligandRepsRef.current = { pdl1: null, keytruda: null }
+      interfaceComponentsRef.current = { pd1Pdl1: null, pdl1: null, pd1Keytruda: null, keytruda: [] }
+      interfaceRepsRef.current = { pd1: null, ligand: [] }
       setIsStructureReady(false)
     }
   }, [])
@@ -352,6 +452,83 @@ const Pd1PoseOverlayViewer = ({ title }) => {
     plugin.dataTransaction(updateLigand)
   }, [activeLigand, isStructureReady])
 
+  useEffect(() => {
+    if (!pluginRef.current || !isStructureReady) {
+      return
+    }
+
+    const plugin = pluginRef.current
+    const option = INTERFACE_REP_OPTIONS.find(opt => opt.id === interfaceStyle)
+
+    plugin.dataTransaction(async () => {
+      // Remove existing interface representations
+      const repsToRemove = []
+      if (interfaceRepsRef.current.pd1?.ref) {
+        repsToRemove.push(interfaceRepsRef.current.pd1.ref)
+      }
+      for (const rep of interfaceRepsRef.current.ligand || []) {
+        if (rep?.ref) {
+          repsToRemove.push(rep.ref)
+        }
+      }
+
+      if (repsToRemove.length > 0) {
+        const builder = plugin.state.data.build()
+        for (const ref of repsToRemove) {
+          builder.delete(ref)
+        }
+        await builder.commit()
+      }
+
+      interfaceRepsRef.current = { pd1: null, ligand: [] }
+
+      if (!option || !option.type) {
+        return
+      }
+
+      const buildProps = colorValue => ({
+        type: option.type,
+        color: "uniform",
+        colorParams: { value: colorValue },
+        ...(option.typeParams ? { typeParams: option.typeParams } : {}),
+      })
+
+      // Add interface representations based on active ligand
+      if (activeLigand === "pdl1") {
+        if (interfaceComponentsRef.current.pd1Pdl1) {
+          interfaceRepsRef.current.pd1 =
+            await plugin.builders.structure.representation.addRepresentation(
+              interfaceComponentsRef.current.pd1Pdl1,
+              buildProps(PD_1_COLOR)
+            )
+        }
+        if (interfaceComponentsRef.current.pdl1) {
+          const rep = await plugin.builders.structure.representation.addRepresentation(
+            interfaceComponentsRef.current.pdl1,
+            buildProps(PD_L1_COLOR)
+          )
+          interfaceRepsRef.current.ligand = [rep]
+        }
+      } else if (activeLigand === "keytruda") {
+        if (interfaceComponentsRef.current.pd1Keytruda) {
+          interfaceRepsRef.current.pd1 =
+            await plugin.builders.structure.representation.addRepresentation(
+              interfaceComponentsRef.current.pd1Keytruda,
+              buildProps(PD_1_COLOR)
+            )
+        }
+        interfaceRepsRef.current.ligand = []
+        for (const component of interfaceComponentsRef.current.keytruda || []) {
+          const rep = await plugin.builders.structure.representation.addRepresentation(
+            component,
+            buildProps(KEYTRUDA_COLOR)
+          )
+          interfaceRepsRef.current.ligand.push(rep)
+        }
+      }
+    })
+  }, [activeLigand, interfaceStyle, isStructureReady])
+
   if (error) {
     return <div style={{ color: "red", padding: "20px" }}>Error: {error}</div>
   }
@@ -373,7 +550,8 @@ const Pd1PoseOverlayViewer = ({ title }) => {
     viewerWrapper: {
       position: "relative",
       width: "100%",
-      height: "440px",
+      height: "min(440px, 70vh)",
+      minHeight: "300px",
       borderRadius: "12px",
       overflow: "hidden",
       backgroundColor: "#f5f5f5",
@@ -394,52 +572,49 @@ const Pd1PoseOverlayViewer = ({ title }) => {
     },
     controlsOverlay: {
       position: "absolute",
-      top: "10px",
+      bottom: "10px",
       right: "10px",
       display: "flex",
-      alignItems: "center",
-      gap: "10px",
-      padding: "6px 12px",
-      borderRadius: "999px",
+      flexDirection: "column",
+      gap: "6px",
+      padding: "8px 10px",
+      borderRadius: "8px",
       background: "rgba(255, 255, 255, 0.9)",
       fontSize: "0.8rem",
       color: "#1f2933",
       zIndex: 15,
     },
-    controlsLabel: {
-      fontWeight: 500,
-    },
-    toggleWrapper: {
+    controlRow: {
       display: "flex",
       alignItems: "center",
       gap: "8px",
     },
-    toggleText: {
+    controlsLabel: {
+      fontWeight: 500,
+      minWidth: "52px",
+    },
+    segmentedControl: {
+      display: "flex",
+      background: "rgba(0, 0, 0, 0.06)",
+      borderRadius: "6px",
+      padding: "2px",
+    },
+    segment: {
+      padding: "6px 10px",
+      border: "none",
+      background: "transparent",
       fontSize: "0.75rem",
-      fontWeight: 600,
-      letterSpacing: "0.01em",
-    },
-    switchButton: {
-      position: "relative",
-      width: "46px",
-      height: "26px",
-      borderRadius: "999px",
-      border: "1px solid rgba(31, 41, 51, 0.12)",
-      padding: 0,
-      background: "#d6dde5",
+      fontWeight: 500,
+      color: "#616e7c",
       cursor: "pointer",
-      transition: "background 150ms ease",
+      borderRadius: "4px",
+      transition: "all 150ms ease",
+      WebkitTapHighlightColor: "transparent",
     },
-    switchThumb: {
-      position: "absolute",
-      top: "1px",
-      left: "1px",
-      width: "22px",
-      height: "22px",
-      borderRadius: "50%",
-      background: "#fff",
-      boxShadow: "0 2px 6px rgba(0, 0, 0, 0.18)",
-      transition: "transform 150ms ease",
+    segmentActive: {
+      background: "white",
+      color: "#1f2933",
+      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
     },
     legend: {
       display: "flex",
@@ -468,8 +643,10 @@ const Pd1PoseOverlayViewer = ({ title }) => {
     },
   }
 
-  const isPdl1Active = activeLigand === "pdl1"
-  const isKeytrudaActive = activeLigand === "keytruda"
+  const ligandOptions = [
+    { id: "pdl1", label: "PD-L1" },
+    { id: "keytruda", label: "Keytruda" },
+  ]
 
   return (
     <div style={styles.container}>
@@ -492,7 +669,7 @@ const Pd1PoseOverlayViewer = ({ title }) => {
               style={{
                 ...styles.swatch,
                 background: `#${PD_L1_COLOR.toString(16)}`,
-                opacity: isPdl1Active ? 1 : 0.4,
+                opacity: activeLigand === "pdl1" ? 1 : 0.4,
               }}
             />
             PD-L1
@@ -502,53 +679,48 @@ const Pd1PoseOverlayViewer = ({ title }) => {
               style={{
                 ...styles.swatch,
                 background: `#${KEYTRUDA_COLOR.toString(16)}`,
-                opacity: isKeytrudaActive ? 1 : 0.4,
+                opacity: activeLigand === "keytruda" ? 1 : 0.4,
               }}
             />
             Keytruda
           </div>
         </div>
         <div style={styles.controlsOverlay}>
-          <span style={styles.controlsLabel}>Ligand</span>
-          <div style={styles.toggleWrapper}>
-            <span
-              style={{
-                ...styles.toggleText,
-                color: isPdl1Active ? "#1f2933" : "#9aa5b1",
-              }}
-            >
-              PD-L1
-            </span>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={isKeytrudaActive}
-              aria-label="Toggle ligand between PD-L1 and Keytruda"
-              onClick={() =>
-                setActiveLigand(isKeytrudaActive ? "pdl1" : "keytruda")
-              }
-              style={{
-                ...styles.switchButton,
-                background: isKeytrudaActive ? "#1d71b7" : "#d6dde5",
-              }}
-            >
-              <span
-                style={{
-                  ...styles.switchThumb,
-                  transform: isKeytrudaActive
-                    ? "translateX(20px)"
-                    : "translateX(0)",
-                }}
-              />
-            </button>
-            <span
-              style={{
-                ...styles.toggleText,
-                color: isKeytrudaActive ? "#1f2933" : "#9aa5b1",
-              }}
-            >
-              Keytruda
-            </span>
+          <div style={styles.controlRow}>
+            <span style={styles.controlsLabel}>Ligand</span>
+            <div style={styles.segmentedControl}>
+              {ligandOptions.map(option => (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => setActiveLigand(option.id)}
+                  style={{
+                    ...styles.segment,
+                    ...(activeLigand === option.id ? styles.segmentActive : {}),
+                  }}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div style={styles.controlRow}>
+            <span style={styles.controlsLabel}>Interface</span>
+            <div style={styles.segmentedControl}>
+              {INTERFACE_REP_OPTIONS.map(option => (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => setInterfaceStyle(option.id)}
+                  style={{
+                    ...styles.segment,
+                    ...(interfaceStyle === option.id ? styles.segmentActive : {}),
+                  }}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
