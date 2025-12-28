@@ -1,105 +1,23 @@
 import React, { useEffect, useRef, useState } from "react"
 import { DefaultPluginSpec } from "molstar/lib/mol-plugin/spec"
 import { PluginContext } from "molstar/lib/mol-plugin/context"
-import { MolScriptBuilder as MS } from "molstar/lib/mol-script/language/builder"
 import { Vec3 } from "molstar/lib/mol-math/linear-algebra"
 
-const PDB_ID = "3BIK"
-const PD_L1_CHAIN = "A"
-const PD_1_CHAIN = "B"
-
-const PD_L1_COLOR = 0xe9c46a
-const PD_1_COLOR = 0x2a9d8f
-const INTERFACE_REP_OPTIONS = [
-  { id: "none", label: "None", type: null },
-  { id: "ball-and-stick", label: "ball & stick", type: "ball-and-stick" },
-  { id: "spacefill", label: "spacefill", type: "spacefill" },
-  {
-    id: "gaussian-surface",
-    label: "surface",
-    type: "gaussian-surface",
-    typeParams: { alpha: 0.6 },
-  },
-]
-const PD_L1_INTERFACE_RESIDUES = [
-  19, 26, 54, 56, 66, 113, 115, 121, 122, 123, 125,
-]
-const PD_1_INTERFACE_RESIDUES = [
-  64, 66, 68, 73, 74, 75, 76, 78, 126, 128, 130, 132, 134, 136,
-]
-
-const chainSelection = chainId =>
-  MS.struct.generator.atomGroups({
-    "chain-test": MS.core.rel.eq([
-      MS.struct.atomProperty.macromolecular.auth_asym_id(),
-      chainId,
-    ]),
-  })
-
-const residueSelection = (chainId, residues) => {
-  if (!residues || residues.length === 0) {
-    return chainSelection(chainId)
-  }
-
-  const residueTests = residues.map(residueId =>
-    MS.core.rel.eq([
-      MS.struct.atomProperty.macromolecular.auth_seq_id(),
-      residueId,
-    ])
-  )
-
-  return MS.struct.generator.atomGroups({
-    "chain-test": MS.core.rel.eq([
-      MS.struct.atomProperty.macromolecular.auth_asym_id(),
-      chainId,
-    ]),
-    "residue-test":
-      residueTests.length === 1
-        ? residueTests[0]
-        : MS.core.logic.or(residueTests),
-    "group-by": MS.struct.atomProperty.macromolecular.residueKey(),
-  })
-}
-
-const setCameraWithPd1OnLeft = (plugin, pd1Center, partnerCenter) => {
-  const camera = plugin.canvas3d.camera
-  const currentSnapshot = camera.getSnapshot()
-
-  // Midpoint between PD-1 and partner
-  const target = Vec3.scale(
-    Vec3(),
-    Vec3.add(Vec3(), pd1Center, partnerCenter),
-    0.5
-  )
-
-  // Vector from PD-1 to partner (partner should appear on the right)
-  const pd1ToPartner = Vec3.sub(Vec3(), partnerCenter, pd1Center)
-
-  // We want to look perpendicular to the pd1-to-partner axis
-  // Use cross product with a reference up vector to get view direction
-  const refUp = Vec3.create(0, 1, 0)
-  let viewDir = Vec3.cross(Vec3(), pd1ToPartner, refUp)
-
-  // If pd1ToPartner is nearly parallel to refUp, use a different reference
-  if (Vec3.magnitude(viewDir) < 0.001) {
-    const altRef = Vec3.create(1, 0, 0)
-    viewDir = Vec3.cross(Vec3(), pd1ToPartner, altRef)
-  }
-  Vec3.normalize(viewDir, viewDir)
-
-  // Camera distance based on current view
-  const currentDist = Vec3.distance(currentSnapshot.position, currentSnapshot.target)
-  const position = Vec3.scaleAndAdd(Vec3(), target, viewDir, currentDist)
-
-  // Up vector should be perpendicular to both view direction and pd1-to-partner
-  const up = Vec3.cross(Vec3(), viewDir, pd1ToPartner)
-  Vec3.normalize(up, up)
-
-  camera.setState(
-    { ...currentSnapshot, target: [...target], position: [...position], up: [...up] },
-    0
-  )
-}
+import {
+  PD_1_COLOR,
+  PD_L1_COLOR,
+  PD_L1_PDB_ID,
+  CHAINS,
+  INTERFACE_REP_OPTIONS,
+  PD_L1_INTERFACE_RESIDUES,
+  PD_1_INTERFACE_RESIDUES_PDL1,
+} from "./shared/constants"
+import { chainSelection, residueSelection } from "./shared/selections"
+import { setCameraWithPd1OnLeft } from "./shared/camera"
+import { controlStyles } from "./shared/styles"
+import ViewerShell from "./components/ViewerShell"
+import Legend from "./components/Legend"
+import SegmentedControl from "./components/SegmentedControl"
 
 const Pd1Pdl1Viewer = ({ title }) => {
   const containerRef = useRef(null)
@@ -158,11 +76,11 @@ const Pd1Pdl1Viewer = ({ title }) => {
         containerRef.current.appendChild(canvas)
         plugin.initViewer(canvas, containerRef.current)
 
-        const pdbUrl = `https://files.rcsb.org/download/${PDB_ID}.pdb`
+        const pdbUrl = `https://files.rcsb.org/download/${PD_L1_PDB_ID}.pdb`
         const structureData = await plugin.builders.data.download({
           url: pdbUrl,
           isBinary: false,
-          label: `PDB ${PDB_ID}`,
+          label: `PDB ${PD_L1_PDB_ID}`,
         })
 
         const trajectory = await plugin.builders.structure.parseTrajectory(
@@ -176,7 +94,7 @@ const Pd1Pdl1Viewer = ({ title }) => {
           const pdL1Chain =
             await plugin.builders.structure.tryCreateComponentFromExpression(
               structure,
-              chainSelection(PD_L1_CHAIN),
+              chainSelection(CHAINS.PD_L1_COMPLEX.PD_L1),
               "PD-L1"
             )
           if (pdL1Chain) {
@@ -188,7 +106,6 @@ const Pd1Pdl1Viewer = ({ title }) => {
                 colorParams: { value: PD_L1_COLOR },
               }
             )
-            // Compute center of PD-L1 chain
             const pdl1Data = pdL1Chain.cell?.obj?.data
             if (pdl1Data) {
               chainCentersRef.current.pdl1 = Vec3.clone(pdl1Data.boundary.sphere.center)
@@ -198,7 +115,7 @@ const Pd1Pdl1Viewer = ({ title }) => {
           const pd1Chain =
             await plugin.builders.structure.tryCreateComponentFromExpression(
               structure,
-              chainSelection(PD_1_CHAIN),
+              chainSelection(CHAINS.PD_L1_COMPLEX.PD_1),
               "PD-1"
             )
           if (pd1Chain) {
@@ -210,7 +127,6 @@ const Pd1Pdl1Viewer = ({ title }) => {
                 colorParams: { value: PD_1_COLOR },
               }
             )
-            // Compute center of PD-1 chain
             const pd1Data = pd1Chain.cell?.obj?.data
             if (pd1Data) {
               chainCentersRef.current.pd1 = Vec3.clone(pd1Data.boundary.sphere.center)
@@ -220,7 +136,7 @@ const Pd1Pdl1Viewer = ({ title }) => {
           const pdL1Interface =
             await plugin.builders.structure.tryCreateComponentFromExpression(
               structure,
-              residueSelection(PD_L1_CHAIN, PD_L1_INTERFACE_RESIDUES),
+              residueSelection(CHAINS.PD_L1_COMPLEX.PD_L1, PD_L1_INTERFACE_RESIDUES),
               "PD-L1 interface"
             )
           interfaceComponentsRef.current.pdl1 = pdL1Interface || null
@@ -228,13 +144,12 @@ const Pd1Pdl1Viewer = ({ title }) => {
           const pd1Interface =
             await plugin.builders.structure.tryCreateComponentFromExpression(
               structure,
-              residueSelection(PD_1_CHAIN, PD_1_INTERFACE_RESIDUES),
+              residueSelection(CHAINS.PD_L1_COMPLEX.PD_1, PD_1_INTERFACE_RESIDUES_PDL1),
               "PD-1 interface"
             )
           interfaceComponentsRef.current.pd1 = pd1Interface || null
         })
 
-        // Set camera orientation with PD-1 on left after a short delay for rendering
         requestAnimationFrame(() => {
           if (chainCentersRef.current.pd1 && chainCentersRef.current.pdl1) {
             setCameraWithPd1OnLeft(
@@ -248,7 +163,7 @@ const Pd1Pdl1Viewer = ({ title }) => {
         setIsStructureReady(true)
         setIsLoading(false)
       } catch (e) {
-        setError(`Failed to load PDB ${PDB_ID}: ${e.message}`)
+        setError(`Failed to load PDB ${PD_L1_PDB_ID}: ${e.message}`)
         setIsLoading(false)
       }
     }
@@ -331,160 +246,30 @@ const Pd1Pdl1Viewer = ({ title }) => {
     })
   }, [interfaceStyle, isStructureReady])
 
-  if (error) {
-    return <div style={{ color: "red", padding: "20px" }}>Error: {error}</div>
-  }
-
-  const styles = {
-    container: {
-      display: "flex",
-      flexDirection: "column",
-      width: "100%",
-      gap: "12px",
-      marginBottom: "20px",
-    },
-    title: {
-      textAlign: "center",
-      margin: 0,
-      fontSize: "1.1rem",
-      fontWeight: 600,
-    },
-    viewerWrapper: {
-      position: "relative",
-      width: "100%",
-      height: "min(440px, 70vh)",
-      minHeight: "300px",
-      borderRadius: "12px",
-      overflow: "hidden",
-      backgroundColor: "#f5f5f5",
-    },
-    viewer: {
-      width: "100%",
-      height: "100%",
-    },
-    loading: {
-      position: "absolute",
-      inset: 0,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      color: "#444",
-      fontSize: "0.95rem",
-      background: "rgba(255, 255, 255, 0.7)",
-    },
-    controlsOverlay: {
-      position: "absolute",
-      bottom: "10px",
-      right: "10px",
-      display: "flex",
-      alignItems: "center",
-      gap: "8px",
-      padding: "6px 10px",
-      borderRadius: "8px",
-      background: "rgba(255, 255, 255, 0.9)",
-      fontSize: "0.8rem",
-      color: "#1f2933",
-      zIndex: 15,
-    },
-    controlsLabel: {
-      fontWeight: 500,
-    },
-    legend: {
-      display: "flex",
-      alignItems: "center",
-      gap: "10px",
-      position: "absolute",
-      top: "10px",
-      left: "10px",
-      padding: "6px 10px",
-      borderRadius: "999px",
-      background: "rgba(255, 255, 255, 0.9)",
-      fontSize: "0.85rem",
-      color: "#1f2933",
-      zIndex: 15,
-    },
-    segmentedControl: {
-      display: "flex",
-      background: "rgba(0, 0, 0, 0.06)",
-      borderRadius: "6px",
-      padding: "2px",
-    },
-    segment: {
-      padding: "6px 10px",
-      border: "none",
-      background: "transparent",
-      fontSize: "0.75rem",
-      fontWeight: 500,
-      color: "#616e7c",
-      cursor: "pointer",
-      borderRadius: "4px",
-      transition: "all 150ms ease",
-      WebkitTapHighlightColor: "transparent",
-    },
-    segmentActive: {
-      background: "white",
-      color: "#1f2933",
-      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-    },
-    legendItem: {
-      display: "flex",
-      alignItems: "center",
-      gap: "6px",
-    },
-    swatch: {
-      width: "12px",
-      height: "12px",
-      borderRadius: "3px",
-      display: "inline-block",
-    },
-  }
+  const legendItems = [
+    { label: "PD-1", color: PD_1_COLOR },
+    { label: "PD-L1", color: PD_L1_COLOR },
+  ]
 
   return (
-    <div style={styles.container}>
-      {title && <h3 style={styles.title}>{title}</h3>}
-      <div style={styles.viewerWrapper}>
-        <div ref={containerRef} style={styles.viewer} />
-        {isLoading && <div style={styles.loading}>Loading...</div>}
-        <div style={styles.legend}>
-          <div style={styles.legendItem}>
-            <span
-              style={{
-                ...styles.swatch,
-                background: `#${PD_1_COLOR.toString(16)}`,
-              }}
-            />
-            PD-1
-          </div>
-          <div style={styles.legendItem}>
-            <span
-              style={{
-                ...styles.swatch,
-                background: `#${PD_L1_COLOR.toString(16)}`,
-              }}
-            />
-            PD-L1
-          </div>
-        </div>
-        <div style={styles.controlsOverlay}>
-          <span style={styles.controlsLabel}>Interface</span>
-          <div style={styles.segmentedControl}>
-            {INTERFACE_REP_OPTIONS.map(option => (
-              <button
-                key={option.id}
-                type="button"
-                onClick={() => setInterfaceStyle(option.id)}
-                style={{
-                  ...styles.segment,
-                  ...(interfaceStyle === option.id ? styles.segmentActive : {}),
-                }}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
+    <ViewerShell
+      ref={containerRef}
+      title={title}
+      isLoading={isLoading}
+      error={error}
+    >
+      <Legend items={legendItems} />
+      <div style={controlStyles.container}>
+        <div style={controlStyles.row}>
+          <span style={controlStyles.label}>Interface</span>
+          <SegmentedControl
+            options={INTERFACE_REP_OPTIONS}
+            value={interfaceStyle}
+            onChange={setInterfaceStyle}
+          />
         </div>
       </div>
-    </div>
+    </ViewerShell>
   )
 }
 

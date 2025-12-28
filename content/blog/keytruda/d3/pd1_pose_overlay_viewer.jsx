@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 import { DefaultPluginSpec } from "molstar/lib/mol-plugin/spec"
 import { PluginContext } from "molstar/lib/mol-plugin/context"
-import { MolScriptBuilder as MS } from "molstar/lib/mol-script/language/builder"
 import {
   QueryContext,
   StructureElement,
@@ -12,92 +11,30 @@ import { compile } from "molstar/lib/mol-script/runtime/query/compiler"
 import { StateTransforms } from "molstar/lib/mol-plugin-state/transforms"
 import { Vec3 } from "molstar/lib/mol-math/linear-algebra"
 
-const PD_L1_PDB_ID = "3BIK"
-const KEYTRUDA_PDB_ID = "5B8C"
-const PD_L1_CHAIN = "A"
-const PD_1_CHAIN_PD_L1 = "B"
-const PD_1_CHAIN_KEYTRUDA = "C"
-const KEYTRUDA_CHAINS = ["A", "B"]
+import {
+  PD_1_COLOR,
+  PD_L1_COLOR,
+  KEYTRUDA_COLOR,
+  PD_L1_PDB_ID,
+  KEYTRUDA_PDB_ID,
+  CHAINS,
+  INTERFACE_REP_OPTIONS,
+  PD_L1_INTERFACE_RESIDUES,
+  PD_1_INTERFACE_RESIDUES_PDL1,
+  KEYTRUDA_INTERFACE_RESIDUES,
+  PD_1_INTERFACE_RESIDUES_KEYTRUDA,
+} from "./shared/constants"
+import { chainSelection, multiChainSelection, residueSelection } from "./shared/selections"
+import { setCameraWithPd1OnLeft } from "./shared/camera"
+import { controlStyles } from "./shared/styles"
+import ViewerShell from "./components/ViewerShell"
+import Legend from "./components/Legend"
+import SegmentedControl from "./components/SegmentedControl"
 
-const PD_1_COLOR = 0x2a9d8f
-const PD_L1_COLOR = 0xe9c46a
-const KEYTRUDA_COLOR = 0xe76f51
-
-const INTERFACE_REP_OPTIONS = [
-  { id: "none", label: "None", type: null },
-  { id: "ball-and-stick", label: "ball & stick", type: "ball-and-stick" },
-  { id: "spacefill", label: "spacefill", type: "spacefill" },
-  {
-    id: "gaussian-surface",
-    label: "surface",
-    type: "gaussian-surface",
-    typeParams: { alpha: 0.6 },
-  },
+const LIGAND_OPTIONS = [
+  { id: "pdl1", label: "PD-L1" },
+  { id: "keytruda", label: "Keytruda" },
 ]
-
-// Interface residues for PD-L1 complex (3BIK)
-const PD_L1_INTERFACE_RESIDUES = [19, 26, 54, 56, 66, 113, 115, 121, 122, 123, 125]
-const PD_1_INTERFACE_RESIDUES_PDL1 = [64, 66, 68, 73, 74, 75, 76, 78, 126, 128, 130, 132, 134, 136]
-
-// Interface residues for Keytruda complex (5B8C)
-const KEYTRUDA_INTERFACE_RESIDUES = {
-  A: [33, 34, 36, 53, 54, 57, 58, 60, 95, 96, 97, 98, 100],
-  B: [28, 30, 31, 33, 35, 50, 51, 52, 54, 55, 57, 58, 59, 99, 101, 102, 103, 104, 105],
-}
-const PD_1_INTERFACE_RESIDUES_KEYTRUDA = [
-  59, 60, 61, 62, 63, 64, 66, 68, 75, 76, 77, 78, 81, 83, 85, 86, 87, 88, 89, 90, 126, 128, 129, 130, 131, 132, 134,
-]
-
-const chainSelection = chainId =>
-  MS.struct.generator.atomGroups({
-    "chain-test": MS.core.rel.eq([
-      MS.struct.atomProperty.macromolecular.auth_asym_id(),
-      chainId,
-    ]),
-  })
-
-const multiChainSelection = chainIds => {
-  if (!chainIds || chainIds.length === 0) {
-    return MS.struct.generator.atomGroups()
-  }
-
-  const chainTests = chainIds.map(chainId =>
-    MS.core.rel.eq([
-      MS.struct.atomProperty.macromolecular.auth_asym_id(),
-      chainId,
-    ])
-  )
-
-  return MS.struct.generator.atomGroups({
-    "chain-test":
-      chainTests.length === 1 ? chainTests[0] : MS.core.logic.or(chainTests),
-  })
-}
-
-const residueSelection = (chainId, residues) => {
-  if (!residues || residues.length === 0) {
-    return chainSelection(chainId)
-  }
-
-  const residueTests = residues.map(residueId =>
-    MS.core.rel.eq([
-      MS.struct.atomProperty.macromolecular.auth_seq_id(),
-      residueId,
-    ])
-  )
-
-  return MS.struct.generator.atomGroups({
-    "chain-test": MS.core.rel.eq([
-      MS.struct.atomProperty.macromolecular.auth_asym_id(),
-      chainId,
-    ]),
-    "residue-test":
-      residueTests.length === 1
-        ? residueTests[0]
-        : MS.core.logic.or(residueTests),
-    "group-by": MS.struct.atomProperty.macromolecular.residueKey(),
-  })
-}
 
 const getChainLoci = (structure, chainId) => {
   const query = compile(chainSelection(chainId))
@@ -114,46 +51,6 @@ const applyTransform = (plugin, structure, matrix) => {
       transform: { name: "matrix", params: { data: matrix, transpose: false } },
     })
   return plugin.runTask(plugin.state.data.updateTree(builder))
-}
-
-const setCameraWithPd1OnLeft = (plugin, pd1Center, partnerCenter) => {
-  const camera = plugin.canvas3d.camera
-  const currentSnapshot = camera.getSnapshot()
-
-  // Midpoint between PD-1 and partner
-  const target = Vec3.scale(
-    Vec3(),
-    Vec3.add(Vec3(), pd1Center, partnerCenter),
-    0.5
-  )
-
-  // Vector from PD-1 to partner (partner should appear on the right)
-  const pd1ToPartner = Vec3.sub(Vec3(), partnerCenter, pd1Center)
-
-  // We want to look perpendicular to the pd1-to-partner axis
-  // Use cross product with a reference up vector to get view direction
-  const refUp = Vec3.create(0, 1, 0)
-  let viewDir = Vec3.cross(Vec3(), pd1ToPartner, refUp)
-
-  // If pd1ToPartner is nearly parallel to refUp, use a different reference
-  if (Vec3.magnitude(viewDir) < 0.001) {
-    const altRef = Vec3.create(1, 0, 0)
-    viewDir = Vec3.cross(Vec3(), pd1ToPartner, altRef)
-  }
-  Vec3.normalize(viewDir, viewDir)
-
-  // Camera distance based on current view
-  const currentDist = Vec3.distance(currentSnapshot.position, currentSnapshot.target)
-  const position = Vec3.scaleAndAdd(Vec3(), target, viewDir, currentDist)
-
-  // Up vector should be perpendicular to both view direction and pd1-to-partner
-  const up = Vec3.cross(Vec3(), viewDir, pd1ToPartner)
-  Vec3.normalize(up, up)
-
-  camera.setState(
-    { ...currentSnapshot, target: [...target], position: [...position], up: [...up] },
-    0
-  )
 }
 
 const Pd1PoseOverlayViewer = ({ title }) => {
@@ -253,11 +150,11 @@ const Pd1PoseOverlayViewer = ({ title }) => {
 
         const pd1RefLoci = getChainLoci(
           pdL1Structure.cell.obj.data,
-          PD_1_CHAIN_PD_L1
+          CHAINS.PD_L1_COMPLEX.PD_1
         )
         const pd1KeytrudaLoci = getChainLoci(
           keytrudaStructure.cell.obj.data,
-          PD_1_CHAIN_KEYTRUDA
+          CHAINS.KEYTRUDA_COMPLEX.PD_1
         )
 
         if (
@@ -277,7 +174,7 @@ const Pd1PoseOverlayViewer = ({ title }) => {
           const pd1Component =
             await plugin.builders.structure.tryCreateComponentFromExpression(
               pdL1Structure,
-              chainSelection(PD_1_CHAIN_PD_L1),
+              chainSelection(CHAINS.PD_L1_COMPLEX.PD_1),
               "PD-1"
             )
           pd1ComponentRef.current = pd1Component || null
@@ -290,7 +187,6 @@ const Pd1PoseOverlayViewer = ({ title }) => {
                 colorParams: { value: PD_1_COLOR },
               }
             )
-            // Compute center of PD-1 chain
             const pd1Data = pd1Component.cell?.obj?.data
             if (pd1Data) {
               chainCentersRef.current.pd1 = Vec3.clone(pd1Data.boundary.sphere.center)
@@ -300,12 +196,11 @@ const Pd1PoseOverlayViewer = ({ title }) => {
           const pdl1Component =
             await plugin.builders.structure.tryCreateComponentFromExpression(
               pdL1Structure,
-              chainSelection(PD_L1_CHAIN),
+              chainSelection(CHAINS.PD_L1_COMPLEX.PD_L1),
               "PD-L1"
             )
           pdl1ComponentRef.current = pdl1Component || null
           if (pdl1Component) {
-            // Compute center of PD-L1 chain
             const pdl1Data = pdl1Component.cell?.obj?.data
             if (pdl1Data) {
               chainCentersRef.current.pdl1 = Vec3.clone(pdl1Data.boundary.sphere.center)
@@ -315,7 +210,7 @@ const Pd1PoseOverlayViewer = ({ title }) => {
           const keytrudaComponent =
             await plugin.builders.structure.tryCreateComponentFromExpression(
               keytrudaStructure,
-              multiChainSelection(KEYTRUDA_CHAINS),
+              multiChainSelection(CHAINS.KEYTRUDA_COMPLEX.KEYTRUDA),
               "Keytruda"
             )
           keytrudaComponentRef.current = keytrudaComponent || null
@@ -324,7 +219,7 @@ const Pd1PoseOverlayViewer = ({ title }) => {
           const pd1Pdl1Interface =
             await plugin.builders.structure.tryCreateComponentFromExpression(
               pdL1Structure,
-              residueSelection(PD_1_CHAIN_PD_L1, PD_1_INTERFACE_RESIDUES_PDL1),
+              residueSelection(CHAINS.PD_L1_COMPLEX.PD_1, PD_1_INTERFACE_RESIDUES_PDL1),
               "PD-1 interface (PD-L1)"
             )
           interfaceComponentsRef.current.pd1Pdl1 = pd1Pdl1Interface || null
@@ -332,7 +227,7 @@ const Pd1PoseOverlayViewer = ({ title }) => {
           const pdl1Interface =
             await plugin.builders.structure.tryCreateComponentFromExpression(
               pdL1Structure,
-              residueSelection(PD_L1_CHAIN, PD_L1_INTERFACE_RESIDUES),
+              residueSelection(CHAINS.PD_L1_COMPLEX.PD_L1, PD_L1_INTERFACE_RESIDUES),
               "PD-L1 interface"
             )
           interfaceComponentsRef.current.pdl1 = pdl1Interface || null
@@ -341,7 +236,7 @@ const Pd1PoseOverlayViewer = ({ title }) => {
           const pd1KeytrudaInterface =
             await plugin.builders.structure.tryCreateComponentFromExpression(
               keytrudaStructure,
-              residueSelection(PD_1_CHAIN_KEYTRUDA, PD_1_INTERFACE_RESIDUES_KEYTRUDA),
+              residueSelection(CHAINS.KEYTRUDA_COMPLEX.PD_1, PD_1_INTERFACE_RESIDUES_KEYTRUDA),
               "PD-1 interface (Keytruda)"
             )
           interfaceComponentsRef.current.pd1Keytruda = pd1KeytrudaInterface || null
@@ -361,7 +256,6 @@ const Pd1PoseOverlayViewer = ({ title }) => {
           interfaceComponentsRef.current.keytruda = keytrudaInterfaces
         })
 
-        // Set camera orientation with PD-1 on left after a short delay for rendering
         requestAnimationFrame(() => {
           if (chainCentersRef.current.pd1 && chainCentersRef.current.pdl1) {
             setCameraWithPd1OnLeft(
@@ -461,7 +355,6 @@ const Pd1PoseOverlayViewer = ({ title }) => {
     const option = INTERFACE_REP_OPTIONS.find(opt => opt.id === interfaceStyle)
 
     plugin.dataTransaction(async () => {
-      // Remove existing interface representations
       const repsToRemove = []
       if (interfaceRepsRef.current.pd1?.ref) {
         repsToRemove.push(interfaceRepsRef.current.pd1.ref)
@@ -493,7 +386,6 @@ const Pd1PoseOverlayViewer = ({ title }) => {
         ...(option.typeParams ? { typeParams: option.typeParams } : {}),
       })
 
-      // Add interface representations based on active ligand
       if (activeLigand === "pdl1") {
         if (interfaceComponentsRef.current.pd1Pdl1) {
           interfaceRepsRef.current.pd1 =
@@ -529,202 +421,39 @@ const Pd1PoseOverlayViewer = ({ title }) => {
     })
   }, [activeLigand, interfaceStyle, isStructureReady])
 
-  if (error) {
-    return <div style={{ color: "red", padding: "20px" }}>Error: {error}</div>
-  }
-
-  const styles = {
-    container: {
-      display: "flex",
-      flexDirection: "column",
-      width: "100%",
-      gap: "12px",
-      marginBottom: "20px",
-    },
-    title: {
-      textAlign: "center",
-      margin: 0,
-      fontSize: "1.1rem",
-      fontWeight: 600,
-    },
-    viewerWrapper: {
-      position: "relative",
-      width: "100%",
-      height: "min(440px, 70vh)",
-      minHeight: "300px",
-      borderRadius: "12px",
-      overflow: "hidden",
-      backgroundColor: "#f5f5f5",
-    },
-    viewer: {
-      width: "100%",
-      height: "100%",
-    },
-    loading: {
-      position: "absolute",
-      inset: 0,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      color: "#444",
-      fontSize: "0.95rem",
-      background: "rgba(255, 255, 255, 0.7)",
-    },
-    controlsOverlay: {
-      position: "absolute",
-      bottom: "10px",
-      right: "10px",
-      display: "flex",
-      flexDirection: "column",
-      gap: "6px",
-      padding: "8px 10px",
-      borderRadius: "8px",
-      background: "rgba(255, 255, 255, 0.9)",
-      fontSize: "0.8rem",
-      color: "#1f2933",
-      zIndex: 15,
-    },
-    controlRow: {
-      display: "flex",
-      alignItems: "center",
-      gap: "8px",
-    },
-    controlsLabel: {
-      fontWeight: 500,
-      minWidth: "52px",
-    },
-    segmentedControl: {
-      display: "flex",
-      background: "rgba(0, 0, 0, 0.06)",
-      borderRadius: "6px",
-      padding: "2px",
-    },
-    segment: {
-      padding: "6px 10px",
-      border: "none",
-      background: "transparent",
-      fontSize: "0.75rem",
-      fontWeight: 500,
-      color: "#616e7c",
-      cursor: "pointer",
-      borderRadius: "4px",
-      transition: "all 150ms ease",
-      WebkitTapHighlightColor: "transparent",
-    },
-    segmentActive: {
-      background: "white",
-      color: "#1f2933",
-      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-    },
-    legend: {
-      display: "flex",
-      alignItems: "center",
-      gap: "10px",
-      position: "absolute",
-      top: "10px",
-      left: "10px",
-      padding: "6px 10px",
-      borderRadius: "999px",
-      background: "rgba(255, 255, 255, 0.9)",
-      fontSize: "0.85rem",
-      color: "#1f2933",
-      zIndex: 15,
-    },
-    legendItem: {
-      display: "flex",
-      alignItems: "center",
-      gap: "6px",
-    },
-    swatch: {
-      width: "12px",
-      height: "12px",
-      borderRadius: "3px",
-      display: "inline-block",
-    },
-  }
-
-  const ligandOptions = [
-    { id: "pdl1", label: "PD-L1" },
-    { id: "keytruda", label: "Keytruda" },
+  const legendItems = [
+    { label: "PD-1", color: PD_1_COLOR },
+    { label: "PD-L1", color: PD_L1_COLOR, opacity: activeLigand === "pdl1" ? 1 : 0.4 },
+    { label: "Keytruda", color: KEYTRUDA_COLOR, opacity: activeLigand === "keytruda" ? 1 : 0.4 },
   ]
 
   return (
-    <div style={styles.container}>
-      {title && <h3 style={styles.title}>{title}</h3>}
-      <div style={styles.viewerWrapper}>
-        <div ref={containerRef} style={styles.viewer} />
-        {isLoading && <div style={styles.loading}>Loading...</div>}
-        <div style={styles.legend}>
-          <div style={styles.legendItem}>
-            <span
-              style={{
-                ...styles.swatch,
-                background: `#${PD_1_COLOR.toString(16)}`,
-              }}
-            />
-            PD-1
-          </div>
-          <div style={styles.legendItem}>
-            <span
-              style={{
-                ...styles.swatch,
-                background: `#${PD_L1_COLOR.toString(16)}`,
-                opacity: activeLigand === "pdl1" ? 1 : 0.4,
-              }}
-            />
-            PD-L1
-          </div>
-          <div style={styles.legendItem}>
-            <span
-              style={{
-                ...styles.swatch,
-                background: `#${KEYTRUDA_COLOR.toString(16)}`,
-                opacity: activeLigand === "keytruda" ? 1 : 0.4,
-              }}
-            />
-            Keytruda
-          </div>
+    <ViewerShell
+      ref={containerRef}
+      title={title}
+      isLoading={isLoading}
+      error={error}
+    >
+      <Legend items={legendItems} />
+      <div style={controlStyles.container}>
+        <div style={controlStyles.row}>
+          <span style={controlStyles.label}>Ligand</span>
+          <SegmentedControl
+            options={LIGAND_OPTIONS}
+            value={activeLigand}
+            onChange={setActiveLigand}
+          />
         </div>
-        <div style={styles.controlsOverlay}>
-          <div style={styles.controlRow}>
-            <span style={styles.controlsLabel}>Ligand</span>
-            <div style={styles.segmentedControl}>
-              {ligandOptions.map(option => (
-                <button
-                  key={option.id}
-                  type="button"
-                  onClick={() => setActiveLigand(option.id)}
-                  style={{
-                    ...styles.segment,
-                    ...(activeLigand === option.id ? styles.segmentActive : {}),
-                  }}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div style={styles.controlRow}>
-            <span style={styles.controlsLabel}>Interface</span>
-            <div style={styles.segmentedControl}>
-              {INTERFACE_REP_OPTIONS.map(option => (
-                <button
-                  key={option.id}
-                  type="button"
-                  onClick={() => setInterfaceStyle(option.id)}
-                  style={{
-                    ...styles.segment,
-                    ...(interfaceStyle === option.id ? styles.segmentActive : {}),
-                  }}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
+        <div style={controlStyles.row}>
+          <span style={controlStyles.label}>Interface</span>
+          <SegmentedControl
+            options={INTERFACE_REP_OPTIONS}
+            value={interfaceStyle}
+            onChange={setInterfaceStyle}
+          />
         </div>
       </div>
-    </div>
+    </ViewerShell>
   )
 }
 
