@@ -18,6 +18,8 @@ import { controlStyles } from "./shared/styles"
 import ViewerShell from "./components/ViewerShell"
 import Legend from "./components/Legend"
 import SegmentedControl from "./components/SegmentedControl"
+import HoverInfo from "./components/HoverInfo"
+import useHoverInfo from "./hooks/useHoverInfo"
 
 const Pd1KeytrudaViewer = ({ title }) => {
   const containerRef = useRef(null)
@@ -256,6 +258,8 @@ const Pd1KeytrudaViewer = ({ title }) => {
     })
   }, [interfaceStyle, isStructureReady])
 
+  const hoverInfo = useHoverInfo(pluginRef, containerRef, isStructureReady)
+
   const legendItems = [
     { label: "PD-1", color: PD_1_COLOR },
     { label: "Keytruda", color: KEYTRUDA_COLOR },
@@ -269,6 +273,7 @@ const Pd1KeytrudaViewer = ({ title }) => {
       error={error}
     >
       <Legend items={legendItems} />
+      <HoverInfo info={hoverInfo} chainNames={{ A: "Keytruda", B: "Keytruda", C: "PD-1" }} />
       <div style={controlStyles.container}>
         <div style={controlStyles.row}>
           <span style={controlStyles.label}>Interface</span>

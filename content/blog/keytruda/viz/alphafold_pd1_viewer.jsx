@@ -3,6 +3,8 @@ import { DefaultPluginSpec } from "molstar/lib/mol-plugin/spec"
 import { PluginContext } from "molstar/lib/mol-plugin/context"
 import ViewerShell from "./components/ViewerShell"
 import Legend from "./components/Legend"
+import HoverInfo from "./components/HoverInfo"
+import useHoverInfo from "./hooks/useHoverInfo"
 
 const ALPHAFOLD_URL =
   "https://alphafold.ebi.ac.uk/files/AF-Q15116-F1-model_v6.pdb"
@@ -18,6 +20,7 @@ const AlphafoldPd1Viewer = ({ title }) => {
   const containerRef = useRef(null)
   const pluginRef = useRef(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isStructureReady, setIsStructureReady] = useState(false)
   const [error, setError] = useState(null)
 
   useEffect(() => {
@@ -105,6 +108,7 @@ const AlphafoldPd1Viewer = ({ title }) => {
           )
         }
 
+        setIsStructureReady(true)
         setIsLoading(false)
       } catch (e) {
         setError(`Failed to load AlphaFold structure: ${e.message}`)
@@ -119,8 +123,11 @@ const AlphafoldPd1Viewer = ({ title }) => {
         pluginRef.current.dispose()
         pluginRef.current = null
       }
+      setIsStructureReady(false)
     }
   }, [])
+
+  const hoverInfo = useHoverInfo(pluginRef, containerRef, isStructureReady)
 
   return (
     <ViewerShell
@@ -130,6 +137,7 @@ const AlphafoldPd1Viewer = ({ title }) => {
       error={error}
     >
       <Legend items={PLDDT_LEGEND} />
+      <HoverInfo info={hoverInfo} chainNames={{ A: "PD-1" }} />
     </ViewerShell>
   )
 }

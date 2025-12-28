@@ -30,6 +30,8 @@ import { controlStyles } from "./shared/styles"
 import ViewerShell from "./components/ViewerShell"
 import Legend from "./components/Legend"
 import SegmentedControl from "./components/SegmentedControl"
+import HoverInfo from "./components/HoverInfo"
+import useHoverInfo from "./hooks/useHoverInfo"
 
 const LIGAND_OPTIONS = [
   { id: "pdl1", label: "PD-L1" },
@@ -421,6 +423,8 @@ const Pd1PoseOverlayViewer = ({ title }) => {
     })
   }, [activeLigand, interfaceStyle, isStructureReady])
 
+  const hoverInfo = useHoverInfo(pluginRef, containerRef, isStructureReady)
+
   const legendItems = [
     { label: "PD-1", color: PD_1_COLOR },
     { label: "PD-L1", color: PD_L1_COLOR, opacity: activeLigand === "pdl1" ? 1 : 0.4 },
@@ -435,6 +439,7 @@ const Pd1PoseOverlayViewer = ({ title }) => {
       error={error}
     >
       <Legend items={legendItems} />
+      <HoverInfo info={hoverInfo} chainNames={{ A: activeLigand === "pdl1" ? "PD-L1" : "Keytruda", B: activeLigand === "pdl1" ? "PD-1" : "Keytruda", C: "PD-1" }} />
       <div style={controlStyles.container}>
         <div style={controlStyles.row}>
           <span style={controlStyles.label}>Ligand</span>
