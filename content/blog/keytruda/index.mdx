@@ -16,12 +16,12 @@ Rarely in the history of medicine has a single drug created a seismic shift as p
 
 Keytruda's story is a circuitous one of setbacks and breakthroughs, serendipity and resilience. You can read about it in this [excellent article](https://www.forbes.com/sites/davidshaywitz/2017/07/26/the-startling-history-behind-mercks-new-cancer-blockbuster/). This blog post focuses on the science of how it works, grounded in visualizations of the key molecular players. My goal is to share, though this example, a sense of wonder at the intricate inner structures of life – and how extraordinary it is that we’ve learned to influence them.
 
-## PD-1 & immune regulation
+## Checks & balances in our immune system
 
 T cells detect and destroy cancer cells. They are tightly regulated to prevent misdirected attacks on healthy cells. For example, **PD-1** (programmed cell death protein 1) is a protein on the surface of T cells that acts like an "off-switch". When PD-1 binds to its partner protein, **PD-L1** (programmed death-ligand 1), it signals the T cell to halt its attack.
 
 <LazyVisualizationWrapper placeholder="Loading PD-1/PD-L1 complex...">
-  <Pd1Pdl1Viewer title="PD-1 & PD-L1 (PDB 3BIK)" />
+  <Pd1Pdl1Viewer title="PD-1/PD-L1 interface (PDB 3BIK)" />
 </LazyVisualizationWrapper>
 
 Here's a close-up of PD-L1 binding PD-1. Try the toggles for a few ways of visualizing the interface interactions. Notice how the two proteins fit together: molecular recognition is governed by shape complementarity and hydrogen bonding at the interface.
@@ -37,20 +37,34 @@ Above are just the extracellular portion of PD-1 and PD-L1. Both are transmembra
 Though these disordered tails elude our experimental methods of structure determination, we can guess at their structure using computational tools. Here's the [AlphaFold2 prediction](https://alphafold.ebi.ac.uk/entry/Q15116) of the full PD-1 sequence, colored by confidence (pLDDT):
 
 <LazyVisualizationWrapper placeholder="Loading AlphaFold PD-1 structure...">
-  <AlphafoldPd1Viewer title="PD-1 AF2 predicted structure (UniProt Q15116)" />
+  <AlphafoldPd1Viewer title="PD-1 full structure predicted by AF2 (UniProt Q15116)" />
 </LazyVisualizationWrapper>
 
-The extracellular binding domain and the transmembrane helix are predicted with high confidence.
+The extracellular binding domain and the transmembrane helix are predicted with high confidence, while the intracellular tail appears disordered with low confidence. When PD-L1 binds to PD-1, subtle structural changes occur in PD-1's intracellular tail that trigger a cascade of events leading to the T cell's inactivation.
 
-## Keytruda blocks PD-L1
+## Exploit & counter
 
-Now compare that with PD-1 bound to Keytruda (pembrolizumab). The antibody grips a broader, shifted surface on PD-1 compared with PD-L1. Toggle the interface view to see how the Keytruda footprint wraps across a different face.
+It is perhaps unsurprising that a common strategy used by cancer cells to evade our immune system is by expressing PD-L1. Using PD-L1, cancer cells engage PD-1 and disarm the T cell.
+
+<Figure
+  content={<Image path={require("./images/tumor_tcell_interactions.jpg")} />}
+>
+  [https://visualsonline.cancer.gov/details.cfm?imageid=10396](https://visualsonline.cancer.gov/details.cfm?imageid=10396)
+</Figure>
+
+If we can block cancer cells from activating PD-1, then we can unleash the T cell's ability to kill the cancer cells. That's the key insight behind Keytruda.
+
+## Keytruda
+
+Keytruda, also known as pembrolizumab, is an antibody that it also binds to PD-1.
 
 <LazyVisualizationWrapper placeholder="Loading PD-1/Keytruda complex...">
-  <Pd1KeytrudaViewer title="PD-1 & Keytruda (PDB 5B8C)" />
+  <Pd1KeytrudaViewer title="PD-1 & Keytruda interface (PDB 5B8C)" />
 </LazyVisualizationWrapper>
 
-Now superpose the two complexes so PD-1 stays fixed in place. Toggle the ligand to see how the Keytruda pose shifts relative to PD-L1.
+Compared to PD-L1, Keytruda binds a shifted surface of PD-1; due to such subtle differences in the binding interaction, it does not trigger T cell inactivation. Crucially, with Keytruda bound, PD-1 is blocked from interacting with PD-L1.
+
+Here's a comparison of the binding poses of PD-L1 vs. Keytruda. Use the toggles to switch between the two.
 
 <LazyVisualizationWrapper placeholder="Loading PD-1 binding pose overlay...">
   <Pd1PoseOverlayViewer title="PD-1 binding PD-L1 vs. Keytruda" />
