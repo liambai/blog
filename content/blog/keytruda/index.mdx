@@ -1,13 +1,14 @@
 ---
-title: "A structural guide to the miracle cancer drug Keytruda"
+title: "A visual guide to the miracle cancer drug Keytruda"
 date: "2025-12-25"
 description: "TODO"
 ---
 
 import LazyVisualizationWrapper from "../../../src/components/lazy-visualization-wrapper.jsx"
-import Pd1Pdl1Viewer from "./d3/pd1_pdl1_viewer"
-import Pd1KeytrudaViewer from "./d3/pd1_keytruda_viewer"
-import Pd1PoseOverlayViewer from "./d3/pd1_pose_overlay_viewer"
+import Pd1Pdl1Viewer from "./viz/pd1_pdl1_viewer"
+import Pd1KeytrudaViewer from "./viz/pd1_keytruda_viewer"
+import Pd1PoseOverlayViewer from "./viz/pd1_pose_overlay_viewer"
+import AlphafoldPd1Viewer from "./viz/alphafold_pd1_viewer"
 import Figure from "../../../src/components/figure.jsx"
 import Image from "../../../src/components/image.jsx"
 
@@ -23,9 +24,9 @@ T cells detect and destroy cancer cells. They are tightly regulated to prevent m
   <Pd1Pdl1Viewer title="PD-1 & PD-L1 (PDB 3BIK)" />
 </LazyVisualizationWrapper>
 
-Here's a close-up of PD-L1 binding PD-1. Use the selector to try a few ways of visualization the interface interactions. Notice how the two proteins fit together: molecular recognition is governed by shape complementarity and hydrogen bonding at the interface.
+Here's a close-up of PD-L1 binding PD-1. Try the toggles for a few ways of visualizing the interface interactions. Notice how the two proteins fit together: molecular recognition is governed by shape complementarity and hydrogen bonding at the interface.
 
-What we've seen is just the extracellular portion of PD-1 and PD-L1. Both are transmembrane proteins anchored in cell membranes, with flexible tails extending into the cell interior.
+Above are just the extracellular portion of PD-1 and PD-L1. Both are transmembrane proteins anchored in cell membranes, with flexible tails extending into the cell interior.
 
 <Figure
   content={<Image path={require("./images/PD1_PDL1_with_membranes.png")} />}
@@ -33,7 +34,13 @@ What we've seen is just the extracellular portion of PD-1 and PD-L1. Both are tr
   TODO
 </Figure>
 
-Because these tails are too disordered to capture with current experimental methods...
+Though these disordered tails elude our experimental methods of structure determination, we can guess at their structure using computational tools. Here's the [AlphaFold2 prediction](https://alphafold.ebi.ac.uk/entry/Q15116) of the full PD-1 sequence, colored by confidence (pLDDT):
+
+<LazyVisualizationWrapper placeholder="Loading AlphaFold PD-1 structure...">
+  <AlphafoldPd1Viewer title="PD-1 AF2 predicted structure (UniProt Q15116)" />
+</LazyVisualizationWrapper>
+
+The extracellular binding domain and the transmembrane helix are predicted with high confidence.
 
 ## Keytruda blocks PD-L1
 
