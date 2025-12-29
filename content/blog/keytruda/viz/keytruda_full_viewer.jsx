@@ -160,8 +160,8 @@ const KeytrudaFullViewer = ({ title }) => {
   const hoverInfo = useHoverInfo(pluginRef, containerRef, isStructureReady)
 
   const legendItems = [
-    { label: "Fv", color: FV_COLOR },
-    { label: "Constant", color: CONST_COLOR },
+    { label: "Variant fragments", color: FV_COLOR },
+    { label: "Constant region", color: CONST_COLOR },
   ]
 
   const chainNames = {
