@@ -12,6 +12,7 @@ import KeytrudaFullViewer from "./viz/keytruda_full_viewer"
 import AlphafoldPd1Viewer from "./viz/alphafold_pd1_viewer"
 import Figure from "../../../src/components/figure.jsx"
 import Image from "../../../src/components/image.jsx"
+import { Note, NoteList } from "./Notes.jsx"
 
 Rarely in the history of medicine has a single drug created a seismic shift as profound as **Keytruda**, the cancer drug developed by Merck. Since its approval in 2014, Keytruda has rewritten the survival statistic of over 15 cancer types and become the best-selling drug in the world, reaching $30 billion in sales last year alone.
 
@@ -19,7 +20,7 @@ Keytruda's story is a circuitous one of setbacks and breakthroughs, serendipity 
 
 ## Checks & balances in our immune system
 
-[T cells](https://en.wikipedia.org/wiki/T_cell) detect and destroy cancer cells. They are tightly regulated to prevent misdirected attacks on healthy cells. For example, **PD-1** (programmed cell death protein 1) is a protein on the surface of T cells that acts like an "off-switch". When PD-1 binds to its partner protein, **PD-L1** (programmed death-ligand 1), it signals the T cell to halt its attack.
+[T cells](https://en.wikipedia.org/wiki/T_cell) detect and destroy cancer cells. They are tightly regulated to prevent misdirected attacks on healthy cells. For example, **PD-1** (programmed cell death protein 1)<Note id={1}/> is a protein on the surface of T cells that acts like an "off-switch". When PD-1 binds to its partner protein, **PD-L1** (programmed death-ligand 1), it signals the T cell to halt its attack.
 
 <LazyVisualizationWrapper placeholder="Loading PD-1/PD-L1 complex...">
   <Pd1Pdl1Viewer title="PD-1/PD-L1 interface (PDB 3BIK)" />
@@ -89,3 +90,5 @@ With the molecular mechanisms in mind, we can better understand how Keytruda res
 3. Keytruda catalyzed major regulatory innovation, including one of the first biomarker-based approvals. The FDA authorized Keytruda for all patients with the PD-L1 biomarker _regardless of cancer type_, a significant departure from the traditional model where approvals are limited to, say, only melanoma or lung cancer.
 
 In the end, so much of life (and life-saving medicines!) comes down to these molecular dances of shape fitting. Messy, elegant, beautiful – like the dance between PD-1 and PD-L1, evolved over millions of years, hijacked by cancer, and now outmaneuvered by human ingenuity.
+
+<NoteList />
