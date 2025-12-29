@@ -16,7 +16,7 @@ import { Note, NoteList } from "./Notes.jsx"
 
 Rarely in the history of medicine has a single drug created a seismic shift as profound as **Keytruda**, the cancer drug developed by Merck. Since its approval in 2014, Keytruda has rewritten the survival statistic of over 15 cancer types and become the best-selling drug in the world, reaching $30 billion in sales last year alone.
 
-Keytruda's story is a circuitous one of setbacks and breakthroughs, serendipity and resilience. You can read about it in this [excellent article](https://www.forbes.com/sites/davidshaywitz/2017/07/26/the-startling-history-behind-mercks-new-cancer-blockbuster/). In this blog post, I'll focus on the science of how it works, grounded in visualizations of the key molecular players. My goal is to share, though this example, a sense of wonder at the intricate inner structures of life – and how extraordinary it is that we’ve learned to influence them.
+Keytruda's story is a circuitous one of setbacks and breakthroughs, serendipity and resilience. You can read about it in this [excellent article](https://www.forbes.com/sites/davidshaywitz/2017/07/26/the-startling-history-behind-mercks-new-cancer-blockbuster/). In this blog post, I'll focus on the science of how it works, grounded in visualizations of the key molecular players. My goal is to share, through this example, a sense of wonder at the intricate inner structures of life – and how extraordinary it is that we’ve learned to influence them.
 
 ## Checks & balances in our immune system
 
@@ -28,12 +28,12 @@ Keytruda's story is a circuitous one of setbacks and breakthroughs, serendipity 
 
 Here's a close-up of PD-L1 binding PD-1. Try the toggles for a few ways of visualizing the interface interactions. Notice how the two proteins fit together: molecular recognition is governed by shape complementarity and hydrogen bonding at the interface.
 
-Above are just the extracellular portion of PD-1 and PD-L1. Both are transmembrane proteins anchored in cell membranes, with flexible tails extending into the cell's interior.
+Above are just the extracellular portions of PD-1 and PD-L1. Both are transmembrane proteins anchored in cell membranes, with flexible tails extending into the cell's interior.
 
 <Figure
   content={<Image path={require("./images/PD1_PDL1_with_membranes.png")} />}
 >
-  PD-1 binding PD-L1. Grey vertical regions represent the cell membranes.
+  PD-1 binding to PD-L1. Grey vertical regions represent the cell membranes.
   Adapted from
   [https://pdb101.rcsb.org/motm/204](https://pdb101.rcsb.org/motm/204).
 </Figure>
@@ -84,7 +84,7 @@ The Keytruda structure above shows only the **variable fragment**, the antigen-b
   <KeytrudaFullViewer title="Full Keytruda antibody (PDB 5DK3)" />
 </LazyVisualizationWrapper>
 
-Because the antibody has two arms, each Keytruda molecule can bind to two PD-1 molecules.
+Because the antibody has two arms, each Keytruda molecule can, in principle, bind to two PD-1 molecules.
 
 ## The impacts of Keytruda
 
