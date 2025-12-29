@@ -1,7 +1,7 @@
 ---
 title: "A visual guide to Keytruda"
 date: "2025-12-30"
-description: "TODO"
+description: PD-1/PD-L1, immuno-oncology, checkpoint inhibition, molecular visualizations, antibody structure.
 ---
 
 import LazyVisualizationWrapper from "../../../src/components/lazy-visualization-wrapper.jsx"
@@ -13,9 +13,9 @@ import AlphafoldPd1Viewer from "./viz/alphafold_pd1_viewer"
 import Figure from "../../../src/components/figure.jsx"
 import Image from "../../../src/components/image.jsx"
 
-Rarely in the history of medicine has a single drug created a seismic shift as profound as **Keytruda**, the cancer drug developed by Merck. Since its approval in 2014, Keytruda has rewritten the survival statistic of over 15 types of cancer, won a Nobel Prize, and reached $30 billion in sales last year alone.
+Rarely in the history of medicine has a single drug created a seismic shift as profound as **Keytruda**, the cancer drug developed by Merck. Since its approval in 2014, Keytruda has rewritten the survival statistic of over 15 cancer types and become the best-selling drug in the world, reaching $30 billion in sales last year alone.
 
-Keytruda's story is a circuitous one of setbacks and breakthroughs, serendipity and resilience. You can read about it in this [excellent article](https://www.forbes.com/sites/davidshaywitz/2017/07/26/the-startling-history-behind-mercks-new-cancer-blockbuster/). This blog post focuses on the science of how it works, grounded in visualizations of the key molecular players. My goal is to share, though this example, a sense of wonder at the intricate inner structures of life – and how extraordinary it is that we’ve learned to influence them.
+Keytruda's story is a circuitous one of setbacks and breakthroughs, serendipity and resilience. You can read about it in this [excellent article](https://www.forbes.com/sites/davidshaywitz/2017/07/26/the-startling-history-behind-mercks-new-cancer-blockbuster/). In this blog post, I'll focus on the science of how it works, grounded in visualizations of the key molecular players. My goal is to share, though this example, a sense of wonder at the intricate inner structures of life – and how extraordinary it is that we’ve learned to influence them.
 
 ## Checks & balances in our immune system
 
@@ -42,7 +42,7 @@ Though these disordered tails elude our experimental methods of structure determ
   <AlphafoldPd1Viewer title="PD-1 full structure predicted by AF2 (UniProt Q15116)" />
 </LazyVisualizationWrapper>
 
-The extracellular binding domain and the transmembrane helix are predicted with high confidence, while the intracellular tail appears disordered with low confidence. When PD-L1 binds to PD-1, subtle structural changes occur in PD-1's intracellular tail that trigger a cascade of events leading to the T cell's inactivation.
+The extracellular binding domain and the transmembrane helix are predicted with high confidence, while the intracellular tail appears disordered with low confidence. When PD-L1 binds to PD-1, PD-1's intracellular tail triggers a cascade of events leading to the T cell's inactivation.
 
 ## Exploit & counter
 
@@ -64,7 +64,7 @@ Keytruda, also known as **pembrolizumab**, is an antibody that also binds to PD-
   <Pd1KeytrudaViewer title="PD-1 & Keytruda interface (PDB 5B8C)" />
 </LazyVisualizationWrapper>
 
-Compared to PD-L1, Keytruda binds a shifted surface of PD-1; due to such subtle differences in the binding interaction, it does not trigger T cell inactivation. Crucially, with Keytruda bound, PD-1 is blocked from interacting with PD-L1.
+Compared to PD-L1, Keytruda binds a shifted surface of PD-1 and therefore does not trigger any downstream signaling. Crucially, with Keytruda bound, PD-1 is blocked from interacting with PD-L1.
 
 Here's a comparison of the binding poses of PD-L1 vs. Keytruda. Use the toggles to switch between the two.
 
