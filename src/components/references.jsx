@@ -18,7 +18,7 @@ export default function getReferenceComponents(references) {
           {Object.entries(references).map(([id, ref]) => (
             <li key={id} style={{ fontSize: 13, color: "slategrey" }}>
               <p>
-                {ref.author} <a href={ref.url}>{ref.title}</a>. {ref.journal} (
+                {ref.author} <a href={ref.url} target="_blank" rel="noopener noreferrer">{ref.title}</a>. {ref.journal} (
                 {ref.year}).
               </p>
             </li>
@@ -29,7 +29,7 @@ export default function getReferenceComponents(references) {
           {Object.entries(references).map(([id, ref]) => (
             <li key={id} className="footnote" id={`fn:${id}`}>
               <p>
-                {ref.author} <a href={ref.url}>{ref.title}</a>. {ref.journal} (
+                {ref.author} <a href={ref.url} target="_blank" rel="noopener noreferrer">{ref.title}</a>. {ref.journal} (
                 {ref.year}).
               </p>
             </li>

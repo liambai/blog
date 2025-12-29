@@ -1,0 +1,128 @@
+export const viewerStyles = {
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+    gap: "12px",
+    marginBottom: "20px",
+  },
+  title: {
+    textAlign: "center",
+    margin: 0,
+    fontSize: "1.1rem",
+    fontWeight: 600,
+  },
+  viewerWrapper: {
+    position: "relative",
+    width: "100%",
+    height: "min(440px, 70vh)",
+    minHeight: "300px",
+    borderRadius: "12px",
+    overflow: "hidden",
+    backgroundColor: "#f5f5f5",
+  },
+  viewer: {
+    width: "100%",
+    height: "100%",
+  },
+  loading: {
+    position: "absolute",
+    inset: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#444",
+    fontSize: "0.95rem",
+    background: "rgba(255, 255, 255, 0.7)",
+  },
+  overlay: {
+    position: "absolute",
+    padding: "6px 10px",
+    borderRadius: "8px",
+    background: "rgba(255, 255, 255, 0.9)",
+    fontSize: "0.8rem",
+    color: "#1f2933",
+    zIndex: 15,
+  },
+  error: {
+    color: "red",
+    padding: "20px",
+  },
+}
+
+export const legendStyles = {
+  container: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    position: "absolute",
+    top: "10px",
+    left: "10px",
+    padding: "6px 10px",
+    borderRadius: "8px",
+    background: "rgba(255, 255, 255, 0.9)",
+    fontSize: "0.85rem",
+    color: "#1f2933",
+    zIndex: 15,
+  },
+  item: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+  },
+  swatch: {
+    width: "12px",
+    height: "12px",
+    borderRadius: "3px",
+    display: "inline-block",
+  },
+}
+
+export const controlStyles = {
+  container: {
+    position: "absolute",
+    bottom: "10px",
+    right: "10px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "6px",
+    padding: "8px 10px",
+    borderRadius: "8px",
+    background: "rgba(255, 255, 255, 0.9)",
+    fontSize: "0.8rem",
+    color: "#1f2933",
+    zIndex: 15,
+  },
+  row: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+  },
+  label: {
+    fontWeight: 500,
+    minWidth: "52px",
+  },
+  segmentedControl: {
+    display: "flex",
+    background: "rgba(0, 0, 0, 0.06)",
+    borderRadius: "6px",
+    padding: "2px",
+  },
+  segment: {
+    padding: "6px 10px",
+    border: "none",
+    background: "transparent",
+    fontSize: "0.75rem",
+    fontWeight: 500,
+    color: "#616e7c",
+    cursor: "pointer",
+    borderRadius: "4px",
+    transition: "all 150ms ease",
+    WebkitTapHighlightColor: "transparent",
+  },
+  segmentActive: {
+    background: "white",
+    color: "#1f2933",
+    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+  },
+}

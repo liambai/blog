@@ -31,10 +31,10 @@ const Bio = () => {
       <Avatar className="bio-avatar" alt="Profile picture" size={50} />
       <p>
         Written by <strong>Liam Bai</strong>, who works on software at{" "}
-        <a href="https://generatebiomedicines.com/">Generate:Biomedicines</a>{" "}
+        <a href="https://generatebiomedicines.com/" target="_blank" rel="noopener noreferrer">Generate:Biomedicines</a>{" "}
         and writes about machine learning and biology. He is on{" "}
-        <a href={`https://x.com/${social.twitter}`}>Twitter</a> and{" "}
-        <a href={`https://www.linkedin.com/in/${social.linkedin}`}>LinkedIn</a>.
+        <a href={`https://x.com/${social.twitter}`} target="_blank" rel="noopener noreferrer">Twitter</a> and{" "}
+        <a href={`https://www.linkedin.com/in/${social.linkedin}`} target="_blank" rel="noopener noreferrer">LinkedIn</a>.
       </p>
     </div>
   )
