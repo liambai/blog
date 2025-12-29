@@ -13,13 +13,13 @@ import AlphafoldPd1Viewer from "./viz/alphafold_pd1_viewer"
 import Figure from "../../../src/components/figure.jsx"
 import Image from "../../../src/components/image.jsx"
 
-Rarely in the history of medicine has a single drug created a seismic shift as profound as Keytruda, the cancer drug developed by Merck. Since its approval in 2014, Keytruda has rewritten the survival statistic of over 15 types of cancer, won a Nobel Prize, and reached $30 billion in sales last year alone.
+Rarely in the history of medicine has a single drug created a seismic shift as profound as **Keytruda**, the cancer drug developed by Merck. Since its approval in 2014, Keytruda has rewritten the survival statistic of over 15 types of cancer, won a Nobel Prize, and reached $30 billion in sales last year alone.
 
 Keytruda's story is a circuitous one of setbacks and breakthroughs, serendipity and resilience. You can read about it in this [excellent article](https://www.forbes.com/sites/davidshaywitz/2017/07/26/the-startling-history-behind-mercks-new-cancer-blockbuster/). This blog post focuses on the science of how it works, grounded in visualizations of the key molecular players. My goal is to share, though this example, a sense of wonder at the intricate inner structures of life – and how extraordinary it is that we’ve learned to influence them.
 
 ## Checks & balances in our immune system
 
-T cells detect and destroy cancer cells. They are tightly regulated to prevent misdirected attacks on healthy cells. For example, **PD-1** (programmed cell death protein 1) is a protein on the surface of T cells that acts like an "off-switch". When PD-1 binds to its partner protein, **PD-L1** (programmed death-ligand 1), it signals the T cell to halt its attack.
+[T cells](https://en.wikipedia.org/wiki/T_cell) detect and destroy cancer cells. They are tightly regulated to prevent misdirected attacks on healthy cells. For example, **PD-1** (programmed cell death protein 1) is a protein on the surface of T cells that acts like an "off-switch". When PD-1 binds to its partner protein, **PD-L1** (programmed death-ligand 1), it signals the T cell to halt its attack.
 
 <LazyVisualizationWrapper placeholder="Loading PD-1/PD-L1 complex...">
   <Pd1Pdl1Viewer title="PD-1/PD-L1 interface (PDB 3BIK)" />
@@ -27,7 +27,7 @@ T cells detect and destroy cancer cells. They are tightly regulated to prevent m
 
 Here's a close-up of PD-L1 binding PD-1. Try the toggles for a few ways of visualizing the interface interactions. Notice how the two proteins fit together: molecular recognition is governed by shape complementarity and hydrogen bonding at the interface.
 
-Above are just the extracellular portion of PD-1 and PD-L1. Both are transmembrane proteins anchored in cell membranes, with flexible tails extending into the cell interior.
+Above are just the extracellular portion of PD-1 and PD-L1. Both are transmembrane proteins anchored in cell membranes, with flexible tails extending into the cell's interior.
 
 <Figure
   content={<Image path={require("./images/PD1_PDL1_with_membranes.png")} />}
@@ -58,7 +58,7 @@ If we can block cancer cells from activating PD-1, then we can unleash the T cel
 
 ## Keytruda
 
-Keytruda, also known as pembrolizumab, is an antibody that also binds to PD-1.
+Keytruda, also known as **pembrolizumab**, is an antibody that also binds to PD-1.
 
 <LazyVisualizationWrapper placeholder="Loading PD-1/Keytruda complex...">
   <Pd1KeytrudaViewer title="PD-1 & Keytruda interface (PDB 5B8C)" />
@@ -72,12 +72,20 @@ Here's a comparison of the binding poses of PD-L1 vs. Keytruda. Use the toggles 
   <Pd1PoseOverlayViewer title="PD-1 binding PD-L1 vs. Keytruda" />
 </LazyVisualizationWrapper>
 
-Here's the full Keytruda antibody, consisting of two heavy chains and two light chains arranged in the characteristic Y-shape:
+The Keytruda structure above is a fragment of the overall antibody with its characteristic Y shape. It is called the **variable fragment**, or **Fv**, in contrast with the stem region that tends to be constant.
 
 <LazyVisualizationWrapper placeholder="Loading full Keytruda structure...">
   <KeytrudaFullViewer title="Full Keytruda antibody (PDB 5DK3)" />
 </LazyVisualizationWrapper>
 
-## A new era in cancer treatment
+Because the antibody has two arms, each Keytruda molecule can bind to two PD-1 molecules.
 
-(TODO: de-slop) Looking at these molecular structures, I'm struck by how much of medicine comes down to shapes fitting together. The dance between PD-1 and PD-L1, evolved over millions of years, hijacked by cancer, and now interrupted by human ingenuity. It's a reminder that at the smallest scales, life is a mechanical process – and one we're learning to engineer.
+## The impacts of Keytruda
+
+With the molecular mechanisms in mind, we can better understand how Keytruda reshaped cancer therapy and continues to drive key trends in the pharma industry.
+
+1. Keytruda is the defining success story in the emerging field of **immuno-oncology**, leveraging the power of our immune system to attack cancer.
+2. Keytruda pioneered biomarker-driven clinical development, accelerating the industry’s shift toward targeted therapies. During development, Merck focused on patients with high levels of PD-L1 expression––evidence of the tumor exploiting the PD-1 pathway. Although this narrowed the set of eligible patients, it delivered ground-breaking efficacy.
+3. Keytruda catalyzed major regulatory innovation, including one of the first biomarker-based approvals. The FDA authorized Keytruda for all patients with the PD-L1 biomarker _regardless of cancer type_, a significant departure from the traditional model where approvals are limited to, say, only melanoma or lung cancer.
+
+In the end, so much of life (and life-saving medicines!) comes down to these molecular dances of shape fitting. Messy, elegant, beautiful – like the dance between PD-1 and PD-L1, evolved over millions of years, hijacked by cancer, and now outmaneuvered by human ingenuity.
