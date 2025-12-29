@@ -1,10 +1,28 @@
 import * as React from "react"
 import { Link, graphql } from "gatsby"
+import { MDXProvider } from "@mdx-js/react"
 
 import Bio from "../components/bio"
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 import Comments from "../components/comments"
+
+// Custom link component that opens external links in new tab
+const ExternalLink = ({ href, children, ...props }) => {
+  const isExternal = href && (href.startsWith("http") || href.startsWith("//"))
+  if (isExternal) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" {...props}>
+        {children}
+      </a>
+    )
+  }
+  return <a href={href} {...props}>{children}</a>
+}
+
+const mdxComponents = {
+  a: ExternalLink,
+}
 
 const BlogPostTemplate = ({
   data: { previous, next, site, mdx: post },
@@ -24,7 +42,7 @@ const BlogPostTemplate = ({
             <h1 itemProp="headline">{post.frontmatter.title}</h1>
             <p>{post.frontmatter.date}</p>
           </header>
-          {children}
+          <MDXProvider components={mdxComponents}>{children}</MDXProvider>
           <hr />
           <Comments issueTerm={post.frontmatter.title} />
           <hr />

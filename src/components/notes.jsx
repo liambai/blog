@@ -35,7 +35,7 @@ function renderMarkdown(text) {
       {
         regex: /\[([^\]]+)\]\(([^)]+)\)/g,
         element: (match, text, url) => (
-          <a key={Math.random()} href={url}>
+          <a key={Math.random()} href={url} target="_blank" rel="noopener noreferrer">
             {text}
           </a>
         ),
