@@ -33,8 +33,9 @@ Above are just the extracellular portion of PD-1 and PD-L1. Both are transmembra
 <Figure
   content={<Image path={require("./images/PD1_PDL1_with_membranes.png")} />}
 >
+  PD-1 binding PD-L1. Grey vertical regions represent the cell membranes.
   Adapted from
-  [https://pdb101.rcsb.org/motm/204](https://pdb101.rcsb.org/motm/204)
+  [https://pdb101.rcsb.org/motm/204](https://pdb101.rcsb.org/motm/204).
 </Figure>
 
 Though these disordered tails elude our experimental methods of structure determination, we can guess at their structure using computational tools. Here's the [AlphaFold2 prediction](https://alphafold.ebi.ac.uk/entry/Q15116) of the full PD-1 sequence, colored by confidence (pLDDT):
@@ -52,7 +53,11 @@ It is perhaps unsurprising that **a common strategy cancer cells use to evade ou
 <Figure
   content={<Image path={require("./images/tumor_tcell_interactions.jpg")} />}
 >
-  [https://visualsonline.cancer.gov/details.cfm?imageid=10396](https://visualsonline.cancer.gov/details.cfm?imageid=10396)
+  Left: A tumor cell expressing PD-L1 can activate PD-1 and evade the T cell's
+  attack. Right: By blocking PD-L1 or PD-1 with another molecule, we can disrupt
+  the tumor's evasion strategy. Keytruda blocks PD-1 (shown as the red
+  triangle). Diagram from
+  [https://visualsonline.cancer.gov/details.cfm?imageid=10396](https://visualsonline.cancer.gov/details.cfm?imageid=10396).
 </Figure>
 
 If we can block cancer cells from activating PD-1, then we can unleash the T cell's ability to kill the cancer cells. That's the key insight behind Keytruda.
