@@ -97,7 +97,35 @@ With the molecular mechanisms in mind, we can better understand how Keytruda res
 
 In the end, so much of life (and life-saving medicines!) comes down to these molecular dances of shape fitting. Messy, elegant, beautiful – like the dance between PD-1 and PD-L1, evolved over millions of years, hijacked by cancer, and now outmaneuvered by human ingenuity.
 
-<FeedbackForm postTitle="A visual guide to Keytruda" />
+<FeedbackForm
+  postTitle="A visual guide to Keytruda"
+  questions={[
+    {
+      id: "understandingBefore",
+      type: "rating",
+      text: "Please rate your understanding of the PD-1 pathway before reading the post.",
+      labels: ["None", "Expert"],
+    },
+    {
+      id: "understandingAfter",
+      type: "rating",
+      text: "Please rate your understanding of the PD-1 pathway after reading the post.",
+      labels: ["None", "Expert"],
+    },
+    {
+      id: "unclear",
+      type: "text",
+      text: "What was unclear or confusing?",
+      placeholder: "Anything that could be explained better...",
+    },
+    {
+      id: "feedback",
+      type: "text",
+      text: "Any other feedback?",
+      placeholder: "Suggestions, corrections, or comments...",
+    },
+  ]}
+/>
 
 ## Acknowledgements
 

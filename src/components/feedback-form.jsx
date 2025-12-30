@@ -161,13 +161,14 @@ const styles = {
   },
 }
 
-const FeedbackForm = ({ postTitle }) => {
+const FeedbackForm = ({ postTitle, questions }) => {
   const [isExpanded, setIsExpanded] = useState(false)
-  const [understandingBefore, setUnderstandingBefore] = useState(null)
-  const [understandingAfter, setUnderstandingAfter] = useState(null)
-  const [unclear, setUnclear] = useState("")
-  const [feedback, setFeedback] = useState("")
+  const [answers, setAnswers] = useState({})
   const [status, setStatus] = useState("idle") // idle, submitting, success, error
+
+  const updateAnswer = (id, value) => {
+    setAnswers(prev => ({ ...prev, [id]: value }))
+  }
 
   const handleSubmit = async e => {
     e.preventDefault()
@@ -181,10 +182,7 @@ const FeedbackForm = ({ postTitle }) => {
         },
         body: JSON.stringify({
           postTitle,
-          understandingBefore,
-          understandingAfter,
-          unclear,
-          feedback,
+          ...answers,
         }),
       })
 
@@ -272,89 +270,47 @@ const FeedbackForm = ({ postTitle }) => {
       <form onSubmit={handleSubmit}>
         <input type="hidden" name="postTitle" value={postTitle} />
 
-        {/* Understanding Before */}
-        <fieldset style={styles.fieldset}>
-          <legend style={styles.legend}>
-            Please rate your understanding of the PD-1 pathway before reading
-            the post.
-          </legend>
-          <div style={styles.ratingContainer}>
-            <span style={styles.ratingLabel}>None</span>
-            <div style={styles.ratingGroup}>
-              {[1, 2, 3, 4, 5].map(num => (
-                <button
-                  key={num}
-                  type="button"
-                  onClick={() => setUnderstandingBefore(num)}
-                  style={{
-                    ...styles.ratingButton,
-                    ...(understandingBefore === num
-                      ? styles.ratingButtonSelected
-                      : {}),
-                  }}
-                  aria-label={`Rate ${num} out of 5`}
-                >
-                  {num}
-                </button>
-              ))}
-            </div>
-            <span style={styles.ratingLabel}>Expert</span>
-          </div>
-        </fieldset>
-
-        {/* Understanding After */}
-        <fieldset style={styles.fieldset}>
-          <legend style={styles.legend}>
-            Please rate your understanding of the PD-1 pathway after reading the
-            post.
-          </legend>
-          <div style={styles.ratingContainer}>
-            <span style={styles.ratingLabel}>None</span>
-            <div style={styles.ratingGroup}>
-              {[1, 2, 3, 4, 5].map(num => (
-                <button
-                  key={num}
-                  type="button"
-                  onClick={() => setUnderstandingAfter(num)}
-                  style={{
-                    ...styles.ratingButton,
-                    ...(understandingAfter === num
-                      ? styles.ratingButtonSelected
-                      : {}),
-                  }}
-                  aria-label={`Rate ${num} out of 5`}
-                >
-                  {num}
-                </button>
-              ))}
-            </div>
-            <span style={styles.ratingLabel}>Expert</span>
-          </div>
-        </fieldset>
-
-        {/* What was unclear */}
-        <fieldset style={styles.fieldset}>
-          <legend style={styles.legend}>What was unclear or confusing?</legend>
-          <textarea
-            name="unclear"
-            value={unclear}
-            onChange={e => setUnclear(e.target.value)}
-            style={styles.textarea}
-            placeholder="Anything that could be explained better..."
-          />
-        </fieldset>
-
-        {/* General Feedback */}
-        <fieldset style={styles.fieldset}>
-          <legend style={styles.legend}>Any other feedback?</legend>
-          <textarea
-            name="feedback"
-            value={feedback}
-            onChange={e => setFeedback(e.target.value)}
-            style={styles.textarea}
-            placeholder="Suggestions, corrections, or comments..."
-          />
-        </fieldset>
+        {questions.map(question => (
+          <fieldset key={question.id} style={styles.fieldset}>
+            <legend style={styles.legend}>{question.text}</legend>
+            {question.type === "rating" ? (
+              <div style={styles.ratingContainer}>
+                <span style={styles.ratingLabel}>
+                  {question.labels?.[0] || "Low"}
+                </span>
+                <div style={styles.ratingGroup}>
+                  {[1, 2, 3, 4, 5].map(num => (
+                    <button
+                      key={num}
+                      type="button"
+                      onClick={() => updateAnswer(question.id, num)}
+                      style={{
+                        ...styles.ratingButton,
+                        ...(answers[question.id] === num
+                          ? styles.ratingButtonSelected
+                          : {}),
+                      }}
+                      aria-label={`Rate ${num} out of 5`}
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+                <span style={styles.ratingLabel}>
+                  {question.labels?.[1] || "High"}
+                </span>
+              </div>
+            ) : (
+              <textarea
+                name={question.id}
+                value={answers[question.id] || ""}
+                onChange={e => updateAnswer(question.id, e.target.value)}
+                style={styles.textarea}
+                placeholder={question.placeholder || ""}
+              />
+            )}
+          </fieldset>
+        ))}
 
         <button
           type="submit"
