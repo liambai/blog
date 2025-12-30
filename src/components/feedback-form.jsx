@@ -275,8 +275,8 @@ const FeedbackForm = ({ postTitle }) => {
         {/* Understanding Before */}
         <fieldset style={styles.fieldset}>
           <legend style={styles.legend}>
-            Please rate your understanding of the PD-1 pathway and Keytruda
-            before reading the post.
+            Please rate your understanding of the PD-1 pathway before reading
+            the post.
           </legend>
           <div style={styles.ratingContainer}>
             <span style={styles.ratingLabel}>None</span>
@@ -305,8 +305,8 @@ const FeedbackForm = ({ postTitle }) => {
         {/* Understanding After */}
         <fieldset style={styles.fieldset}>
           <legend style={styles.legend}>
-            Please rate your understanding of the PD-1 pathway and Keytruda
-            after reading the post.
+            Please rate your understanding of the PD-1 pathway after reading the
+            post.
           </legend>
           <div style={styles.ratingContainer}>
             <span style={styles.ratingLabel}>None</span>
