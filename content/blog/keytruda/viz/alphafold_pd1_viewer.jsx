@@ -29,7 +29,7 @@ const EXPERIMENTAL_COLOR = 0x808080 // Gray for experimental structure
 
 const OVERLAY_OPTIONS = [
   { id: "off", label: "off" },
-  { id: "on", label: "off" },
+  { id: "on", label: "on" },
 ]
 
 const COLOR_MODE_OPTIONS = [
