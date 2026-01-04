@@ -7,9 +7,12 @@ const styles = {
     background: "var(--color-surface)",
     border: "1px solid var(--color-accent)",
     borderRadius: "var(--radius-md)",
-    padding: "var(--spacing-6)",
+    padding: "var(--spacing-4)",
     marginTop: "var(--spacing-8)",
     marginBottom: "var(--spacing-8)",
+    boxSizing: "border-box",
+    maxWidth: "100%",
+    overflow: "hidden",
   },
   title: {
     fontFamily: "var(--font-heading)",
@@ -57,21 +60,29 @@ const styles = {
   },
   ratingGroup: {
     display: "flex",
-    gap: "var(--spacing-2)",
+    gap: "var(--spacing-1)",
+    flexWrap: "wrap",
+    justifyContent: "center",
   },
   ratingContainer: {
     display: "flex",
-    alignItems: "center",
-    gap: "var(--spacing-3)",
+    flexDirection: "column",
+    alignItems: "stretch",
+    gap: "var(--spacing-2)",
+  },
+  ratingLabels: {
+    display: "flex",
+    justifyContent: "space-between",
+    width: "100%",
   },
   ratingLabel: {
     fontSize: "var(--fontSize-0)",
     color: "var(--color-text-light)",
-    whiteSpace: "nowrap",
   },
   ratingButton: {
-    width: "2.5rem",
+    minWidth: "2rem",
     height: "2.5rem",
+    flex: "1 1 auto",
     border: "1px solid var(--color-accent)",
     borderRadius: "var(--radius-md)",
     background: "var(--color-soft)",
@@ -137,13 +148,16 @@ const styles = {
     alignItems: "center",
     justifyContent: "space-between",
     cursor: "pointer",
-    padding: "var(--spacing-4) var(--spacing-6)",
+    padding: "var(--spacing-4)",
+    gap: "var(--spacing-3)",
     background: "var(--color-surface)",
     border: "1px solid var(--color-accent)",
     borderRadius: "var(--radius-md)",
     marginTop: "var(--spacing-8)",
     marginBottom: "var(--spacing-8)",
     transition: "background 0.2s ease",
+    boxSizing: "border-box",
+    maxWidth: "100%",
   },
   collapsedText: {
     fontFamily: "var(--font-body)",
@@ -155,6 +169,7 @@ const styles = {
     fontSize: "var(--fontSize-2)",
     color: "var(--color-text-light)",
     transition: "transform 0.2s ease",
+    flexShrink: 0,
   },
   chevronExpanded: {
     transform: "rotate(180deg)",
@@ -275,9 +290,6 @@ const FeedbackForm = ({ postTitle, questions }) => {
             <legend style={styles.legend}>{question.text}</legend>
             {question.type === "rating" ? (
               <div style={styles.ratingContainer}>
-                <span style={styles.ratingLabel}>
-                  {question.labels?.[0] || "Low"}
-                </span>
                 <div style={styles.ratingGroup}>
                   {[1, 2, 3, 4, 5].map(num => (
                     <button
@@ -296,9 +308,14 @@ const FeedbackForm = ({ postTitle, questions }) => {
                     </button>
                   ))}
                 </div>
-                <span style={styles.ratingLabel}>
-                  {question.labels?.[1] || "High"}
-                </span>
+                <div style={styles.ratingLabels}>
+                  <span style={styles.ratingLabel}>
+                    {question.labels?.[0] || "Low"}
+                  </span>
+                  <span style={styles.ratingLabel}>
+                    {question.labels?.[1] || "High"}
+                  </span>
+                </div>
               </div>
             ) : (
               <textarea
