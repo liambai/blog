@@ -1,0 +1,7 @@
+# pnpm 10 blocks dependency build scripts unless allowlisted here (its canonical
+# location, in addition to the `pnpm` field in package.json). esbuild needs its
+# postinstall to set up the platform binary; littlefoot is a git dependency that
+# builds its dist on install.
+onlyBuiltDependencies:
+  - esbuild
+  - littlefoot
