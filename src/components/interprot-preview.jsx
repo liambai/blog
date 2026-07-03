@@ -1,9 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react"
 import { FaHandPointer } from "react-icons/fa"
-import { DefaultPluginSpec } from "molstar/lib/mol-plugin/spec"
-import { PluginContext } from "molstar/lib/mol-plugin/context"
-import { CustomElementProperty } from "molstar/lib/mol-model-props/common/custom-element-property"
-import { Color } from "molstar/lib/mol-util/color"
 
 const PDB_ID = "7KYX"
 const ACTIVATION_VALUES = [
@@ -29,6 +25,8 @@ const ACTIVATION_VALUES = [
 const InterProtPreview = ({ width = "100%", height = "100%" }) => {
   const containerRef = useRef(null)
   const pluginRef = useRef(null)
+  // Holds the lazily-imported Mol* modules needed by the coloring effect.
+  const molstarRef = useRef(null)
   const [isStructureLoaded, setIsStructureLoaded] = useState(false)
 
   // Create color theme function that maps white (0) to red (max)
@@ -36,6 +34,12 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
     if (!values || values.length === 0) {
       return null
     }
+
+    const molstar = molstarRef.current
+    if (!molstar) {
+      return null
+    }
+    const { CustomElementProperty, Color } = molstar
 
     return CustomElementProperty.create({
       label: "Activation Colors",
@@ -86,10 +90,29 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
   }, [])
 
   useEffect(() => {
-    if (!containerRef.current) return
+    const container = containerRef.current
+    if (!container) return
+
+    let isCancelled = false
 
     const initMolstar = async () => {
       try {
+        // Lazily import Mol* so its large bundle stays out of the initial page
+        // load; this only runs once the preview nears the viewport.
+        const [
+          { DefaultPluginSpec },
+          { PluginContext },
+          { CustomElementProperty },
+          { Color },
+        ] = await Promise.all([
+          import("molstar/lib/mol-plugin/spec"),
+          import("molstar/lib/mol-plugin/context"),
+          import("molstar/lib/mol-model-props/common/custom-element-property"),
+          import("molstar/lib/mol-util/color"),
+        ])
+        if (isCancelled || !containerRef.current) return
+        molstarRef.current = { CustomElementProperty, Color }
+
         if (pluginRef.current) {
           pluginRef.current.dispose()
           pluginRef.current = null
@@ -198,9 +221,22 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
       }
     }
 
-    initMolstar()
+    // Defer initialization (and the Mol* download) until the preview scrolls
+    // near the viewport.
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          observer.disconnect()
+          initMolstar()
+        }
+      },
+      { rootMargin: "200px" },
+    )
+    observer.observe(container)
 
     return () => {
+      isCancelled = true
+      observer.disconnect()
       if (pluginRef.current) {
         pluginRef.current.dispose()
         pluginRef.current = null
