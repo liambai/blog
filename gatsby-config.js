@@ -23,8 +23,6 @@ module.exports = {
     repo: "liambai/blog",
   },
   plugins: [
-    `gatsby-plugin-image`,
-    `gatsby-transformer-csv`,
     {
       resolve: `gatsby-source-filesystem`,
       options: {
@@ -44,25 +42,12 @@ module.exports = {
       options: {
         extensions: [`.mdx`, `.md`],
         gatsbyRemarkPlugins: [
-          {
-            resolve: `gatsby-remark-images`,
-            options: {
-              maxWidth: 630,
-            },
-          },
-          {
-            resolve: `gatsby-remark-responsive-iframe`,
-            options: {
-              wrapperStyle: `margin-bottom: 1.0725rem`,
-            },
-          },
           `gatsby-remark-prismjs`,
           `gatsby-remark-katex`,
           `gatsby-remark-autolink-headers`,
         ],
       },
     },
-    `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
     {
       resolve: `gatsby-plugin-feed`,
