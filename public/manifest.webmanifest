@@ -1,0 +1,14 @@
+{
+  "name": "Liam Bai",
+  "short_name": "Liam Bai",
+  "start_url": "/",
+  "background_color": "#ffffff",
+  "display": "minimal-ui",
+  "icons": [
+    {
+      "src": "/icons/telescope-emoji.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

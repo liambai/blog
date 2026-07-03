@@ -1,0 +1,28 @@
+---
+import avatarImage from "../images/liam.jpeg"
+
+interface Props {
+  class?: string
+  alt?: string
+  size?: number
+  loading?: "lazy" | "eager"
+}
+
+const {
+  class: className,
+  alt = "Liam Bai",
+  size,
+  loading = "lazy",
+} = Astro.props
+---
+
+<a href="/" aria-label="Home">
+  <img
+    class={className}
+    src={avatarImage.src}
+    alt={alt}
+    loading={loading}
+    width={size}
+    height={size}
+  />
+</a>

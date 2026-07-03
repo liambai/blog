@@ -707,7 +707,7 @@ a:focus {
   margin: var(--spacing-0);
 }
 
-.gatsby-highlight {
+pre[class*="language-"] {
   margin-bottom: var(--spacing-8);
 }
 
@@ -715,9 +715,22 @@ a:focus {
   margin: var(--spacing-0) var(--spacing-0) var(--spacing-8) var(--spacing-0);
 }
 
-.math-display {
+/* Responsive image widths (replaces react-responsive in image.jsx) */
+.content-image {
+  width: var(--img-width, 100%);
+}
+
+@media (max-width: 1224px) {
+  .content-image {
+    width: var(--img-mobile-width, 100%);
+  }
+}
+
+.math-display,
+.katex-display {
   margin: var(--spacing-0) var(--spacing-0) var(--spacing-8) var(--spacing-0);
   overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .littlefoot-button {

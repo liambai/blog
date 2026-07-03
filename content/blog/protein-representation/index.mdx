@@ -3,6 +3,15 @@ title: How to represent a protein sequence
 date: "2023-09-29"
 description: Learning protein representations. Transfer learning, protein language models, contextual embeddings, Transformers, masked language modeling, BERT, UniRep, ESM, attention analysis.
 ---
+import img_PDB_sequences_vs_structures from "./images/PDB-sequences-vs-structures.png"
+import img_MLM from "./images/MLM.png"
+import img_architecture from "./images/architecture.png"
+import img_attention_viz from "./images/attention-viz.png"
+import img_UniRep_protein_engineering from "./images/UniRep-protein-engineering.png"
+import img_UniRep_clustering from "./images/UniRep-clustering.png"
+import img_UniRep_helix_sheet_neuron from "./images/UniRep-helix-sheet-neuron.png"
+import img_attention_contact from "./images/attention-contact.png"
+import img_attention_binding_site from "./images/attention-binding-site.png"
 
 import AminoAcidEmbedding from "./d3/AminoAcidEmbedding.jsx"
 import MSACoupling from "../protein-evolution/d3/MSACoupling.jsx"
@@ -10,21 +19,18 @@ import AminoAcidEmbeddingEncoder from "./d3/AminoAcidEmbeddingEncoder.jsx"
 import CharacterEmbedding from "./d3/CharacterEmbedding.jsx"
 import WordEmbedding from "./d3/WordEmbedding.jsx"
 import AminoAcidEmbeddingAverage from "./d3/AminoAcidEmbeddingAverage.jsx"
-import Figure from "../../../src/components/figure.jsx"
+import Figure from "../../../src/components/Figure.astro"
 import Image from "../../../src/components/image.jsx"
-import { Link } from "gatsby"
 import { Reference, ReferenceList } from "./References.jsx"
 
 In the last decade, [innovations in DNA sequencing](https://ourworldindata.org/grapher/cost-of-sequencing-a-full-human-genome) propelled biology into a new information age. This came with a happy conundrum: we now have many orders of magnitude more protein sequences than structural or functional data. We uncovered massive tomes written in nature's language – the blueprint of our wondrous biological tapestry – but lack the ability to understand them.
 
-<Figure
-  content={
-    <Image
-      path={require("./images/PDB-sequences-vs-structures.png")}
+<Figure>
+  <Image slot="content"
+      path={img_PDB_sequences_vs_structures}
       width="70%"
     />
-  }
->
+
   The red and yellow lines represent the number of available sequences in public
   online databases; the blue line represents the number of available structures,
   whose increase is unnoticeable in comparison. Figure from
@@ -43,7 +49,9 @@ When labels are rare, as in our case with proteins, we need to rely on more **un
 
 1. Come up with a vector representation of the protein sequence that captures its important features. The vectors are called **contextualized embeddings**. This is no easy task: it's where the heavy lifting happens and will be the subject of this post.
 
-   <Figure content={<AminoAcidEmbedding />}>
+   <Figure>
+     <AminoAcidEmbedding client:visible slot="content" />
+
      Representation vectors are created from the amino acid sequence. Each
      vector corresponds to an amino acid (hover to view). The values in the
      vectors are made up. The length of each vector is typically between several
@@ -56,9 +64,11 @@ This is referred to as **transfer learning**: the knowledge learned by the repre
 
 ## What about MSAs?
 
-We talked in a <Link to="/protein-evolution">previous post</Link> about ways to leverage the information hidden in Multiple Sequence Alignments (MSAs): the co-evolutionary data of proteins.
+We talked in a <a href="/protein-evolution">previous post</a> about ways to leverage the information hidden in Multiple Sequence Alignments (MSAs): the co-evolutionary data of proteins.
 
-<Figure content={<MSACoupling />}>
+<Figure>
+  <MSACoupling client:visible slot="content" />
+
   An MSA contains different variants of a sequence. The structure sketches how
   the amino acid chain might fold in space (try dragging the nodes). Hover over
   each row in the MSA to see the corresponding amino acid in the folded
@@ -79,7 +89,9 @@ One way to look at the models in this post is that they are answers to that ques
 
 The general problem of converting some data into a vector representation is called [representation learning](https://en.wikipedia.org/wiki/Feature_learning), an important technique in **natural language processing (NLP)**. In the context of proteins, we're looking for a function, an **encoder**, that takes an amino acid sequence and outputs a bunch of representation vectors.
 
-<Figure content={<AminoAcidEmbeddingEncoder />}>
+<Figure>
+  <AminoAcidEmbeddingEncoder client:visible slot="content" />
+
   An encoder converts a sequence into representation vectors (hover to view).
   The length of each vector is typically between several hundred to a few
   thousand.
@@ -89,13 +101,17 @@ The general problem of converting some data into a vector representation is call
 
 In NLP lingo, each amino acid is a **token**. An English sentence can be represented in the same way, using characters as tokens.
 
-<Figure content={<CharacterEmbedding />}>
+<Figure>
+  <CharacterEmbedding client:visible slot="content" />
+
   Hover to view the representation vector of each character token.
 </Figure>
 
 As an aside, words are also a reasonable choice for tokens in natural language.
 
-<Figure content={<WordEmbedding />}>
+<Figure>
+  <WordEmbedding client:visible slot="content" />
+
   Hover to view the representation vector of each word token.
 </Figure>
 
@@ -109,7 +125,9 @@ In contrast, our _contextualized_ embedding vectors for each token, as the name 
 
 As a result of the rich contextual information, when we need one vector that describes the _entire sequence_ – instead of a vector for each amino acid – we can simply average the values in each vector.
 
-<Figure content={<AminoAcidEmbeddingAverage />} />
+<Figure>
+  <AminoAcidEmbeddingAverage client:visible slot="content" />
+</Figure>
 
 Now, let's work on creating these representation vectors!
 
@@ -129,11 +147,9 @@ We know the ground truth label from the original sequence, which we can use to g
 
 This lets us take advantage of the wealth of known sequences, each of which is now a labeled training example. In NLP, this approach is called **masked language modeling (MLM)**, a form of **self-supervised learning**.
 
-<Figure
-  content={
-    <Image path={require("./images/MLM.png")} style={{ marginBottom: 5 }} />
-  }
->
+<Figure>
+  <Image slot="content" path={img_MLM} style={{ marginBottom: 5 }} />
+
   The masked language modelling objective. Hide a token (in this case, R) and
   ask the encoder model to predict the hidden token. The encoder model is set up
   so that, while attempting and learning this prediction task, representation
@@ -150,14 +166,12 @@ The first protein language encoder of this kind is [UniRep](https://www.nature.c
 
 More recently, **Transformer models** that rely on a mechanism called **self- attention** have taken the spotlight <Reference id={5} />. [BERT](<https://en.wikipedia.org/wiki/BERT_(language_model)>) stands for Bidirectional Encoder Representations from Transformer and is a state-of-the-art natural language encoder developed at Google <Reference id={2} />. We'll focus on a BERT-like encoder model applied to proteins.
 
-<Figure
-  content={
-    <Image
-      path={require("./images/architecture.png")}
+<Figure>
+  <Image slot="content"
+      path={img_architecture}
       style={{ marginBottom: 5 }}
     />
-  }
->
+
   A simplified diagram of BERT's architecture.
 </Figure>
 
@@ -167,9 +181,9 @@ Roughly speaking, the $\alpha_{ij}$ parameters in the self-attention layer (also
 
 Here's an example of attention scores of a transformer trained on a word-tokenized sentence:
 
-<Figure
-  content={<Image path={require("./images/attention-viz.png")} width="80%" />}
->
+<Figure>
+  <Image slot="content" path={img_attention_viz} width="80%" />
+
   Self-attention visualization of a word-tokenized sentence. Deeper blue
   indicates higher attention score.
 </Figure>
@@ -200,7 +214,7 @@ I hoped to convey some basic intuition about self-attention and masked language 
 
 Once we have our representation vectors, we can train simple models like logistic regression with our vectors as input. This is the approach used in [ESM](https://github.com/facebookresearch/esm), achieving state-of-the-art performance on predictions of 3D contacts and mutation effects <Reference id={3} /> <Reference id={4} />. We can think of the logistic regression model as merely teasing out the information already contained in the input representation, an easy task. (We're omitting a lot of details, but if you're interested, please check out [those](https://www.pnas.org/doi/full/10.1073/pnas.2016239118) [papers](https://www.biorxiv.org/content/10.1101/2020.12.15.422761v1)!)
 
-We saw in the <Link to="/protein-evolution">previous post</Link> that with clever samplings approaches like **Markov Chain Monte Carlo (MCMC)**, a good predictive model can be used to generate new sequences. That's exactly the approach taken by researches from the [Church lab](https://arep.med.harvard.edu/gmc/) leveraging UniRep for protein engineering <Reference id={6} />:
+We saw in the <a href="/protein-evolution">previous post</a> that with clever samplings approaches like **Markov Chain Monte Carlo (MCMC)**, a good predictive model can be used to generate new sequences. That's exactly the approach taken by researches from the [Church lab](https://arep.med.harvard.edu/gmc/) leveraging UniRep for protein engineering <Reference id={6} />:
 
 <ol type="a">
   <li>
@@ -223,13 +237,13 @@ We saw in the <Link to="/protein-evolution">previous post</Link> that with cleve
     them, all [*in silico*](https://en.wikipedia.org/wiki/In_silico). Apply the
     Metropolis-Hastings acceptance criterion repeatedly to generate a new,
     optimized sequence. (If this sounds unfamiliar, check out the{" "}
-    <Link to="/protein-evolution">previous post</Link>!)
+    <a href="/protein-evolution">previous post</a>!)
   </li>
 </ol>
 
-<Figure
-  content={<Image path={require("./images/UniRep-protein-engineering.png")} />}
->
+<Figure>
+  <Image slot="content" path={img_UniRep_protein_engineering} />
+
   Protein engineering with UniRep. This process is analogous to to meandering
   the [sparsely
   functional](https://en.wikipedia.org/wiki/Sequence_space_(evolution)#Functional_sequences_in_sequence_space)
@@ -244,7 +258,9 @@ We've been talking a lot about all this "information" learned by our representat
 
 UniRep vectors capture biochemical properties of amino acids and phylogeny in sequences from different organisms.
 
-<Figure content={<Image path={require("./images/UniRep-clustering.png")} />}>
+<Figure>
+  <Image slot="content" path={img_UniRep_clustering} />
+
   (Left) Feed a single amino acid into UniRep and take the output representation
   vector. Applying
   [PCA](https://en.wikipedia.org/wiki/Principal_component_analysis) and plotting
@@ -260,14 +276,12 @@ UniRep vectors capture biochemical properties of amino acids and phylogeny in se
 
 More incredibly, one of the neurons in UniRep's LSTM network showed firing patterns highly correlated with the [secondary structure](https://en.wikipedia.org/wiki/Protein_secondary_structure) of the protein: alpha helices and beta sheets. UniRep has clearly learned meaningful signals about the protein's folded structure.
 
-<Figure
-  content={
-    <Image
-      path={require("./images/UniRep-helix-sheet-neuron.png")}
+<Figure>
+  <Image slot="content"
+      path={img_UniRep_helix_sheet_neuron}
       width="80%"
     />
-  }
->
+
   The activations of the neuron are overlaid with the 3D structure of the [Lac
   repressor protein](https://en.wikipedia.org/wiki/Lac_repressor). The neuron
   has high positive activations at positions that correspond to an alpha helix,
@@ -281,7 +295,9 @@ In NLP, the attention scores in Transformer models tend to relate to the semanti
 
 Let's look at 5 unsupervised Transformer models on proteins sequences – all trained in the same BERT-inspired way we described <Reference id={7} />. Amino acid pairs that with high attention scores are more often in 3D contact in the folded structure, especially in the deeper layers.
 
-<Figure content={<Image path={require("./images/attention-contact.png")} />}>
+<Figure>
+  <Image slot="content" path={img_attention_contact} />
+
   The percentage of high-confidence attention scores that correspond to amino
   acids positions in 3D contact. Deeper blue reflects higher correlation between
   attention scores and contacts. Data is shown for each attention head in each
@@ -291,9 +307,9 @@ Let's look at 5 unsupervised Transformer models on proteins sequences – all tr
 
 Similarly, a lot of attention is directed to [binding sites](https://en.wikipedia.org/wiki/Binding_site) – the functionally most important regions of a protein – throughout the layers.
 
-<Figure
-  content={<Image path={require("./images/attention-binding-site.png")} />}
->
+<Figure>
+  <Image slot="content" path={img_attention_binding_site} />
+
   The percentage of high-confidence attention scores that correspond to binding
   sites. These are positions j part of binding sites that have high $\alpha_{ij}
   $, i.e. positions that have attention directed *to* them. Figure from <Reference
@@ -301,7 +317,7 @@ Similarly, a lot of attention is directed to [binding sites](https://en.wikipedi
   />.
 </Figure>
 
-Applying supervised learning to attention scores – instead of output representations – also achieves astonishing performance in contact prediction. Compared to [GREMLIN](https://openseq.org/), an MSA-based method similar to the one we talked about in the <Link to="/protein-evolution">previous post</Link>, logistic regression trained on ESM's attention scores yielded better performance after only seeing 20 (!) labeled training examples.
+Applying supervised learning to attention scores – instead of output representations – also achieves astonishing performance in contact prediction. Compared to [GREMLIN](https://openseq.org/), an MSA-based method similar to the one we talked about in the <a href="/protein-evolution">previous post</a>, logistic regression trained on ESM's attention scores yielded better performance after only seeing 20 (!) labeled training examples.
 
 ## Further reading
 

@@ -4,17 +4,22 @@
 
 https://liambai.com/
 
+Built with [Astro](https://astro.build/). Posts live in `content/blog/<slug>/index.mdx`,
+colocated with their images and visualization components (d3 + Mol\* React islands).
+
 ### Run locally
 
-Works with node v22
+Works with node v22+ and [pnpm](https://pnpm.io/).
 
 ```
-yarn install
-yarn develop
+pnpm install
+pnpm dev
 ```
 
 ### Build
 
 ```
-yarn build
+pnpm build
 ```
+
+Preview the production build with `pnpm preview`.

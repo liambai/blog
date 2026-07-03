@@ -1,0 +1,104 @@
+---
+import { getCollection, render } from "astro:content"
+import BaseLayout from "../layouts/BaseLayout.astro"
+import Bio from "../components/Bio.astro"
+import Comments from "../components/Comments.astro"
+import { SITE } from "../config"
+
+// Code highlighting, math, and footnote styles are only needed on posts.
+import "prismjs/themes/prism.css"
+import "katex/dist/katex.min.css"
+import "littlefoot/dist/littlefoot.css"
+
+export async function getStaticPaths() {
+  // Sorted oldest-first so previous = older post, next = newer post (matching
+  // the old gatsby-node prev/next logic).
+  const posts = (await getCollection("blog")).sort(
+    (a, b) => a.data.date.valueOf() - b.data.date.valueOf(),
+  )
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    props: {
+      post,
+      previous: i > 0 ? posts[i - 1] : null,
+      next: i < posts.length - 1 ? posts[i + 1] : null,
+    },
+  }))
+}
+
+const { post, previous, next } = Astro.props
+const { Content } = await render(post)
+
+const dateStr = post.data.date.toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  timeZone: "UTC",
+})
+
+const previewUrl = `${SITE.siteUrl}/previews/${post.id.replace(/\//g, "")}.png`
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  image={previewUrl}
+  type="article"
+>
+  <article class="blog-post" itemscope itemtype="http://schema.org/Article">
+    <header>
+      <h1 itemprop="headline">{post.data.title}</h1>
+      <p>{dateStr}</p>
+    </header>
+    <Content />
+    <hr />
+    <Comments issueTerm={post.data.title} />
+    <hr />
+    <footer>
+      <Bio />
+    </footer>
+  </article>
+  <nav class="blog-post-nav">
+    <ul
+      style="display: flex; flex-wrap: wrap; justify-content: space-between; list-style: none; padding: 0;"
+    >
+      <li>
+        {
+          previous && (
+            <a href={`/${previous.id}/`} rel="prev">
+              ← {previous.data.title}
+            </a>
+          )
+        }
+      </li>
+      <li>
+        {
+          next && (
+            <a href={`/${next.id}/`} rel="next">
+              {next.data.title} →
+            </a>
+          )
+        }
+      </li>
+    </ul>
+  </nav>
+</BaseLayout>
+
+<script>
+  import littlefoot from "littlefoot"
+
+  littlefoot({
+    activateOnHover: true,
+    dismissOnUnhover: true,
+    allowDuplicates: true,
+    buttonTemplate: `
+      <button
+        aria-label="Reference <% reference %>"
+        class="littlefoot-button"
+        id="<% reference %>"
+      />
+        [<% reference %>]
+      </button>
+    `,
+  })
+</script>

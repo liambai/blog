@@ -3,13 +3,21 @@ title: What we can learn from evolving proteins
 date: "2023-09-12"
 description: Predicting protein structure and function. Multiple Sequence Alignments (MSAs), the protein folding problem, the Potts model, Direct Coupling Analysis (DCA), EVCouplings.
 ---
+import img_sequence_evolution from "./images/sequence-evolution.png"
+import img_sequence_logo from "./images/sequence-logo.png"
+import img_potts from "./images/potts.png"
+import img_DI_vs_MI from "./images/DI-vs-MI.png"
+import img_structures from "./images/structures.png"
+import img_deltaE_mutations from "./images/deltaE-mutations.png"
+import img_deltaE_experimental from "./images/deltaE-experimental.png"
+import img_CM_energy from "./images/CM-energy.jpeg"
 
 import MSACoupling from "./d3/MSACoupling.jsx"
 import Distributions from "./d3/Distributions.jsx"
 import MSAHighlighted from "./d3/MSAHighlighted.jsx"
 import MSAFrequencies from "./d3/MSAFrequencies.jsx"
 import MSACovariance from "./d3/MSACovariance.jsx"
-import Figure from "../../../src/components/figure.jsx"
+import Figure from "../../../src/components/Figure.astro"
 import Image from "../../../src/components/image.jsx"
 import { Reference, ReferenceList } from "./References.jsx"
 
@@ -17,7 +25,9 @@ Proteins are remarkable molecular machines that orchestrate almost all activity 
 
 [Amino acids](https://en.wikipedia.org/wiki/Amino_acid) make up proteins and specify their structure and function. Over millions of years, evolution has conducted a massive experiment over the [space](<https://en.wikipedia.org/wiki/Sequence_space_(evolution)>) of all possible amino acid sequences: those that encode a functional protein survive; those that don't are extinct.
 
-<Figure content={<Image path={require("./images/sequence-evolution.png")} />}>
+<Figure>
+  <Image slot="content" path={img_sequence_evolution} />
+
   Throughout evolution, mutations change the sequences of proteins. Only the
   ones with highest
   [fitness](https://evolution.berkeley.edu/evolution-101/mechanisms-the-processes-of-evolution/evolutionary-fitness/)
@@ -29,7 +39,9 @@ We can learn a surprising lot about a protein by studying similar variants of it
 
 A **Multiple Sequence Alignment (MSA)** compiles known variants of a protein – which can come from different organisms – and is created by searching vast protein sequence databases.
 
-<Figure content={<MSACoupling />}>
+<Figure>
+  <MSACoupling client:visible slot="content" />
+
   An MSA contains different variants of a sequence. The structure sketches how
   the amino acid chain might fold in space (try dragging the nodes). Hover over
   each row in the MSA to see the corresponding amino acid in the folded
@@ -44,7 +56,9 @@ Let's start with the question: given an MSA and an amino acid sequence, what's t
 
 Knowing $P$ is powerful. It lends us insight into sequences that we've never encountered before (more on this later!). Oftentimes, $P$ is called a _model_. For the outcome of rolling a die, we have great models; proteins, unfortunately not so much.
 
-<Figure content={<Distributions />}>
+<Figure>
+  <Distributions client:visible slot="content" />
+
   Hover over the bars to see the probabilities. Sequence probabilities are made
   up but follow some expected patterns: sequences that resemble sequences in the
   MSA have higher probabilities. The set of all possible sequences (the
@@ -58,21 +72,25 @@ Knowing $P$ is powerful. It lends us insight into sequences that we've never enc
 
 Let's take a closer look at the MSA:
 
-<Figure content={<MSAHighlighted />} />
+<Figure>
+  <MSAHighlighted client:visible slot="content" />
+</Figure>
 
 Some positions have the same amino acid across almost all rows. For example, every sequence has L in the first position – it is **evolutionarily conserved** – which means that it's probably important!
 
 To measure this, let's count the frequencies of observing each amino acid at each position. Let $f_i(A_i)$ be the frequency of observing the amino acid $A_i$ at position $i$.
 
-<Figure content={<MSAFrequencies />}>
+<Figure>
+  <MSAFrequencies client:visible slot="content" />
+
   Hover over the MSA to compute amino acid frequencies at each position.
 </Figure>
 
 If we compile these frequencies into a matrix, we get what is known as a **position-specific scoring matrix (PSSM)**, commonly visualized as a [sequence logo](https://en.wikipedia.org/wiki/Sequence_logo).
 
-<Figure
-  content={<Image path={require("./images/sequence-logo.png")} width="90%" />}
->
+<Figure>
+  <Image slot="content" path={img_sequence_logo} width="90%" />
+
   A sequence logo [generated](https://weblogo.berkeley.edu/logo.cgi) from our
   MSA. The height of each amino acid indicates its degree of evolutionary
   conservation.
@@ -94,7 +112,9 @@ But what about the co-variation between pairs of positions? As hinted in the beg
 
 Let $f_{ij}(A_i, A_j)$ be the frequency of observing amino acid $A_i$ at position $i$ _and_ amino acid $A_j$ at position $j$.
 
-<Figure content={<MSACovariance />}>
+<Figure>
+  <MSACovariance client:visible slot="content" />
+
   Hover over the MSA to compute pairwise amino acid frequencies in reference to
   the second position.
 </Figure>
@@ -115,7 +135,9 @@ As it turns out, physicists have studied this function since the 1950s, in a dif
 
 They call this the **Potts model**, and a fancy name for the energy function is the [Hamiltonian](<https://en.wikipedia.org/wiki/Hamiltonian_(quantum_mechanics)>). This fascinating field of physics applying these statistical models to explain macroscopic behaviors of matter is called [statistical mechanics](https://en.wikipedia.org/wiki/Statistical_mechanics).
 
-<Figure content={<Image path={require("./images/potts.png")} width="50%" />}>
+<Figure>
+  <Image slot="content" path={img_potts} width="50%" />
+
   The Potts model on a square lattice. Black and white dots are in different
   states. Figure from
   [https://arxiv.org/abs/1511.03031](https://arxiv.org/abs/1511.03031).
@@ -160,7 +182,9 @@ Given an amino acid sequence, what is the 3D structure that it folds into? This 
 Myriad forces choreograph the folding of a protein. Let's simplify and focus on
 pairs of amino acid positions that interact strongly with each other – and hypothesize that they are in spatial contact. These predicted contacts can act as a set of constraints from which we can then derive the full 3D structure.
 
-<Figure content={<MSACoupling />}>
+<Figure>
+  <MSACoupling client:visible slot="content" />
+
   The structure sketches how the amino acid chain might fold in space (try
   dragging the nodes). Hover over each column in the MSA to see the
   corresponding amino acid in the folded structure. Hover over the blue link to
@@ -215,7 +239,9 @@ $$
 
 This measure is called **direct information**, a more globally-aware measure of pairwise interactions. When compared to real contacts in experimentally determined structures, DI performed much better than MI, demonstrating the usefulness of considering the global sequence context <Reference id={1} />.
 
-<Figure content={<Image path={require("./images/DI-vs-MI.png")} width="90%" />}>
+<Figure>
+  <Image slot="content" path={img_DI_vs_MI} width="90%" />
+
   Axes are amino acid positions. The grey grooves are the actual contact in the
   experimentally obtained structures. The red dots are the predicted contacts
   using DI; the blue dots are the predicted contacts using MI. Data is shown for
@@ -226,7 +252,9 @@ This measure is called **direct information**, a more globally-aware measure of 
 
 Given predicted contacts by DI, we need to carry out a few more computational steps – e.g. [simulated annealing](https://en.wikipedia.org/wiki/Simulated_annealing) – to generate the full predicted 3D structure. Omitting those details: the results are these beautiful predicted structures that closely resemble the real structures.
 
-<Figure content={<Image path={require("./images/structures.png")} />}>
+<Figure>
+  <Image slot="content" path={img_structures} />
+
   Grey structures are real, experimentally observed; red structures are
   predicted using DI. [Root mean square deviation
   (RMSD)](https://en.wikipedia.org/wiki/Root-mean-square_deviation_of_atomic_positions)
@@ -260,7 +288,9 @@ captures how much the mutant's energy improved over the wildtype.
 
 In this [paper](https://www.nature.com/articles/nbt.3769) introducing the [mutation effect prediction tool](https://marks.hms.harvard.edu/evmutation/) in EVCouplings, researchers computed the $\Delta E$ of each mutant sequence in a saturation mutagenesis experiment on a protein called M.HaeIII <Reference id={3} />.
 
-<Figure content={<Image path={require("./images/deltaE-mutations.png")} />}>
+<Figure>
+  <Image slot="content" path={img_deltaE_mutations} />
+
   Deeper shades of blue reflect more negative ΔE. Most mutations are damaging.
   Averages across amino acids are shown as a bar on the bottom, labeled with *
   (sensitivity per site). Figure from <Reference id={3} />.
@@ -270,11 +300,9 @@ Not all positions are created equal: mutations at some positions are especially 
 
 The calculated energies correlated strongly with experimentally observed fitness (!), meaning that our energy function provides helpful guidance on how a given mutation might affect function. It's remarkable that with such a simple model and from seemly so little information (just MSAs!), we can attain such profound predictive power.
 
-<Figure
-  content={
-    <Image path={require("./images/deltaE-experimental.png")} width="90%" />
-  }
->
+<Figure>
+  <Image slot="content" path={img_deltaE_experimental} width="90%" />
+
   Evolutionary statistical energy refers to our energy function E. Left plot
   shows all mutants; right plot shows averages over amino acids at each
   position. Figure from <Reference id={3} />.
@@ -312,9 +340,9 @@ When they set $T = 0.33$ (second row in the figure below), they created sequence
    the smaller the better)
 2. enhanced activity compared to natural CM when expressed in E. coli (!)
 
-<Figure
-  content={<Image path={require("./images/CM-energy.jpeg")} width="90%" />}
->
+<Figure>
+  <Image slot="content" path={img_CM_energy} width="90%" />
+
   EcCM is a natural CM whose high activity is used as a benchmark and goalpost.
   Statistical energies on the left are negatives of ours, i.e. the smaller the
   better. norm. r.e. on the right stands for normalized relative enrichment;

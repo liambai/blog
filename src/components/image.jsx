@@ -1,25 +1,30 @@
 import React from "react"
 
-import { useMediaQuery } from "react-responsive"
-
 const Image = ({
   path,
+  src,
   width = "100%",
   mobileWidth = "100%",
   alt = "",
   style = {},
   href,
 }) => {
-  const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
+  // `path` is an ESM-imported asset (Astro's ImageMetadata `{ src }`); also
+  // accept a plain URL string. Responsive width is handled with CSS custom
+  // properties (see `.content-image` in style.css) instead of react-responsive.
+  const resolvedSrc =
+    src || (typeof path === "string" ? path : path?.src || path?.default || "")
 
   const imageElement = (
     <img
+      className="content-image"
       style={{
-        width: isMobile ? mobileWidth : width,
+        "--img-width": width,
+        "--img-mobile-width": mobileWidth,
         margin: "auto",
         ...style,
       }}
-      src={path.default}
+      src={resolvedSrc}
       alt={alt}
     />
   )
