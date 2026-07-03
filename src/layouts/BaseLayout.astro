@@ -1,7 +1,7 @@
 ---
 import { SITE } from "../config"
 
-// Global styles and fonts (previously imported in gatsby-browser.js).
+// Global styles and fonts.
 import "@fontsource-variable/montserrat"
 import "@fontsource/merriweather"
 import "../normalize.css"
@@ -22,21 +22,15 @@ const pathname = Astro.url.pathname
 const isRootPath = pathname === "/"
 
 const metaDescription = description || SITE.description
-const pageTitle = title || defaultTitle || ""
-const fullTitle =
-  title && defaultTitle ? `${title} | ${defaultTitle}` : pageTitle
+const fullTitle = title ? `${title} | ${defaultTitle}` : defaultTitle
 const canonicalUrl = new URL(pathname, siteUrl).href
 
-const seoImage = image || SITE.defaultImage
-const isAbsoluteImage = /^https?:\/\//i.test(seoImage)
-const imageUrl = isAbsoluteImage ? seoImage : new URL(seoImage, siteUrl).href
+// new URL() ignores the base when its first arg is already absolute, so this
+// handles both absolute preview URLs and the relative default image.
+const imageUrl = new URL(image || SITE.defaultImage, siteUrl).href
 
-const twitterHandle = SITE.social?.twitter || ""
-const twitterCreator = twitterHandle
-  ? twitterHandle.startsWith("@")
-    ? twitterHandle
-    : `@${twitterHandle}`
-  : ""
+const twitterHandle = SITE.social?.twitter
+const twitterCreator = twitterHandle ? `@${twitterHandle}` : ""
 
 const gtagId = SITE.gtagId
 ---

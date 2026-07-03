@@ -28,12 +28,12 @@
   --spacing-20: 5rem;
   --spacing-24: 6rem;
   --spacing-32: 8rem;
-  --fontFamily-sans: "MontserratVariable", system-ui, -apple-system,
-    BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
-    sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-    "Noto Color Emoji";
-  --fontFamily-serif: "Merriweather", "Georgia", Cambria, "Times New Roman",
-    Times, serif;
+  --fontFamily-sans:
+    "MontserratVariable", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --fontFamily-serif:
+    "Merriweather", "Georgia", Cambria, "Times New Roman", Times, serif;
   --font-body: var(--fontFamily-serif);
   --font-heading: var(--fontFamily-sans);
   --fontWeight-normal: 400;
@@ -457,7 +457,9 @@ a:focus {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .landing-links a svg {
@@ -711,11 +713,38 @@ pre[class*="language-"] {
   margin-bottom: var(--spacing-8);
 }
 
+/* Heading anchor links: the octicon sits in the left gutter, hidden until the
+   heading is hovered, so it never shifts the heading text or the resting
+   layout. */
+.blog-post :is(h1, h2, h3, h4, h5, h6) {
+  position: relative;
+}
+
+.blog-post .anchor.before {
+  position: absolute;
+  top: 0;
+  left: -1.4em;
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  padding-right: 0.3em;
+  color: inherit;
+}
+
+.blog-post .anchor svg {
+  visibility: hidden;
+}
+
+.blog-post :is(h1, h2, h3, h4, h5, h6):hover .anchor svg,
+.blog-post .anchor:focus svg {
+  visibility: visible;
+}
+
 .figure {
   margin: var(--spacing-0) var(--spacing-0) var(--spacing-8) var(--spacing-0);
 }
 
-/* Responsive image widths (replaces react-responsive in image.jsx) */
+/* Responsive image widths, driven by image.jsx's --img-* custom properties */
 .content-image {
   width: var(--img-width, 100%);
 }

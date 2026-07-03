@@ -2,7 +2,6 @@ import React from "react"
 
 const Image = ({
   path,
-  src,
   width = "100%",
   mobileWidth = "100%",
   alt = "",
@@ -10,10 +9,9 @@ const Image = ({
   href,
 }) => {
   // `path` is an ESM-imported asset (Astro's ImageMetadata `{ src }`); also
-  // accept a plain URL string. Responsive width is handled with CSS custom
-  // properties (see `.content-image` in style.css) instead of react-responsive.
-  const resolvedSrc =
-    src || (typeof path === "string" ? path : path?.src || path?.default || "")
+  // accept a plain URL string. Responsive width comes from CSS custom
+  // properties (see `.content-image` in style.css).
+  const resolvedSrc = typeof path === "string" ? path : path.src
 
   const imageElement = (
     <img

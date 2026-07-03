@@ -11,7 +11,7 @@ import rehypeSlug from "rehype-slug"
 import rehypeAutolinkHeadings from "rehype-autolink-headings"
 import rehypeExternalLinks from "rehype-external-links"
 
-// Octicon link icon, matching gatsby-remark-autolink-headers' anchor.
+// Octicon link icon for heading anchors (revealed on hover; see style.css).
 const anchorIcon = {
   type: "element",
   tagName: "svg",
@@ -47,14 +47,12 @@ export default defineConfig({
   integrations: [react(), mdx(), sitemap()],
   vite: {
     ssr: {
-      // These CommonJS packages expose named exports that Node's ESM loader
-      // can't statically resolve during SSR; bundling them applies interop.
-      noExternal: [
-        "react-katex",
-        "react-responsive",
-        "d3-simple-slider",
-        "molstar",
-      ],
+      // Bundle these for SSR: their ESM entries expose the named exports we
+      // import, and molstar's extensionless internal imports need a bundler to
+      // resolve. (react-katex is handled instead by default-importing it and
+      // destructuring — its UMD build breaks named-export detection AND the
+      // prop-types interop when bundled, so it's left external.)
+      noExternal: ["react-responsive", "d3-simple-slider", "molstar"],
     },
   },
   markdown: {

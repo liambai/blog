@@ -4,6 +4,7 @@ import BaseLayout from "../layouts/BaseLayout.astro"
 import Bio from "../components/Bio.astro"
 import Comments from "../components/Comments.astro"
 import { SITE } from "../config"
+import { formatPostDate } from "../lib/format"
 
 // Code highlighting, math, and footnote styles are only needed on posts.
 import "prismjs/themes/prism.css"
@@ -11,8 +12,7 @@ import "katex/dist/katex.min.css"
 import "littlefoot/dist/littlefoot.css"
 
 export async function getStaticPaths() {
-  // Sorted oldest-first so previous = older post, next = newer post (matching
-  // the old gatsby-node prev/next logic).
+  // Sorted oldest-first so previous = older post and next = newer post.
   const posts = (await getCollection("blog")).sort(
     (a, b) => a.data.date.valueOf() - b.data.date.valueOf(),
   )
@@ -29,12 +29,7 @@ export async function getStaticPaths() {
 const { post, previous, next } = Astro.props
 const { Content } = await render(post)
 
-const dateStr = post.data.date.toLocaleDateString("en-US", {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-  timeZone: "UTC",
-})
+const dateStr = formatPostDate(post.data.date)
 
 const previewUrl = `${SITE.siteUrl}/previews/${post.id.replace(/\//g, "")}.png`
 ---
