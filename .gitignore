@@ -54,8 +54,8 @@ typings/
 # dotenv environment variable files
 .env*
 
-# build output
-dist/
+# build output (anchored to repo root so it doesn't match vendor/*/dist)
+/dist/
 .astro/
 
 # Mac files
