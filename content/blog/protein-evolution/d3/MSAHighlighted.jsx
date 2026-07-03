@@ -65,7 +65,7 @@ const MSAHighlighted = () => {
       .text(d => d.char)
       .style("text-align", "center")
       .style("background-color", d =>
-        d.pos === 1 ? "lightgrey" : "transparent"
+        d.pos === 1 ? "lightgrey" : "transparent",
       )
 
     // Exit any rows not in the data

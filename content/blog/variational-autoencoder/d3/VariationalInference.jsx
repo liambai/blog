@@ -63,12 +63,12 @@ function VariationalInference() {
     xScale.domain(
       d3.extent(lineData, function (d) {
         return d.x
-      })
+      }),
     )
     yScale.domain(
       d3.extent(lineData, function (d) {
         return d.y
-      })
+      }),
     )
 
     lineSvg

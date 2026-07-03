@@ -10,7 +10,7 @@ const fetchCSV = async path => {
   const response = await fetch(path)
   if (!response.ok) {
     throw new Error(
-      `Failed to fetch CSV: ${response.status} ${response.statusText}`
+      `Failed to fetch CSV: ${response.status} ${response.statusText}`,
     )
   }
   return await response.text()
@@ -29,7 +29,7 @@ const viridisColorMapRGB = t => {
   ]
   const i = Math.max(
     0,
-    Math.min(colors.length - 1, Math.floor(t * (colors.length - 1)))
+    Math.min(colors.length - 1, Math.floor(t * (colors.length - 1))),
   )
   const color1 = colors[i]
   const color2 = colors[Math.min(colors.length - 1, i + 1)]
@@ -68,7 +68,9 @@ const StructureOverlay = ({ title, pdbId, logitsPath, maxLogit }) => {
           dynamicTyping: true,
         }).data.filter(
           row =>
-            row && row.length > 0 && row.some(val => val !== null && val !== "")
+            row &&
+            row.length > 0 &&
+            row.some(val => val !== null && val !== ""),
         )
         setLogitData(parsedData)
         if (parsedData.length > 0) {
@@ -141,7 +143,7 @@ const StructureOverlay = ({ title, pdbId, logitsPath, maxLogit }) => {
             // Normalize logit value to range [0, 1] based on maxLogit
             const normalizedLogit = Math.min(
               1.0,
-              Math.max(0.0, logit / maxLogit)
+              Math.max(0.0, logit / maxLogit),
             )
             const rgbColor = viridisColorMapRGB(normalizedLogit)
             return Color.fromRgb(rgbColor[0], rgbColor[1], rgbColor[2])
@@ -153,7 +155,7 @@ const StructureOverlay = ({ title, pdbId, logitsPath, maxLogit }) => {
         },
       })
     },
-    [maxLogit]
+    [maxLogit],
   )
 
   // Initialize Molstar and load structure
@@ -248,11 +250,11 @@ const StructureOverlay = ({ title, pdbId, logitsPath, maxLogit }) => {
 
         const trajectory = await plugin.builders.structure.parseTrajectory(
           structureData,
-          "pdb"
+          "pdb",
         )
         await plugin.builders.structure.hierarchy.applyPreset(
           trajectory,
-          "default"
+          "default",
         )
         setIsLoading(false)
         setIsStructureLoaded(true) // Structure is now loaded
@@ -310,10 +312,10 @@ const StructureOverlay = ({ title, pdbId, logitsPath, maxLogit }) => {
 
     // Always attempt to remove the theme before adding the new instance.
     plugin.representation.structure.themes.colorThemeRegistry.remove(
-      colorThemeProvider
+      colorThemeProvider,
     )
     plugin.representation.structure.themes.colorThemeRegistry.add(
-      colorThemeProvider
+      colorThemeProvider,
     )
 
     plugin.dataTransaction(async () => {
@@ -328,7 +330,7 @@ const StructureOverlay = ({ title, pdbId, logitsPath, maxLogit }) => {
           s.components,
           {
             color: actualThemeName, // Use the name from the colorThemeProvider
-          }
+          },
         )
       }
     })

@@ -67,7 +67,7 @@ const LOCATION_LEGEND = [
 const getChainLoci = (structure, chainId) => {
   const query = compile(chainSelection(chainId))
   return StructureSelection.toLociWithCurrentUnits(
-    query(new QueryContext(structure))
+    query(new QueryContext(structure)),
   )
 }
 
@@ -157,14 +157,12 @@ const AlphafoldPd1Viewer = ({ title }) => {
 
         const afTrajectory = await plugin.builders.structure.parseTrajectory(
           afData,
-          "pdb"
+          "pdb",
         )
-        const afModel = await plugin.builders.structure.createModel(
-          afTrajectory
-        )
-        const afStructure = await plugin.builders.structure.createStructure(
-          afModel
-        )
+        const afModel =
+          await plugin.builders.structure.createModel(afTrajectory)
+        const afStructure =
+          await plugin.builders.structure.createStructure(afModel)
 
         // Load experimental structure
         const expData = await plugin.builders.data.download({
@@ -175,14 +173,12 @@ const AlphafoldPd1Viewer = ({ title }) => {
 
         const expTrajectory = await plugin.builders.structure.parseTrajectory(
           expData,
-          "pdb"
+          "pdb",
         )
-        const expModel = await plugin.builders.structure.createModel(
-          expTrajectory
-        )
-        const expStructure = await plugin.builders.structure.createStructure(
-          expModel
-        )
+        const expModel =
+          await plugin.builders.structure.createModel(expTrajectory)
+        const expStructure =
+          await plugin.builders.structure.createStructure(expModel)
 
         // Align experimental structure to AlphaFold using PD-1 chains
         const afStructureData = afStructure.cell?.obj?.data
@@ -201,7 +197,7 @@ const AlphafoldPd1Viewer = ({ title }) => {
               await applyTransform(
                 plugin,
                 expStructure,
-                transforms[0].bTransform
+                transforms[0].bTransform,
               )
             }
           }
@@ -214,7 +210,7 @@ const AlphafoldPd1Viewer = ({ title }) => {
         const afComponent =
           await plugin.builders.structure.tryCreateComponentStatic(
             afStructure,
-            "polymer"
+            "polymer",
           )
         afComponentRef.current = afComponent || null
 
@@ -238,7 +234,7 @@ const AlphafoldPd1Viewer = ({ title }) => {
                     ],
                   },
                 },
-              }
+              },
             )
         }
 
@@ -248,7 +244,7 @@ const AlphafoldPd1Viewer = ({ title }) => {
             await plugin.builders.structure.tryCreateComponentFromExpression(
               afStructure,
               residueRangeSelection(range.start, range.end),
-              `${domainName} domain`
+              `${domainName} domain`,
             )
           if (domainComponent) {
             domainComponentsRef.current[domainName] = domainComponent
@@ -260,7 +256,7 @@ const AlphafoldPd1Viewer = ({ title }) => {
           await plugin.builders.structure.tryCreateComponentFromExpression(
             expStructure,
             chainSelection(EXPERIMENTAL_CHAIN),
-            "Experimental PD-1"
+            "Experimental PD-1",
           )
         expComponentRef.current = expComponent || null
 
@@ -316,7 +312,7 @@ const AlphafoldPd1Viewer = ({ title }) => {
               type: "cartoon",
               color: "uniform",
               colorParams: { value: EXPERIMENTAL_COLOR },
-            }
+            },
           )
       }
     }
@@ -373,13 +369,13 @@ const AlphafoldPd1Viewer = ({ title }) => {
                     ],
                   },
                 },
-              }
+              },
             )
         }
       } else if (colorMode === "location") {
         // Add location coloring representations for each domain
         for (const [domainName, component] of Object.entries(
-          domainComponentsRef.current
+          domainComponentsRef.current,
         )) {
           domainRepsRef.current[domainName] =
             await plugin.builders.structure.representation.addRepresentation(
@@ -388,7 +384,7 @@ const AlphafoldPd1Viewer = ({ title }) => {
                 type: "cartoon",
                 color: "uniform",
                 colorParams: { value: DOMAIN_COLORS[domainName] },
-              }
+              },
             )
         }
       }

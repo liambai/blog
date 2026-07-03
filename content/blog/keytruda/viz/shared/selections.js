@@ -17,7 +17,7 @@ export const multiChainSelection = chainIds => {
     MS.core.rel.eq([
       MS.struct.atomProperty.macromolecular.auth_asym_id(),
       chainId,
-    ])
+    ]),
   )
 
   return MS.struct.generator.atomGroups({
@@ -35,7 +35,7 @@ export const residueSelection = (chainId, residues) => {
     MS.core.rel.eq([
       MS.struct.atomProperty.macromolecular.auth_seq_id(),
       residueId,
-    ])
+    ]),
   )
 
   return MS.struct.generator.atomGroups({

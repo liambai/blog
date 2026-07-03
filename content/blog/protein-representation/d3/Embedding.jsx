@@ -52,7 +52,7 @@ const Embedding = ({
       .attr("width", tokenWidth)
       .attr("height", tokenHeight)
       .attr("fill", (d, i) =>
-        i === focusedCharIndex ? "lightgrey" : pageBackground
+        i === focusedCharIndex ? "lightgrey" : pageBackground,
       )
       .on("mouseover", (event, d) => {
         setFocusedCharIndex(d.id)
@@ -144,11 +144,11 @@ const Embedding = ({
         .attr("text-anchor", "middle")
         .attr(
           "x",
-          (d, i) => margin + i * vectorBoxWidth + offsetX + vectorBoxWidth / 2
+          (d, i) => margin + i * vectorBoxWidth + offsetX + vectorBoxWidth / 2,
         )
         .attr(
           "y",
-          margin + spaceFromSequence + offsetY + vectorBoxHeight / 2 + 6
+          margin + spaceFromSequence + offsetY + vectorBoxHeight / 2 + 6,
         )
         .attr("font-size", fontSize)
     }
@@ -162,7 +162,7 @@ const Embedding = ({
         .attr("x2", margin + focusedCharIndex * offsetXMultiplier)
         .attr(
           "y2",
-          margin + spaceFromSequence + focusedCharIndex * offsetYMultiplier
+          margin + spaceFromSequence + focusedCharIndex * offsetYMultiplier,
         )
         .style("stroke", "gray")
         .style("stroke-width", 2)
@@ -174,11 +174,11 @@ const Embedding = ({
           "x2",
           margin +
             focusedCharIndex * offsetXMultiplier +
-            vectorBoxWidth * embeddingLength
+            vectorBoxWidth * embeddingLength,
         )
         .attr(
           "y2",
-          margin + spaceFromSequence + focusedCharIndex * offsetYMultiplier
+          margin + spaceFromSequence + focusedCharIndex * offsetYMultiplier,
         )
         .style("stroke", "gray")
         .style("stroke-width", 2)

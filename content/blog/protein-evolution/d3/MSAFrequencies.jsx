@@ -83,7 +83,7 @@ const MSAFrequencies = () => {
     rows
       .selectAll("td")
       .style("background-color", d =>
-        focusedColumn === d.pos ? "lightgrey" : "transparent"
+        focusedColumn === d.pos ? "lightgrey" : "transparent",
       )
   }, [width, focusedColumn, setFocusedColumn])
 
@@ -99,7 +99,7 @@ const MSAFrequencies = () => {
       }
     }
     equations = Object.entries(charToFreqs).map(
-      ([c, freq]) => `f_{${focusedColumn}}(\\text{${c}}) = ${freq / 8}`
+      ([c, freq]) => `f_{${focusedColumn}}(\\text{${c}}) = ${freq / 8}`,
     )
   }
 

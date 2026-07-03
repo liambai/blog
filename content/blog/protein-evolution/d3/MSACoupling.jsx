@@ -80,7 +80,7 @@ const MSAViz = ({ focusedNodes, setFocusedNodes }) => {
     rows
       .selectAll("td")
       .style("background-color", d =>
-        focusedNodes.includes(d.pos) ? "lightgrey" : "transparent"
+        focusedNodes.includes(d.pos) ? "lightgrey" : "transparent",
       )
   }, [focusedNodes, setFocusedNodes])
 
@@ -164,7 +164,7 @@ const NetworkViz = ({ focusedNodes, setFocusedNodes }) => {
         d3
           .forceLink(edges)
           .id(d => d.id)
-          .distance(d => (d.backbone ? backboneEdgeLength : 0))
+          .distance(d => (d.backbone ? backboneEdgeLength : 0)),
       )
       .force("charge", d3.forceManyBody().strength(-100))
       .force("center", d3.forceCenter(width / 2, height / 2 - 10))
@@ -177,7 +177,7 @@ const NetworkViz = ({ focusedNodes, setFocusedNodes }) => {
       .attr("class", "link")
       .style("stroke", d => (d.backbone ? "black" : "lightblue"))
       .style("stroke-width", d =>
-        d.backbone ? backboneEdgeWidth : contactEdgeWidth
+        d.backbone ? backboneEdgeWidth : contactEdgeWidth,
       )
       .on("mouseover", function (event, d) {
         if (!d.backbone) {

@@ -24,7 +24,11 @@ import {
   KEYTRUDA_INTERFACE_RESIDUES,
   PD_1_INTERFACE_RESIDUES_KEYTRUDA,
 } from "./shared/constants"
-import { chainSelection, multiChainSelection, residueSelection } from "./shared/selections"
+import {
+  chainSelection,
+  multiChainSelection,
+  residueSelection,
+} from "./shared/selections"
 import { setCameraWithPd1OnLeft } from "./shared/camera"
 import { controlStyles } from "./shared/styles"
 import ViewerShell from "./components/ViewerShell"
@@ -41,7 +45,7 @@ const LIGAND_OPTIONS = [
 const getChainLoci = (structure, chainId) => {
   const query = compile(chainSelection(chainId))
   return StructureSelection.toLociWithCurrentUnits(
-    query(new QueryContext(structure))
+    query(new QueryContext(structure)),
   )
 }
 
@@ -135,7 +139,7 @@ const Pd1PoseOverlayViewer = ({ title }) => {
 
         const pdL1Trajectory = await plugin.builders.structure.parseTrajectory(
           pdL1Data,
-          "pdb"
+          "pdb",
         )
         const keytrudaTrajectory =
           await plugin.builders.structure.parseTrajectory(keytrudaData, "pdb")
@@ -152,11 +156,11 @@ const Pd1PoseOverlayViewer = ({ title }) => {
 
         const pd1RefLoci = getChainLoci(
           pdL1Structure.cell.obj.data,
-          CHAINS.PD_L1_COMPLEX.PD_1
+          CHAINS.PD_L1_COMPLEX.PD_1,
         )
         const pd1KeytrudaLoci = getChainLoci(
           keytrudaStructure.cell.obj.data,
-          CHAINS.KEYTRUDA_COMPLEX.PD_1
+          CHAINS.KEYTRUDA_COMPLEX.PD_1,
         )
 
         if (
@@ -170,14 +174,18 @@ const Pd1PoseOverlayViewer = ({ title }) => {
         if (!transforms[0]?.bTransform) {
           throw new Error("Failed to align PD-1 chains")
         }
-        await applyTransform(plugin, keytrudaStructure, transforms[0].bTransform)
+        await applyTransform(
+          plugin,
+          keytrudaStructure,
+          transforms[0].bTransform,
+        )
 
         await plugin.dataTransaction(async () => {
           const pd1Component =
             await plugin.builders.structure.tryCreateComponentFromExpression(
               pdL1Structure,
               chainSelection(CHAINS.PD_L1_COMPLEX.PD_1),
-              "PD-1"
+              "PD-1",
             )
           pd1ComponentRef.current = pd1Component || null
           if (pd1Component) {
@@ -187,11 +195,13 @@ const Pd1PoseOverlayViewer = ({ title }) => {
                 type: "cartoon",
                 color: "uniform",
                 colorParams: { value: PD_1_COLOR },
-              }
+              },
             )
             const pd1Data = pd1Component.cell?.obj?.data
             if (pd1Data) {
-              chainCentersRef.current.pd1 = Vec3.clone(pd1Data.boundary.sphere.center)
+              chainCentersRef.current.pd1 = Vec3.clone(
+                pd1Data.boundary.sphere.center,
+              )
             }
           }
 
@@ -199,13 +209,15 @@ const Pd1PoseOverlayViewer = ({ title }) => {
             await plugin.builders.structure.tryCreateComponentFromExpression(
               pdL1Structure,
               chainSelection(CHAINS.PD_L1_COMPLEX.PD_L1),
-              "PD-L1"
+              "PD-L1",
             )
           pdl1ComponentRef.current = pdl1Component || null
           if (pdl1Component) {
             const pdl1Data = pdl1Component.cell?.obj?.data
             if (pdl1Data) {
-              chainCentersRef.current.pdl1 = Vec3.clone(pdl1Data.boundary.sphere.center)
+              chainCentersRef.current.pdl1 = Vec3.clone(
+                pdl1Data.boundary.sphere.center,
+              )
             }
           }
 
@@ -213,7 +225,7 @@ const Pd1PoseOverlayViewer = ({ title }) => {
             await plugin.builders.structure.tryCreateComponentFromExpression(
               keytrudaStructure,
               multiChainSelection(CHAINS.KEYTRUDA_COMPLEX.KEYTRUDA),
-              "Keytruda"
+              "Keytruda",
             )
           keytrudaComponentRef.current = keytrudaComponent || null
 
@@ -221,16 +233,22 @@ const Pd1PoseOverlayViewer = ({ title }) => {
           const pd1Pdl1Interface =
             await plugin.builders.structure.tryCreateComponentFromExpression(
               pdL1Structure,
-              residueSelection(CHAINS.PD_L1_COMPLEX.PD_1, PD_1_INTERFACE_RESIDUES_PDL1),
-              "PD-1 interface (PD-L1)"
+              residueSelection(
+                CHAINS.PD_L1_COMPLEX.PD_1,
+                PD_1_INTERFACE_RESIDUES_PDL1,
+              ),
+              "PD-1 interface (PD-L1)",
             )
           interfaceComponentsRef.current.pd1Pdl1 = pd1Pdl1Interface || null
 
           const pdl1Interface =
             await plugin.builders.structure.tryCreateComponentFromExpression(
               pdL1Structure,
-              residueSelection(CHAINS.PD_L1_COMPLEX.PD_L1, PD_L1_INTERFACE_RESIDUES),
-              "PD-L1 interface"
+              residueSelection(
+                CHAINS.PD_L1_COMPLEX.PD_L1,
+                PD_L1_INTERFACE_RESIDUES,
+              ),
+              "PD-L1 interface",
             )
           interfaceComponentsRef.current.pdl1 = pdl1Interface || null
 
@@ -238,18 +256,24 @@ const Pd1PoseOverlayViewer = ({ title }) => {
           const pd1KeytrudaInterface =
             await plugin.builders.structure.tryCreateComponentFromExpression(
               keytrudaStructure,
-              residueSelection(CHAINS.KEYTRUDA_COMPLEX.PD_1, PD_1_INTERFACE_RESIDUES_KEYTRUDA),
-              "PD-1 interface (Keytruda)"
+              residueSelection(
+                CHAINS.KEYTRUDA_COMPLEX.PD_1,
+                PD_1_INTERFACE_RESIDUES_KEYTRUDA,
+              ),
+              "PD-1 interface (Keytruda)",
             )
-          interfaceComponentsRef.current.pd1Keytruda = pd1KeytrudaInterface || null
+          interfaceComponentsRef.current.pd1Keytruda =
+            pd1KeytrudaInterface || null
 
           const keytrudaInterfaces = []
-          for (const [chainId, residues] of Object.entries(KEYTRUDA_INTERFACE_RESIDUES)) {
+          for (const [chainId, residues] of Object.entries(
+            KEYTRUDA_INTERFACE_RESIDUES,
+          )) {
             const component =
               await plugin.builders.structure.tryCreateComponentFromExpression(
                 keytrudaStructure,
                 residueSelection(chainId, residues),
-                `Keytruda interface ${chainId}`
+                `Keytruda interface ${chainId}`,
               )
             if (component) {
               keytrudaInterfaces.push(component)
@@ -263,7 +287,7 @@ const Pd1PoseOverlayViewer = ({ title }) => {
             setCameraWithPd1OnLeft(
               plugin,
               chainCentersRef.current.pd1,
-              chainCentersRef.current.pdl1
+              chainCentersRef.current.pdl1,
             )
           }
         })
@@ -288,7 +312,12 @@ const Pd1PoseOverlayViewer = ({ title }) => {
       pdl1ComponentRef.current = null
       keytrudaComponentRef.current = null
       ligandRepsRef.current = { pdl1: null, keytruda: null }
-      interfaceComponentsRef.current = { pd1Pdl1: null, pdl1: null, pd1Keytruda: null, keytruda: [] }
+      interfaceComponentsRef.current = {
+        pd1Pdl1: null,
+        pdl1: null,
+        pd1Keytruda: null,
+        keytruda: [],
+      }
       interfaceRepsRef.current = { pd1: null, ligand: [] }
       setIsStructureReady(false)
     }
@@ -328,7 +357,7 @@ const Pd1PoseOverlayViewer = ({ title }) => {
               type: "cartoon",
               color: "uniform",
               colorParams: { value: PD_L1_COLOR },
-            }
+            },
           )
       }
 
@@ -340,7 +369,7 @@ const Pd1PoseOverlayViewer = ({ title }) => {
               type: "cartoon",
               color: "uniform",
               colorParams: { value: KEYTRUDA_COLOR },
-            }
+            },
           )
       }
     }
@@ -393,14 +422,15 @@ const Pd1PoseOverlayViewer = ({ title }) => {
           interfaceRepsRef.current.pd1 =
             await plugin.builders.structure.representation.addRepresentation(
               interfaceComponentsRef.current.pd1Pdl1,
-              buildProps(PD_1_COLOR)
+              buildProps(PD_1_COLOR),
             )
         }
         if (interfaceComponentsRef.current.pdl1) {
-          const rep = await plugin.builders.structure.representation.addRepresentation(
-            interfaceComponentsRef.current.pdl1,
-            buildProps(PD_L1_COLOR)
-          )
+          const rep =
+            await plugin.builders.structure.representation.addRepresentation(
+              interfaceComponentsRef.current.pdl1,
+              buildProps(PD_L1_COLOR),
+            )
           interfaceRepsRef.current.ligand = [rep]
         }
       } else if (activeLigand === "keytruda") {
@@ -408,15 +438,16 @@ const Pd1PoseOverlayViewer = ({ title }) => {
           interfaceRepsRef.current.pd1 =
             await plugin.builders.structure.representation.addRepresentation(
               interfaceComponentsRef.current.pd1Keytruda,
-              buildProps(PD_1_COLOR)
+              buildProps(PD_1_COLOR),
             )
         }
         interfaceRepsRef.current.ligand = []
         for (const component of interfaceComponentsRef.current.keytruda || []) {
-          const rep = await plugin.builders.structure.representation.addRepresentation(
-            component,
-            buildProps(KEYTRUDA_COLOR)
-          )
+          const rep =
+            await plugin.builders.structure.representation.addRepresentation(
+              component,
+              buildProps(KEYTRUDA_COLOR),
+            )
           interfaceRepsRef.current.ligand.push(rep)
         }
       }
@@ -427,8 +458,16 @@ const Pd1PoseOverlayViewer = ({ title }) => {
 
   const legendItems = [
     { label: "PD-1", color: PD_1_COLOR },
-    { label: "PD-L1", color: PD_L1_COLOR, opacity: activeLigand === "pdl1" ? 1 : 0.4 },
-    { label: "Keytruda", color: KEYTRUDA_COLOR, opacity: activeLigand === "keytruda" ? 1 : 0.4 },
+    {
+      label: "PD-L1",
+      color: PD_L1_COLOR,
+      opacity: activeLigand === "pdl1" ? 1 : 0.4,
+    },
+    {
+      label: "Keytruda",
+      color: KEYTRUDA_COLOR,
+      opacity: activeLigand === "keytruda" ? 1 : 0.4,
+    },
   ]
 
   return (
@@ -439,7 +478,14 @@ const Pd1PoseOverlayViewer = ({ title }) => {
       error={error}
     >
       <Legend items={legendItems} />
-      <HoverInfo info={hoverInfo} chainNames={{ A: activeLigand === "pdl1" ? "PD-L1" : "Keytruda", B: activeLigand === "pdl1" ? "PD-1" : "Keytruda", C: "PD-1" }} />
+      <HoverInfo
+        info={hoverInfo}
+        chainNames={{
+          A: activeLigand === "pdl1" ? "PD-L1" : "Keytruda",
+          B: activeLigand === "pdl1" ? "PD-1" : "Keytruda",
+          C: "PD-1",
+        }}
+      />
       <div style={controlStyles.container}>
         <div style={controlStyles.row}>
           <span style={controlStyles.label}>Ligand</span>

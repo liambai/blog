@@ -3,13 +3,29 @@ import { StructureElement } from "molstar/lib/mol-model/structure"
 import { OrderedSet } from "molstar/lib/mol-data/int"
 
 const THREE_LETTER_TO_ONE = {
-  ALA: "A", ARG: "R", ASN: "N", ASP: "D", CYS: "C",
-  GLN: "Q", GLU: "E", GLY: "G", HIS: "H", ILE: "I",
-  LEU: "L", LYS: "K", MET: "M", PHE: "F", PRO: "P",
-  SER: "S", THR: "T", TRP: "W", TYR: "Y", VAL: "V",
+  ALA: "A",
+  ARG: "R",
+  ASN: "N",
+  ASP: "D",
+  CYS: "C",
+  GLN: "Q",
+  GLU: "E",
+  GLY: "G",
+  HIS: "H",
+  ILE: "I",
+  LEU: "L",
+  LYS: "K",
+  MET: "M",
+  PHE: "F",
+  PRO: "P",
+  SER: "S",
+  THR: "T",
+  TRP: "W",
+  TYR: "Y",
+  VAL: "V",
 }
 
-const formatResidueName = (threeLetterCode) => {
+const formatResidueName = threeLetterCode => {
   const oneLetter = THREE_LETTER_TO_ONE[threeLetterCode]
   if (oneLetter) {
     return `${threeLetterCode} (${oneLetter})`
@@ -17,7 +33,7 @@ const formatResidueName = (threeLetterCode) => {
   return threeLetterCode
 }
 
-const extractResidueInfo = (loci) => {
+const extractResidueInfo = loci => {
   if (!StructureElement.Loci.is(loci) || StructureElement.Loci.isEmpty(loci)) {
     return null
   }
@@ -60,7 +76,7 @@ const useHoverInfo = (pluginRef, containerRef, isReady) => {
     const plugin = pluginRef?.current
     if (!plugin || !isReady) return
 
-    const subscription = plugin.behaviors.interaction.hover.subscribe((event) => {
+    const subscription = plugin.behaviors.interaction.hover.subscribe(event => {
       if (!event.current || event.current.loci.kind === "empty-loci") {
         setHoverInfo(null)
         return
@@ -74,7 +90,7 @@ const useHoverInfo = (pluginRef, containerRef, isReady) => {
           const rect = container.getBoundingClientRect()
           info.position = {
             x: rect.left + event.page[0],
-            y: rect.top + event.page[1]
+            y: rect.top + event.page[1],
           }
         }
       }

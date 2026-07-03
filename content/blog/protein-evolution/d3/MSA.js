@@ -11,5 +11,5 @@ export const MSA = [
   ["L", "V", "R", "A", "T", "L", "P", "W", "D", "A"],
 ]
 export const MSAData = MSA.map(row =>
-  row.map((char, idx) => ({ pos: idx + 1, char: char }))
+  row.map((char, idx) => ({ pos: idx + 1, char: char })),
 )

@@ -8,7 +8,7 @@ const fetchCSV = async path => {
     const response = await fetch(path)
     if (!response.ok) {
       throw new Error(
-        `Failed to fetch CSV: ${response.status} ${response.statusText}`
+        `Failed to fetch CSV: ${response.status} ${response.statusText}`,
       )
     }
     return await response.text()
@@ -215,7 +215,7 @@ const TrueTokensRanksHeatmap = ({ title, sequence, ranksPath }) => {
         }
       }
     },
-    [sequence]
+    [sequence],
   )
 
   useEffect(() => {
