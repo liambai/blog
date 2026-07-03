@@ -1,0 +1,14 @@
+{
+  "name": "littlefoot",
+  "version": "4.0.1",
+  "description": "Prebuilt vendored copy of liambai/littlefoot (footnotes). Vendored so the Netlify build doesn't have to clone and yarn-build the git dependency during pnpm install.",
+  "license": "MIT",
+  "main": "dist/littlefoot.cjs.js",
+  "module": "dist/littlefoot.mjs",
+  "types": "dist/littlefoot.d.ts",
+  "dependencies": {
+    "@pacote/get-style": "2.0.2",
+    "@pacote/pixels": "2.0.2",
+    "@pacote/throttle": "2.0.2"
+  }
+}

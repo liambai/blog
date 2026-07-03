@@ -39,8 +39,8 @@ importers:
         specifier: ^0.16.47
         version: 0.16.47
       littlefoot:
-        specifier: https://github.com/liambai/littlefoot.git
-        version: https://codeload.github.com/liambai/littlefoot/tar.gz/aad970d82d682f23f154a615ea7d92832713e01d
+        specifier: file:./vendor/littlefoot
+        version: file:vendor/littlefoot
       molstar:
         specifier: ^4.18.0
         version: 4.18.0(@types/react@18.3.31)(fp-ts@2.16.11)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2050,9 +2050,8 @@ packages:
     resolution: {integrity: sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==}
     engines: {node: '>=6'}
 
-  littlefoot@https://codeload.github.com/liambai/littlefoot/tar.gz/aad970d82d682f23f154a615ea7d92832713e01d:
-    resolution: {tarball: https://codeload.github.com/liambai/littlefoot/tar.gz/aad970d82d682f23f154a615ea7d92832713e01d}
-    version: 4.0.1
+  littlefoot@file:vendor/littlefoot:
+    resolution: {directory: vendor/littlefoot, type: directory}
 
   longest-streak@3.1.0:
     resolution: {integrity: sha512-9Ri+o0JYgehTaVBBDoMqIl8GXtbWg711O3srftcHhZ0dqnETqLaoIK0x17fUw9rFSlK/0NlsKe0Ahhyl5pXE2g==}
@@ -5367,7 +5366,7 @@ snapshots:
 
   kleur@3.0.3: {}
 
-  littlefoot@https://codeload.github.com/liambai/littlefoot/tar.gz/aad970d82d682f23f154a615ea7d92832713e01d:
+  littlefoot@file:vendor/littlefoot:
     dependencies:
       '@pacote/get-style': 2.0.2
       '@pacote/pixels': 2.0.2
