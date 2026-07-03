@@ -731,6 +731,11 @@ a:focus {
 
 .molstar-interactive-indicator {
   animation: fadeInOut 3s ease-in-out;
+  transition: opacity 0.2s ease;
+}
+
+.molstar-viewer:hover .molstar-interactive-indicator {
+  opacity: 0;
 }
 
 @keyframes fadeInOut {

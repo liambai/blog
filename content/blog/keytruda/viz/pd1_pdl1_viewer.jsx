@@ -87,7 +87,7 @@ const Pd1Pdl1Viewer = ({ title }) => {
 
         const trajectory = await plugin.builders.structure.parseTrajectory(
           structureData,
-          "pdb"
+          "pdb",
         )
         const model = await plugin.builders.structure.createModel(trajectory)
         const structure = await plugin.builders.structure.createStructure(model)
@@ -97,7 +97,7 @@ const Pd1Pdl1Viewer = ({ title }) => {
             await plugin.builders.structure.tryCreateComponentFromExpression(
               structure,
               chainSelection(CHAINS.PD_L1_COMPLEX.PD_L1),
-              "PD-L1"
+              "PD-L1",
             )
           if (pdL1Chain) {
             await plugin.builders.structure.representation.addRepresentation(
@@ -106,11 +106,13 @@ const Pd1Pdl1Viewer = ({ title }) => {
                 type: "cartoon",
                 color: "uniform",
                 colorParams: { value: PD_L1_COLOR },
-              }
+              },
             )
             const pdl1Data = pdL1Chain.cell?.obj?.data
             if (pdl1Data) {
-              chainCentersRef.current.pdl1 = Vec3.clone(pdl1Data.boundary.sphere.center)
+              chainCentersRef.current.pdl1 = Vec3.clone(
+                pdl1Data.boundary.sphere.center,
+              )
             }
           }
 
@@ -118,7 +120,7 @@ const Pd1Pdl1Viewer = ({ title }) => {
             await plugin.builders.structure.tryCreateComponentFromExpression(
               structure,
               chainSelection(CHAINS.PD_L1_COMPLEX.PD_1),
-              "PD-1"
+              "PD-1",
             )
           if (pd1Chain) {
             await plugin.builders.structure.representation.addRepresentation(
@@ -127,27 +129,35 @@ const Pd1Pdl1Viewer = ({ title }) => {
                 type: "cartoon",
                 color: "uniform",
                 colorParams: { value: PD_1_COLOR },
-              }
+              },
             )
             const pd1Data = pd1Chain.cell?.obj?.data
             if (pd1Data) {
-              chainCentersRef.current.pd1 = Vec3.clone(pd1Data.boundary.sphere.center)
+              chainCentersRef.current.pd1 = Vec3.clone(
+                pd1Data.boundary.sphere.center,
+              )
             }
           }
 
           const pdL1Interface =
             await plugin.builders.structure.tryCreateComponentFromExpression(
               structure,
-              residueSelection(CHAINS.PD_L1_COMPLEX.PD_L1, PD_L1_INTERFACE_RESIDUES),
-              "PD-L1 interface"
+              residueSelection(
+                CHAINS.PD_L1_COMPLEX.PD_L1,
+                PD_L1_INTERFACE_RESIDUES,
+              ),
+              "PD-L1 interface",
             )
           interfaceComponentsRef.current.pdl1 = pdL1Interface || null
 
           const pd1Interface =
             await plugin.builders.structure.tryCreateComponentFromExpression(
               structure,
-              residueSelection(CHAINS.PD_L1_COMPLEX.PD_1, PD_1_INTERFACE_RESIDUES_PDL1),
-              "PD-1 interface"
+              residueSelection(
+                CHAINS.PD_L1_COMPLEX.PD_1,
+                PD_1_INTERFACE_RESIDUES_PDL1,
+              ),
+              "PD-1 interface",
             )
           interfaceComponentsRef.current.pd1 = pd1Interface || null
         })
@@ -157,7 +167,7 @@ const Pd1Pdl1Viewer = ({ title }) => {
             setCameraWithPd1OnLeft(
               plugin,
               chainCentersRef.current.pd1,
-              chainCentersRef.current.pdl1
+              chainCentersRef.current.pdl1,
             )
           }
         })
@@ -198,7 +208,7 @@ const Pd1Pdl1Viewer = ({ title }) => {
     }
 
     const option = INTERFACE_REP_OPTIONS.find(
-      currentOption => currentOption.id === interfaceStyle
+      currentOption => currentOption.id === interfaceStyle,
     )
 
     plugin.dataTransaction(async () => {
@@ -235,14 +245,14 @@ const Pd1Pdl1Viewer = ({ title }) => {
         interfaceRepsRef.current.pdl1 =
           await plugin.builders.structure.representation.addRepresentation(
             pdl1,
-            buildProps(PD_L1_COLOR)
+            buildProps(PD_L1_COLOR),
           )
       }
       if (pd1) {
         interfaceRepsRef.current.pd1 =
           await plugin.builders.structure.representation.addRepresentation(
             pd1,
-            buildProps(PD_1_COLOR)
+            buildProps(PD_1_COLOR),
           )
       }
     })

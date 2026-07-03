@@ -12,7 +12,11 @@ import {
   KEYTRUDA_INTERFACE_RESIDUES,
   PD_1_INTERFACE_RESIDUES_KEYTRUDA,
 } from "./shared/constants"
-import { chainSelection, multiChainSelection, residueSelection } from "./shared/selections"
+import {
+  chainSelection,
+  multiChainSelection,
+  residueSelection,
+} from "./shared/selections"
 import { setCameraWithPd1OnLeft } from "./shared/camera"
 import { controlStyles } from "./shared/styles"
 import ViewerShell from "./components/ViewerShell"
@@ -87,7 +91,7 @@ const Pd1KeytrudaViewer = ({ title }) => {
 
         const trajectory = await plugin.builders.structure.parseTrajectory(
           structureData,
-          "pdb"
+          "pdb",
         )
         const model = await plugin.builders.structure.createModel(trajectory)
         const structure = await plugin.builders.structure.createStructure(model)
@@ -97,7 +101,7 @@ const Pd1KeytrudaViewer = ({ title }) => {
             await plugin.builders.structure.tryCreateComponentFromExpression(
               structure,
               multiChainSelection(CHAINS.KEYTRUDA_COMPLEX.KEYTRUDA),
-              "Keytruda"
+              "Keytruda",
             )
           if (keytrudaChains) {
             await plugin.builders.structure.representation.addRepresentation(
@@ -106,11 +110,13 @@ const Pd1KeytrudaViewer = ({ title }) => {
                 type: "cartoon",
                 color: "uniform",
                 colorParams: { value: KEYTRUDA_COLOR },
-              }
+              },
             )
             const keytrudaData = keytrudaChains.cell?.obj?.data
             if (keytrudaData) {
-              chainCentersRef.current.keytruda = Vec3.clone(keytrudaData.boundary.sphere.center)
+              chainCentersRef.current.keytruda = Vec3.clone(
+                keytrudaData.boundary.sphere.center,
+              )
             }
           }
 
@@ -118,7 +124,7 @@ const Pd1KeytrudaViewer = ({ title }) => {
             await plugin.builders.structure.tryCreateComponentFromExpression(
               structure,
               chainSelection(CHAINS.KEYTRUDA_COMPLEX.PD_1),
-              "PD-1"
+              "PD-1",
             )
           if (pd1Chain) {
             await plugin.builders.structure.representation.addRepresentation(
@@ -127,21 +133,25 @@ const Pd1KeytrudaViewer = ({ title }) => {
                 type: "cartoon",
                 color: "uniform",
                 colorParams: { value: PD_1_COLOR },
-              }
+              },
             )
             const pd1Data = pd1Chain.cell?.obj?.data
             if (pd1Data) {
-              chainCentersRef.current.pd1 = Vec3.clone(pd1Data.boundary.sphere.center)
+              chainCentersRef.current.pd1 = Vec3.clone(
+                pd1Data.boundary.sphere.center,
+              )
             }
           }
 
           const keytrudaInterfaces = []
-          for (const [chainId, residues] of Object.entries(KEYTRUDA_INTERFACE_RESIDUES)) {
+          for (const [chainId, residues] of Object.entries(
+            KEYTRUDA_INTERFACE_RESIDUES,
+          )) {
             const component =
               await plugin.builders.structure.tryCreateComponentFromExpression(
                 structure,
                 residueSelection(chainId, residues),
-                `Keytruda interface ${chainId}`
+                `Keytruda interface ${chainId}`,
               )
             if (component) {
               keytrudaInterfaces.push(component)
@@ -152,8 +162,11 @@ const Pd1KeytrudaViewer = ({ title }) => {
           const pd1Interface =
             await plugin.builders.structure.tryCreateComponentFromExpression(
               structure,
-              residueSelection(CHAINS.KEYTRUDA_COMPLEX.PD_1, PD_1_INTERFACE_RESIDUES_KEYTRUDA),
-              "PD-1 interface"
+              residueSelection(
+                CHAINS.KEYTRUDA_COMPLEX.PD_1,
+                PD_1_INTERFACE_RESIDUES_KEYTRUDA,
+              ),
+              "PD-1 interface",
             )
           interfaceComponentsRef.current.pd1 = pd1Interface || null
         })
@@ -163,7 +176,7 @@ const Pd1KeytrudaViewer = ({ title }) => {
             setCameraWithPd1OnLeft(
               plugin,
               chainCentersRef.current.pd1,
-              chainCentersRef.current.keytruda
+              chainCentersRef.current.keytruda,
             )
           }
         })
@@ -204,7 +217,7 @@ const Pd1KeytrudaViewer = ({ title }) => {
     }
 
     const option = INTERFACE_REP_OPTIONS.find(
-      currentOption => currentOption.id === interfaceStyle
+      currentOption => currentOption.id === interfaceStyle,
     )
 
     plugin.dataTransaction(async () => {
@@ -243,7 +256,7 @@ const Pd1KeytrudaViewer = ({ title }) => {
         interfaceRepsRef.current.pd1 =
           await plugin.builders.structure.representation.addRepresentation(
             pd1,
-            buildProps(PD_1_COLOR)
+            buildProps(PD_1_COLOR),
           )
       }
       interfaceRepsRef.current.keytruda = []
@@ -251,7 +264,7 @@ const Pd1KeytrudaViewer = ({ title }) => {
         const rep =
           await plugin.builders.structure.representation.addRepresentation(
             component,
-            buildProps(KEYTRUDA_COLOR)
+            buildProps(KEYTRUDA_COLOR),
           )
         interfaceRepsRef.current.keytruda.push(rep)
       }
@@ -273,7 +286,10 @@ const Pd1KeytrudaViewer = ({ title }) => {
       error={error}
     >
       <Legend items={legendItems} />
-      <HoverInfo info={hoverInfo} chainNames={{ A: "Keytruda", B: "Keytruda", C: "PD-1" }} />
+      <HoverInfo
+        info={hoverInfo}
+        chainNames={{ A: "Keytruda", B: "Keytruda", C: "PD-1" }}
+      />
       <div style={controlStyles.container}>
         <div style={controlStyles.row}>
           <span style={controlStyles.label}>Interface</span>

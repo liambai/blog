@@ -1,4 +1,3 @@
-import React from "react"
 import getNoteComponents from "../../../src/components/notes"
 
 const notes = {

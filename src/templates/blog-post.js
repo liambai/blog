@@ -17,7 +17,11 @@ const ExternalLink = ({ href, children, ...props }) => {
       </a>
     )
   }
-  return <a href={href} {...props}>{children}</a>
+  return (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  )
 }
 
 const mdxComponents = {

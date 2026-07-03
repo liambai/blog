@@ -35,7 +35,12 @@ function renderMarkdown(text) {
       {
         regex: /\[([^\]]+)\]\(([^)]+)\)/g,
         element: (match, text, url) => (
-          <a key={Math.random()} href={url} target="_blank" rel="noopener noreferrer">
+          <a
+            key={Math.random()}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             {text}
           </a>
         ),
@@ -74,7 +79,7 @@ function renderMarkdown(text) {
           }
 
           newParts.push(
-            ...(currentParts.length > 0 ? currentParts : [textPart])
+            ...(currentParts.length > 0 ? currentParts : [textPart]),
           )
           pattern.regex.lastIndex = 0 // Reset regex
         } else {

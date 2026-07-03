@@ -30,7 +30,6 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
   const containerRef = useRef(null)
   const pluginRef = useRef(null)
   const [isStructureLoaded, setIsStructureLoaded] = useState(false)
-  const [showIndicator, setShowIndicator] = useState(true)
 
   // Create color theme function that maps white (0) to red (max)
   const createActivationColorTheme = useCallback((values, maxValue) => {
@@ -148,11 +147,11 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
 
         const trajectory = await plugin.builders.structure.parseTrajectory(
           structureData,
-          "pdb"
+          "pdb",
         )
         await plugin.builders.structure.hierarchy.applyPreset(
           trajectory,
-          "default"
+          "default",
         )
 
         // Filter to show only the first chain
@@ -185,7 +184,7 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
               if (unitsToRemove.length > 0) {
                 await plugin.managers.structure.component.removeComponents(
                   structure.components,
-                  unitsToRemove
+                  unitsToRemove,
                 )
               }
             }
@@ -233,10 +232,10 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
 
     // Remove existing theme if present, then add new one
     plugin.representation.structure.themes.colorThemeRegistry.remove(
-      colorThemeProvider
+      colorThemeProvider,
     )
     plugin.representation.structure.themes.colorThemeRegistry.add(
-      colorThemeProvider
+      colorThemeProvider,
     )
 
     plugin.dataTransaction(async () => {
@@ -251,7 +250,7 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
           s.components,
           {
             color: themeName,
-          }
+          },
         )
       }
     })
@@ -259,6 +258,7 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
 
   return (
     <div
+      className="molstar-viewer"
       style={{
         position: "relative",
         width,
@@ -269,8 +269,6 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
         maxWidth: "100%",
         boxSizing: "border-box",
       }}
-      onMouseEnter={() => setShowIndicator(false)}
-      onMouseLeave={() => setShowIndicator(true)}
     >
       <div
         ref={containerRef}
@@ -280,30 +278,28 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
           cursor: "grab",
         }}
       />
-      {showIndicator && (
-        <div
-          className="molstar-interactive-indicator"
-          style={{
-            position: "absolute",
-            top: "8px",
-            right: "8px",
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-            padding: "6px 10px",
-            background: "rgba(15, 76, 92, 0.9)",
-            color: "white",
-            borderRadius: "20px",
-            fontSize: "0.75rem",
-            fontFamily: "var(--font-heading)",
-            fontWeight: "var(--fontWeight-bold)",
-            pointerEvents: "none",
-            zIndex: 10,
-          }}
-        >
-          <FaHandPointer style={{ fontSize: "0.875rem" }} />
-        </div>
-      )}
+      <div
+        className="molstar-interactive-indicator"
+        style={{
+          position: "absolute",
+          top: "8px",
+          right: "8px",
+          display: "flex",
+          alignItems: "center",
+          gap: "6px",
+          padding: "6px 10px",
+          background: "rgba(15, 76, 92, 0.9)",
+          color: "white",
+          borderRadius: "20px",
+          fontSize: "0.75rem",
+          fontFamily: "var(--font-heading)",
+          fontWeight: "var(--fontWeight-bold)",
+          pointerEvents: "none",
+          zIndex: 10,
+        }}
+      >
+        <FaHandPointer style={{ fontSize: "0.875rem" }} />
+      </div>
     </div>
   )
 }

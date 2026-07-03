@@ -21,7 +21,7 @@ const LazyVisualizationWrapper = ({
       {
         rootMargin,
         threshold: 0.1,
-      }
+      },
     )
 
     const currentElement = elementRef.current

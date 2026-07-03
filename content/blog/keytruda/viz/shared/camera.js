@@ -8,7 +8,7 @@ export const setCameraWithPd1OnLeft = (plugin, pd1Center, partnerCenter) => {
   const target = Vec3.scale(
     Vec3(),
     Vec3.add(Vec3(), pd1Center, partnerCenter),
-    0.5
+    0.5,
   )
 
   // Vector from PD-1 to partner (partner should appear on the right)
@@ -27,7 +27,10 @@ export const setCameraWithPd1OnLeft = (plugin, pd1Center, partnerCenter) => {
   Vec3.normalize(viewDir, viewDir)
 
   // Camera distance based on current view
-  const currentDist = Vec3.distance(currentSnapshot.position, currentSnapshot.target)
+  const currentDist = Vec3.distance(
+    currentSnapshot.position,
+    currentSnapshot.target,
+  )
   const position = Vec3.scaleAndAdd(Vec3(), target, viewDir, currentDist)
 
   // Up vector should be perpendicular to both view direction and pd1-to-partner
@@ -35,7 +38,12 @@ export const setCameraWithPd1OnLeft = (plugin, pd1Center, partnerCenter) => {
   Vec3.normalize(up, up)
 
   camera.setState(
-    { ...currentSnapshot, target: [...target], position: [...position], up: [...up] },
-    0
+    {
+      ...currentSnapshot,
+      target: [...target],
+      position: [...position],
+      up: [...up],
+    },
+    0,
   )
 }

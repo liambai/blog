@@ -82,7 +82,7 @@ const KeytrudaFullViewer = ({ title }) => {
 
         const trajectory = await plugin.builders.structure.parseTrajectory(
           structureData,
-          "pdb"
+          "pdb",
         )
         const model = await plugin.builders.structure.createModel(trajectory)
         const structure = await plugin.builders.structure.createStructure(model)
@@ -97,7 +97,7 @@ const KeytrudaFullViewer = ({ title }) => {
               await plugin.builders.structure.tryCreateComponentFromExpression(
                 structure,
                 residueRangeSelection(chainId, 1, vEnd),
-                `${chainId} V${isHeavy ? "H" : "L"}`
+                `${chainId} V${isHeavy ? "H" : "L"}`,
               )
             if (fvComponent) {
               await plugin.builders.structure.representation.addRepresentation(
@@ -106,7 +106,7 @@ const KeytrudaFullViewer = ({ title }) => {
                   type: "cartoon",
                   color: "uniform",
                   colorParams: { value: FV_COLOR },
-                }
+                },
               )
             }
 
@@ -115,7 +115,7 @@ const KeytrudaFullViewer = ({ title }) => {
               await plugin.builders.structure.tryCreateComponentFromExpression(
                 structure,
                 residueRangeSelection(chainId, vEnd + 1, CHAIN_END),
-                `${chainId} C${isHeavy ? "H" : "L"}`
+                `${chainId} C${isHeavy ? "H" : "L"}`,
               )
             if (constComponent) {
               await plugin.builders.structure.representation.addRepresentation(
@@ -124,7 +124,7 @@ const KeytrudaFullViewer = ({ title }) => {
                   type: "cartoon",
                   color: "uniform",
                   colorParams: { value: CONST_COLOR },
-                }
+                },
               )
             }
           }
