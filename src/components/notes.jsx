@@ -1,55 +1,45 @@
 import React from "react"
 import { InlineMath } from "../lib/react-katex"
 
-// Simple markdown renderer for notes
+const MARKDOWN_PATTERNS = [
+  {
+    regex: /\*\*(.*?)\*\*/g,
+    element: (match, content) => <strong>{content}</strong>,
+  },
+  {
+    regex: /\*(.*?)\*/g,
+    element: (match, content) => <em>{content}</em>,
+  },
+  {
+    regex: /\[([^\]]+)\]\(([^)]+)\)/g,
+    element: (match, text, url) => (
+      <a href={url} target="_blank" rel="noopener noreferrer">
+        {text}
+      </a>
+    ),
+  },
+  {
+    regex: /`([^`]+)`/g,
+    element: (match, code) => <code>{code}</code>,
+  },
+]
+
 function renderMarkdown(text) {
   if (typeof text !== "string") {
-    // If it's already JSX (existing notes), return as-is
     return text
   }
 
-  // Split by math expressions first to avoid interfering with other parsing
   const parts = text.split(/(\$\$[\s\S]*?\$\$|\$[^$]*?\$)/g)
 
   return parts.map((part, index) => {
-    // Handle math expressions
     if (part.startsWith("$") && part.endsWith("$")) {
       return <InlineMath key={index}>{part.slice(1, -1)}</InlineMath>
     }
 
-    // Process the text for markdown patterns
-    const patterns = [
-      // Bold text
-      {
-        regex: /\*\*(.*?)\*\*/g,
-        element: (match, content) => <strong>{content}</strong>,
-      },
-      // Italic text
-      {
-        regex: /\*(.*?)\*/g,
-        element: (match, content) => <em>{content}</em>,
-      },
-      // Links
-      {
-        regex: /\[([^\]]+)\]\(([^)]+)\)/g,
-        element: (match, text, url) => (
-          <a href={url} target="_blank" rel="noopener noreferrer">
-            {text}
-          </a>
-        ),
-      },
-      // Code
-      {
-        regex: /`([^`]+)`/g,
-        element: (match, code) => <code>{code}</code>,
-      },
-    ]
-
-    // Split text and process each pattern
     let textParts = [part]
     let keyCounter = 0
 
-    patterns.forEach(pattern => {
+    MARKDOWN_PATTERNS.forEach(pattern => {
       let newParts = []
       textParts.forEach(textPart => {
         if (typeof textPart === "string") {
@@ -58,11 +48,9 @@ function renderMarkdown(text) {
           let currentParts = []
 
           while ((match = pattern.regex.exec(textPart)) !== null) {
-            // Add text before match
             if (match.index > lastIndex) {
               currentParts.push(textPart.slice(lastIndex, match.index))
             }
-            // Add processed element with a key stable across renders
             currentParts.push(
               React.cloneElement(pattern.element(...match), {
                 key: keyCounter++,
@@ -71,7 +59,6 @@ function renderMarkdown(text) {
             lastIndex = pattern.regex.lastIndex
           }
 
-          // Add remaining text
           if (lastIndex < textPart.length) {
             currentParts.push(textPart.slice(lastIndex))
           }
@@ -79,7 +66,7 @@ function renderMarkdown(text) {
           newParts.push(
             ...(currentParts.length > 0 ? currentParts : [textPart]),
           )
-          pattern.regex.lastIndex = 0 // Reset regex
+          pattern.regex.lastIndex = 0
         } else {
           newParts.push(textPart)
         }

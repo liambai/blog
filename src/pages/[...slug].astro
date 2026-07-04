@@ -59,9 +59,7 @@ const previewUrl = `${SITE.siteUrl}/previews/${post.id}.png`
     </footer>
   </article>
   <nav class="blog-post-nav">
-    <ul
-      style="display: flex; flex-wrap: wrap; justify-content: space-between; list-style: none; padding: 0;"
-    >
+    <ul class="blog-post-nav-list">
       <li>
         {
           previous && (
@@ -96,7 +94,7 @@ const previewUrl = `${SITE.siteUrl}/previews/${post.id}.png`
         aria-label="Reference <% reference %>"
         class="littlefoot-button"
         id="<% reference %>"
-      />
+      >
         [<% reference %>]
       </button>
     `,

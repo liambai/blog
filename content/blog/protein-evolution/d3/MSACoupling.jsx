@@ -225,7 +225,6 @@ const NetworkViz = ({ focusedNodes, setFocusedNodes }) => {
   useEffect(() => {
     const svg = d3.select(ref.current)
     svg.selectAll(".node").attr("stroke-width", d => {
-      // console.log(d.id, focusedNodes.includes(d.id))
       return focusedNodes.includes(d.id)
         ? nodeBorderHoverWidth
         : nodeBorderWidth

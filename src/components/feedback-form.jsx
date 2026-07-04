@@ -158,6 +158,9 @@ const styles = {
     transition: "background 0.2s ease",
     boxSizing: "border-box",
     maxWidth: "100%",
+    width: "100%",
+    textAlign: "left",
+    font: "inherit",
   },
   collapsedText: {
     fontFamily: "var(--font-body)",
@@ -179,7 +182,7 @@ const styles = {
 const FeedbackForm = ({ postTitle, questions }) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [answers, setAnswers] = useState({})
-  const [status, setStatus] = useState("idle") // idle, submitting, success, error
+  const [status, setStatus] = useState("idle")
 
   const updateAnswer = (id, value) => {
     setAnswers(prev => ({ ...prev, [id]: value }))
@@ -223,23 +226,17 @@ const FeedbackForm = ({ postTitle, questions }) => {
 
   if (!isExpanded) {
     return (
-      <div
+      <button
+        type="button"
         style={styles.collapsedHeader}
         onClick={() => setIsExpanded(true)}
-        role="button"
-        tabIndex={0}
-        onKeyDown={e => {
-          if (e.key === "Enter" || e.key === " ") {
-            setIsExpanded(true)
-          }
-        }}
       >
         <p style={styles.collapsedText}>
           To help me get better at writing, please consider filling out this
           feedback form.
         </p>
         <span style={styles.chevron}>▼</span>
-      </div>
+      </button>
     )
   }
 
