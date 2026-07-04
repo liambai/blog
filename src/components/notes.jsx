@@ -22,25 +22,18 @@ function renderMarkdown(text) {
       // Bold text
       {
         regex: /\*\*(.*?)\*\*/g,
-        element: (match, content) => (
-          <strong key={Math.random()}>{content}</strong>
-        ),
+        element: (match, content) => <strong>{content}</strong>,
       },
       // Italic text
       {
         regex: /\*(.*?)\*/g,
-        element: (match, content) => <em key={Math.random()}>{content}</em>,
+        element: (match, content) => <em>{content}</em>,
       },
       // Links
       {
         regex: /\[([^\]]+)\]\(([^)]+)\)/g,
         element: (match, text, url) => (
-          <a
-            key={Math.random()}
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href={url} target="_blank" rel="noopener noreferrer">
             {text}
           </a>
         ),
@@ -48,12 +41,13 @@ function renderMarkdown(text) {
       // Code
       {
         regex: /`([^`]+)`/g,
-        element: (match, code) => <code key={Math.random()}>{code}</code>,
+        element: (match, code) => <code>{code}</code>,
       },
     ]
 
     // Split text and process each pattern
     let textParts = [part]
+    let keyCounter = 0
 
     patterns.forEach(pattern => {
       let newParts = []
@@ -68,8 +62,12 @@ function renderMarkdown(text) {
             if (match.index > lastIndex) {
               currentParts.push(textPart.slice(lastIndex, match.index))
             }
-            // Add processed element
-            currentParts.push(pattern.element(...match))
+            // Add processed element with a key stable across renders
+            currentParts.push(
+              React.cloneElement(pattern.element(...match), {
+                key: keyCounter++,
+              }),
+            )
             lastIndex = pattern.regex.lastIndex
           }
 

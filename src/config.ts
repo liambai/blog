@@ -1,4 +1,4 @@
-// Static site metadata. Replaces Gatsby's `siteMetadata` GraphQL layer.
+// Static site metadata.
 const social = {
   twitter: "liambai21",
   linkedin: "liambai",
