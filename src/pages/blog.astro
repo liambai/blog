@@ -1,0 +1,45 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro"
+import Avatar from "../components/Avatar.astro"
+import { formatPostDate } from "../lib/format"
+import { getSortedPosts, postPath } from "../lib/posts"
+
+const posts = await getSortedPosts()
+---
+
+<BaseLayout title="Blog">
+  <section class="blog-hero">
+    <h1 class="page-title">Liam's Blog</h1>
+    <div class="blog-intro-row">
+      <Avatar class="blog-avatar" alt="Liam Bai" size={56} />
+      <p class="blog-intro">
+        Exploring machine learning and biology. Come learn with me!
+      </p>
+    </div>
+  </section>
+  <ol class="post-list">
+    {
+      posts.map(post => (
+        <li>
+          <article
+            class="post-list-item"
+            itemscope
+            itemtype="http://schema.org/Article"
+          >
+            <header>
+              <h2>
+                <a href={postPath(post.id)} itemprop="url">
+                  <span itemprop="headline">{post.data.title}</span>
+                </a>
+              </h2>
+              <small>{formatPostDate(post.data.date)}</small>
+            </header>
+            <section>
+              <p itemprop="description">{post.data.description}</p>
+            </section>
+          </article>
+        </li>
+      ))
+    }
+  </ol>
+</BaseLayout>

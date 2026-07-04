@@ -1,0 +1,9 @@
+[build]
+  command = "pnpm build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+  # Use Corepack so Netlify installs the exact pnpm from package.json's
+  # `packageManager` field (the version verified locally).
+  ENABLE_COREPACK = "true"

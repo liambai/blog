@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react"
 import * as d3 from "d3"
-import { BlockMath } from "react-katex"
+import { BlockMath } from "../../../../src/lib/react-katex"
 import { useMediaQuery } from "react-responsive"
 
 import { nodeIds, MSA, MSAData } from "./MSA"

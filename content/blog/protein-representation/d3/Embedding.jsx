@@ -25,6 +25,7 @@ const Embedding = ({
   const svgRef = useRef()
   const [focusedCharIndex, setFocusedCharIndex] = useState(null)
   const isMobile = useMediaQuery({ query: "(max-width: 1224px)" })
+  const svgWidth = isMobile ? 350 : width
 
   useEffect(() => {
     const embeddingLength = data[0].embedding.length
@@ -83,9 +84,8 @@ const Embedding = ({
     const fontSize = isMobile ? 12 : 16
     const spaceFromSequence = 80
 
-    // Some hacky math for mobile spacing – should probably improve this
     const offsetXMultiplier = isMobile
-      ? window.innerWidth * (6 / (data.length * 5 * embeddingLength))
+      ? (svgWidth * 1.2) / (data.length * embeddingLength)
       : 12
     const offsetYMultiplier = 12
 
@@ -183,9 +183,9 @@ const Embedding = ({
         .style("stroke", "gray")
         .style("stroke-width", 2)
     }
-  }, [isMobile, data, focusedCharIndex, tokenWidth])
+  }, [isMobile, data, focusedCharIndex, tokenWidth, svgWidth])
 
-  return <svg ref={svgRef} width={isMobile ? 350 : width} height={height} />
+  return <svg ref={svgRef} width={svgWidth} height={height} />
 }
 
 export default Embedding

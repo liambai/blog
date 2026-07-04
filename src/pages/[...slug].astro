@@ -1,0 +1,102 @@
+---
+import { render } from "astro:content"
+import BaseLayout from "../layouts/BaseLayout.astro"
+import Bio from "../components/Bio.astro"
+import Comments from "../components/Comments.astro"
+import Figure from "../components/Figure.astro"
+import Image from "../components/image.jsx"
+import { SITE } from "../config"
+import { formatPostDate } from "../lib/format"
+import { getSortedPosts, postPath } from "../lib/posts"
+
+// Figure and Image are used in every post, so hand them to all MDX content here
+// (Astro's MDXProvider equivalent) instead of making each post import them.
+const mdxComponents = { Figure, Image }
+
+// Code highlighting, math, and footnote styles are only needed on posts.
+import "prismjs/themes/prism.css"
+import "katex/dist/katex.min.css"
+import "littlefoot/dist/littlefoot.css"
+
+export async function getStaticPaths() {
+  // Reversed to oldest-first so previous = older post and next = newer post.
+  const posts = (await getSortedPosts()).reverse()
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    props: {
+      post,
+      previous: i > 0 ? posts[i - 1] : null,
+      next: i < posts.length - 1 ? posts[i + 1] : null,
+    },
+  }))
+}
+
+const { post, previous, next } = Astro.props
+const { Content } = await render(post)
+
+const dateStr = formatPostDate(post.data.date)
+
+const previewUrl = `${SITE.siteUrl}/previews/${post.id}.png`
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  image={previewUrl}
+  type="article"
+>
+  <article class="blog-post" itemscope itemtype="http://schema.org/Article">
+    <header>
+      <h1 itemprop="headline">{post.data.title}</h1>
+      <p>{dateStr}</p>
+    </header>
+    <Content components={mdxComponents} />
+    <hr />
+    <Comments issueTerm={post.data.title} />
+    <hr />
+    <footer>
+      <Bio />
+    </footer>
+  </article>
+  <nav class="blog-post-nav">
+    <ul class="blog-post-nav-list">
+      <li>
+        {
+          previous && (
+            <a href={postPath(previous.id)} rel="prev">
+              ← {previous.data.title}
+            </a>
+          )
+        }
+      </li>
+      <li>
+        {
+          next && (
+            <a href={postPath(next.id)} rel="next">
+              {next.data.title} →
+            </a>
+          )
+        }
+      </li>
+    </ul>
+  </nav>
+</BaseLayout>
+
+<script>
+  import littlefoot from "littlefoot"
+
+  littlefoot({
+    activateOnHover: true,
+    dismissOnUnhover: true,
+    allowDuplicates: true,
+    buttonTemplate: `
+      <button
+        aria-label="Reference <% reference %>"
+        class="littlefoot-button"
+        id="<% reference %>"
+      >
+        [<% reference %>]
+      </button>
+    `,
+  })
+</script>

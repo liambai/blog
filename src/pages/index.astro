@@ -1,0 +1,131 @@
+---
+import {
+  FaTwitter,
+  FaGithub,
+  FaGraduationCap,
+  FaLinkedin,
+  FaArrowRight,
+  FaRss,
+} from "react-icons/fa"
+
+import BaseLayout from "../layouts/BaseLayout.astro"
+import InterProtPreview from "../components/interprot-preview.jsx"
+import { SITE } from "../config"
+import profilePic from "../images/liam.jpeg"
+---
+
+<BaseLayout>
+  <div class="landing-simple">
+    <div class="landing-intro">
+      <div class="landing-copy">
+        <p class="landing-summary">
+          Hi! I'm Liam. I work on software at <a
+            href="https://generatebiomedicines.com/"
+            target="_blank"
+            rel="noopener noreferrer">Generate:Biomedicines</a
+          >.
+        </p>
+        <p class="landing-summary">
+          I am interested in protein design, interpretability, and systems for
+          automating scientific discovery. I enjoy writing about cool things I
+          learn.
+        </p>
+      </div>
+      <img
+        class="landing-profile-pic"
+        src={profilePic.src}
+        alt="Liam Bai"
+        width={160}
+        height={160}
+      />
+    </div>
+    <a href="/blog" class="blog-cta-button">
+      My blog <FaArrowRight className="arrow-icon" />
+    </a>
+    <div class="landing-links">
+      <a
+        href={SITE.socialUrls.twitter}
+        aria-label="Twitter"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <FaTwitter />
+      </a>
+      <a
+        href="https://github.com/liambai"
+        aria-label="GitHub"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <FaGithub />
+      </a>
+      <a
+        href="https://scholar.google.com/citations?user=qBKzB2sAAAAJ&hl=en"
+        aria-label="Google Scholar"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <FaGraduationCap />
+      </a>
+      <a
+        href={SITE.socialUrls.linkedin}
+        aria-label="LinkedIn"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <FaLinkedin />
+      </a>
+      <a href="/rss.xml" aria-label="RSS feed">
+        <FaRss />
+      </a>
+    </div>
+    <section class="landing-work">
+      <ul class="work-list">
+        <li class="work-item work-item-paper">
+          <div class="work-item-content">
+            <div class="work-thumbnail">
+              <InterProtPreview client:only="react" />
+            </div>
+            <div class="work-details">
+              <a
+                href="https://interprot.com/"
+                class="work-title"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                From Mechanistic Interpretability to Mechanistic Biology:
+                Training, Evaluating, and Interpreting Sparse Autoencoders on
+                Protein Language Models
+              </a>
+              <p class="work-authors">
+                Etowah Adams*, <u>Liam Bai*</u>, Minji Lee, Yiyang Yu, Mohammed
+                AlQuraishi
+              </p>
+              <p class="work-venue">
+                International Conference on Machine Learning (ICML), 2025
+                (Spotlight)
+              </p>
+              <div class="work-links">
+                <a
+                  href="https://interprot.com/"
+                  target="_blank"
+                  rel="noopener noreferrer">Website</a
+                >
+                <a
+                  href="https://www.biorxiv.org/content/10.1101/2025.02.06.636901v2"
+                  target="_blank"
+                  rel="noopener noreferrer">Paper</a
+                >
+                <a
+                  href="https://github.com/etowahadams/interprot"
+                  target="_blank"
+                  rel="noopener noreferrer">Code</a
+                >
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </section>
+  </div>
+</BaseLayout>

@@ -29,7 +29,6 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
   const molstarRef = useRef(null)
   const [isStructureLoaded, setIsStructureLoaded] = useState(false)
 
-  // Create color theme function that maps white (0) to red (max)
   const createActivationColorTheme = useCallback((values, maxValue) => {
     if (!values || values.length === 0) {
       return null
@@ -68,13 +67,11 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
             typeof value !== "number" ||
             value === 0
           ) {
-            return Color(0xffffff) // White for zero or missing values
+            return Color(0xffffff)
           }
 
-          // Normalize value to range [0, 1]
           const normalized = Math.min(1.0, Math.max(0.0, value / maxValue))
 
-          // Interpolate from white (255, 255, 255) to red (255, 0, 0)
           const r = 255
           const g = Math.round(255 * (1 - normalized))
           const b = Math.round(255 * (1 - normalized))
@@ -177,7 +174,6 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
           "default",
         )
 
-        // Filter to show only the first chain
         await plugin.dataTransaction(async () => {
           const structures =
             plugin.managers.structure.hierarchy.current.structures
@@ -186,14 +182,12 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
             const units = structure.units
 
             if (units.length > 0) {
-              // Get the first chain ID from the first unit
               const firstUnit = units[0]
               const firstChainId =
                 firstUnit.model.atomicHierarchy.chains.chainId[
                   firstUnit.chainIndex[0]
                 ]
 
-              // Collect units to remove (all units not from first chain)
               const unitsToRemove = []
               for (const unit of units) {
                 const chainId =
@@ -203,7 +197,6 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
                 }
               }
 
-              // Remove units from other chains
               if (unitsToRemove.length > 0) {
                 await plugin.managers.structure.component.removeComponents(
                   structure.components,
@@ -245,14 +238,13 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
     }
   }, [width, height])
 
-  // Apply coloring when structure is loaded and activation values are provided
   useEffect(() => {
     if (!pluginRef.current || !isStructureLoaded) {
       return
     }
 
     const plugin = pluginRef.current
-    const maxValue = Math.max(...ACTIVATION_VALUES, 1) // Find max value, default to 1
+    const maxValue = Math.max(...ACTIVATION_VALUES, 1)
     const colorTheme = createActivationColorTheme(ACTIVATION_VALUES, maxValue)
 
     if (!colorTheme || !colorTheme.colorThemeProvider) {
@@ -266,7 +258,6 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
       return
     }
 
-    // Remove existing theme if present, then add new one
     plugin.representation.structure.themes.colorThemeRegistry.remove(
       colorThemeProvider,
     )

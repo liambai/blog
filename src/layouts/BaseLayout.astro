@@ -1,0 +1,105 @@
+---
+import { SITE } from "../config"
+
+// Global styles and fonts.
+import "@fontsource-variable/montserrat"
+import "@fontsource/merriweather"
+import "../normalize.css"
+import "../style.css"
+
+interface Props {
+  title?: string
+  description?: string
+  image?: string
+  type?: "website" | "article"
+}
+
+const { title, description, image, type = "website" } = Astro.props
+
+const defaultTitle = SITE.title
+const siteUrl = SITE.siteUrl
+const pathname = Astro.url.pathname
+const isRootPath = pathname === "/"
+
+const metaDescription = description || SITE.description
+const fullTitle = title ? `${title} | ${defaultTitle}` : defaultTitle
+const canonicalUrl = new URL(pathname, siteUrl).href
+
+// new URL() ignores the base when its first arg is already absolute, so this
+// handles both absolute preview URLs and the relative default image.
+const imageUrl = new URL(image || SITE.defaultImage, siteUrl).href
+
+const twitterCreator = `@${SITE.social.twitter}`
+
+const gtagId = SITE.gtagId
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <title>{fullTitle}</title>
+    <link rel="canonical" href={canonicalUrl} />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={`${defaultTitle} RSS Feed`}
+      href={`${siteUrl}/rss.xml`}
+    />
+
+    <meta name="description" content={metaDescription} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={metaDescription} />
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={imageUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content={twitterCreator} />
+    <meta name="twitter:site" content={twitterCreator} />
+    <meta name="twitter:image" content={imageUrl} />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={metaDescription} />
+
+    {/* Google Analytics (gtag) */}
+    {
+      gtagId && (
+        <>
+          <script
+            is:inline
+            async
+            src={`https://www.googletagmanager.com/gtag/js?id=${gtagId}`}
+          />
+          <script is:inline define:vars={{ gtagId }}>
+            window.dataLayer = window.dataLayer || []
+            function gtag() {
+              dataLayer.push(arguments)
+            }
+            gtag("js", new Date())
+            gtag("config", gtagId)
+          </script>
+        </>
+      )
+    }
+    <slot name="head" />
+  </head>
+  <body>
+    <div class="global-wrapper" data-is-root-path={isRootPath}>
+      <header class="global-header">
+        <div class="header-inner">
+          <a class="header-logo" href="/">{defaultTitle}</a>
+          <nav class="header-nav" aria-label="Primary">
+            <a href="/blog">Blog</a>
+          </nav>
+        </div>
+      </header>
+      <main>
+        <slot />
+      </main>
+    </div>
+  </body>
+</html>

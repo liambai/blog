@@ -1,0 +1,23 @@
+---
+import Avatar from "./Avatar.astro"
+import { SITE } from "../config"
+---
+
+<div class="bio">
+  <Avatar class="bio-avatar" alt="Profile picture" size={50} />
+  <p>
+    Written by <strong>Liam Bai</strong>, who works on software at <a
+      href="https://generatebiomedicines.com/"
+      target="_blank"
+      rel="noopener noreferrer">Generate:Biomedicines</a
+    > and writes about machine learning and biology. He is on <a
+      href={SITE.socialUrls.twitter}
+      target="_blank"
+      rel="noopener noreferrer">Twitter</a
+    > and <a
+      href={SITE.socialUrls.linkedin}
+      target="_blank"
+      rel="noopener noreferrer">LinkedIn</a
+    >.
+  </p>
+</div>

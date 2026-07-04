@@ -4,32 +4,29 @@ date: "2023-10-09"
 description: Protein design by hallucination. DeepDream, Markov Chain Monte Carlo (MCMC), KL divergence, gradient optimization, scaffolding functional sites, SARS-CoV-2 receptor traps.
 ---
 
-import { Link } from "gatsby"
-import Figure from "../../../src/components/figure.jsx"
-import Image from "../../../src/components/image.jsx"
 import LongRangeContacts from "./d3/LongRangeContacts.jsx"
 import { Note, NoteList } from "./Notes.jsx"
 import { Reference, ReferenceList } from "./References.jsx"
 
-Models that are good at making predictions also possess some generative power. We saw this theme play out in <Link to="/protein-evolution">previous</Link> <Link to="/protein-representation">posts</Link> with a technique called **Markov Chain Monte Carlo (MCMC)**. Here's a quick recap:
+Models that are good at making predictions also possess some generative power. We saw this theme play out in <a href="/protein-evolution">previous</a> <a href="/protein-representation">posts</a> with a technique called **Markov Chain Monte Carlo (MCMC)**. Here's a quick recap:
 
 Imagine you have a monkey that, when shown an image, gets visibly excited if the image contains bananas – and sad otherwise.
 
-<Figure content={<Image path={require("./images/monkey-model.png")} />} />
+<Figure>
+  <Image slot="content" path="./images/monkey-model.png" />
+</Figure>
 
 An obvious task the monkey can help with is image classification: discriminate images containing bananas from ones that don't. The monkey is a **discriminative model**.
 
 Now suppose you want to create some _new_ images of bananas. We can start with a white-noise image:
 
-<Figure
-  content={
-    <Image
-      path={require("./images/white-noise.png")}
+<Figure>
+  <Image slot="content"
+      path="./images/white-noise.png"
       width="50%"
       mobileWidth="60%"
     />
-  }
-/>
+</Figure>
 
 randomly change a couple pixels, and show it to our monkey:
 
@@ -40,7 +37,9 @@ Repeat this thousands of times: we'll end up with an image that looks a lot like
 
 Researchers at Google used a similar technique in a cool project called [DeepDream](https://en.wikipedia.org/wiki/DeepDream). Instead of monkeys, they used [**convolutional neural networks (CNNs)**](https://en.wikipedia.org/wiki/Convolutional_neural_network).
 
-<Figure content={<Image path={require("./images/deepdream-bananas.png")} />}>
+<Figure>
+  <Image slot="content" path="./images/deepdream-bananas.png" />
+
   "Optimize with prior" refers to the fact that to make this work well, we
   usually need to constrain our generated images to have some features of
   natural images: for example, neighboring pixels should be correlated. Figure
@@ -65,15 +64,13 @@ Let's replace the banana recognition task with one we're not so good at: predict
 
 Let's focus on step 1. One structure-defining number produced by trRosetta is the distance between the residues, $d$. There's also this angle $\omega$:
 
-<Figure
-  content={
-    <Image
-      path={require("./images/interresidue-distance.png")}
+<Figure>
+  <Image slot="content"
+      path="./images/interresidue-distance.png"
       width="40%"
       mobileWidth="60%"
     />
-  }
->
+
   C$\alpha$ (alpha-carbon), is the first carbon in the amino acid's [side
   chain](https://en.wikipedia.org/wiki/Side_chain); C$\beta$ (beta-carbon) is
   the second. Simplistically, imagine your index fingers as side chains:
@@ -84,15 +81,13 @@ Let's focus on step 1. One structure-defining number produced by trRosetta is th
 
 as well as 4 other angles:
 
-<Figure
-  content={
-    <Image
-      path={require("./images/interresidue-angles.png")}
+<Figure>
+  <Image slot="content"
+      path="./images/interresidue-angles.png"
       width="40%"
       mobileWidth="60%"
     />
-  }
->
+
   Figure from <Reference id={1} />.
 </Figure>
 
@@ -102,15 +97,13 @@ If we know these 6 numbers for each residue pair in folded 3D structure, then we
 
 Here's the architecture of the trRosetta CNN. For our purposes, understanding the inner workings is not as important. The big picture: the network takes in an MSA and spits out these interresidue distances and orientation angles.
 
-<Figure
-  content={
-    <Image
-      path={require("./images/trRosetta-architecture.png")}
+<Figure>
+  <Image slot="content"
+      path="./images/trRosetta-architecture.png"
       width="40%"
       mobileWidth="60%"
     />
-  }
->
+
   trRosetta uses a deep residual CNN. For more details, check out the [trRosetta
   paper](https://www.pnas.org/doi/10.1073/pnas.1914677117). Figure from
   <Reference id={1} />.
@@ -120,19 +113,19 @@ Here's the architecture of the trRosetta CNN. For our purposes, understanding th
 
 Let's ignore the angles for now and focus on distance. The interresidue distances predicted by the network are presented in a matrix called the **distance map**:
 
-<Figure
-  content={
-    <Image
-      path={require("./images/distance-map.png")}
+<Figure>
+  <Image slot="content"
+      path="./images/distance-map.png"
       width="60%"
       mobileWidth="80%"
     />
-  }
-/>
+</Figure>
 
 Surrounding the diagonal of the matrix are residues that are close in sequence position – which are of course close in 3D space – explaining the dark diagonal line. (Only the residues that are far apart in sequence but close in 3D are interesting and structure-defining.)
 
-<Figure content={<LongRangeContacts />}>
+<Figure>
+  <LongRangeContacts client:visible slot="content" />
+
   In this simplified visualization of an amino acid chain's folded structure,
   the fact that residues 2 and 3 (close in sequence, on diagonal of matrix) are
   close in space is obvious and uninteresting, but the fact that 2 and 8 (far in
@@ -143,9 +136,8 @@ Surrounding the diagonal of the matrix are residues that are close in sequence p
 
 Neural networks output probabilities. For example, language models like GPT – tasked with predicting the next word given some previous words as context – outputs a probability distribution over the set of all possible words (the vocabulary); in an additional final step, the word with the highest probability is chosen to be the prediction. In our case, trRosetta outputs probabilities for different distance bins, like this:
 
-<Figure
-  content={
-    <table
+<Figure>
+  <table slot="content"
       style={{
         width: 300,
         margin: "auto",
@@ -190,8 +182,7 @@ Neural networks output probabilities. For example, language models like GPT –�
         <td>0</td>
       </tr>
     </table>
-  }
->
+
   An angstrom (Å) is $10^{-10}$ m, a common unit for measuring atomic distance.
   Each distance bin spans 5 Å and is assigned a probability by trRosetta.
 </Figure>
@@ -204,15 +195,13 @@ But trRosetta is not always so confident. If the probability distribution is mor
 
 Let's visualize this. In the two distance maps we showed above, the colors reflect, for each residue pair, the sum of trRosetta's predicted probabilities for the bins in the $ <10 \text{\r{A}}$ range, i.e. how likely trRosetta thinks it is for the residues to end up close together in the 3D structure.
 
-<Figure
-  content={
-    <Image
-      path={require("./images/distance-map.png")}
+<Figure>
+  <Image slot="content"
+      path="./images/distance-map.png"
       width="60%"
       mobileWidth="80%"
     />
-  }
->
+
   Figure from <Reference id={2} />.
 </Figure>
 
@@ -264,17 +253,17 @@ $P$ is sharp if it's as far away from $Q$ as possible, as measured by the averag
 
 To recap, when fed an amino acid sequence that encodes a functional protein, trRosetta produces a sharp distance map, a good foundation for structure prediction.
 
-<Figure
-  content={<Image path={require("./images/hallucination-background.png")} />}
->
+<Figure>
+  <Image slot="content" path="./images/hallucination-background.png" />
+
   Figure from <Reference id={2} />.
 </Figure>
 
 When fed a random amino acid sequence, trRosetta produces a blurry distance map. But, equipped with a tool to measure sharpness, _we can sharpen the blurry distance map using MCMC_ <Reference id={2}/>.
 
-<Figure
-  content={<Image path={require("./images/hallucination-MCMC-overview.png")} />}
->
+<Figure>
+  <Image slot="content" path="./images/hallucination-MCMC-overview.png" />
+
   Figure from <Reference id={2} />.
 </Figure>
 
@@ -287,19 +276,17 @@ Let's start with a random sequence analogous to a white-noise image. At each MCM
    - this acceptance criterion is called the [Metropolis criterion](https://en.wikipedia.org/wiki/Metropolis%E2%80%93Hastings_algorithm).
    - an additional parameter, $T$, is introduced as a knob we can use to control acceptance probability.
 
-<Figure
-  content={<Image path={require("./images/hallucination-MCMC-details.png")} />}
->
+<Figure>
+  <Image slot="content" path="./images/hallucination-MCMC-details.png" />
+
   Figure from <Reference id={2} />.
 </Figure>
 
 As we repeat these steps, the distance maps get progressively sharper, converging on a final, sharp distance map after 40,000 iterations.
 
-<Figure
-  content={
-    <Image path={require("./images/hallucination-MCMC-progression.png")} />
-  }
->
+<Figure>
+  <Image slot="content" path="./images/hallucination-MCMC-progression.png" />
+
   Each row represents a Monte Carlo trajectory, the evolutionary path from a
   random protein to a hallucinated protein. Distance maps get progressively
   sharper along the trajectory. Final predicted structures are shown on the
@@ -309,11 +296,9 @@ As we repeat these steps, the distance maps get progressively sharper, convergin
 
 When expressed in _E. coli_, many of these these hallucinated sequences fold into stable structures that closely match trRosetta's predictions.
 
-<Figure
-  content={
-    <Image path={require("./images/hallucination-structure-example.png")} />
-  }
->
+<Figure>
+  <Image slot="content" path="./images/hallucination-structure-example.png" />
+
   Here's one of the hallucinated sequences. We compare trRosetta's predicted
   structure to the experimental structure obtained via [X-ray
   crystallography](https://en.wikipedia.org/wiki/X-ray_crystallography) after
@@ -335,9 +320,9 @@ We already have a loss function: our average KL divergence between $P$ and $Q$. 
 2. Use the gradients to propose a mutation instead of using a random one.
    - Turning the gradients into a proposed mutation takes a few simple steps (bottom left of the diagram). They are explained in the methods section [here](https://www.pnas.org/doi/10.1073/pnas.2017228118).
 
-<Figure
-  content={<Image path={require("./images/hallucination-gradients.png")} />}
->
+<Figure>
+  <Image slot="content" path="./images/hallucination-gradients.png" />
+
   The figure describes a more constrained version of protein design called
   **fixed-backbone design**, which seeks an amino acid sequence given a target
   structure <Reference id={3} />. This is why the loss function, in addition to
@@ -357,30 +342,26 @@ So far, we have focused on creating stable proteins that fold into well-predicte
 
 Most proteins perform their function via a **functional site** formed by a small subset of residues called a **motif**. For example, the functional sites of enzymes bind to their substrates and perform the catalytic function <Note id={5}/>.
 
-<Figure
-  content={
-    <Image
-      path={require("./images/enzyme-active-site.png")}
+<Figure>
+  <Image slot="content"
+      path="./images/enzyme-active-site.png"
       width="60%"
       mobileWidth="85%"
     />
-  }
->
+
   The functional sites of enzymes are called **active sites**. Figure from
   [https://biocyclopedia.com/index/general_zoology/action_of_enzymes.php](https://biocyclopedia.com/index/general_zoology/action_of_enzymes.php).
 </Figure>
 
 Since it's really the functional site that matters, a natural problem is: given a desired functional site, can we design a protein that contains it? This is called **scaffolding** a functional site. Solutions to this problem has wide-ranging implications, from designing new vaccines to interfering with cancer <Reference id={5}/>.
 
-<Figure
-  content={
-    <Image
-      path={require("./images/scaffolding-motif.png")}
+<Figure>
+  <Image slot="content"
+      path="./images/scaffolding-motif.png"
       width="40%"
       mobileWidth="60%"
     />
-  }
->
+
   The green part is the motif we need; the grey part is what we need to design.
   Figure from <Reference id={4} />.
 </Figure>
@@ -397,15 +378,13 @@ where $Loss_{FH}$, the **free-hallucination loss**, is our average DL divergence
 
 Intuitively, this loss needs to be small when the structure predicted by trRosetta clearly contains the desired motif – and big otherwise (for the mathematical details, check out the methods section [here](https://www.biorxiv.org/content/10.1101/2020.11.29.402743v1)). We are engaging in a balancing act: we want proteins that contain the functional site (low motif-satisfaction loss) that are also generally good, stable proteins (low free-hallucination loss)!
 
-<Figure
-  content={
-    <Image
-      path={require("./images/motif-satisfaction-overview.png")}
+<Figure>
+  <Image slot="content"
+      path="./images/motif-satisfaction-overview.png"
       width="60%"
       mobileWidth="85%"
     />
-  }
->
+
   We take trRosetta's predicted distance maps and look at them in two ways: 1.
   look at the residues that correspond to the motif: do they do a good job
   recreating the motif? (motif-satisfaction) <Note id={6} />; 2. look at the
@@ -417,18 +396,18 @@ Intuitively, this loss needs to be small when the structure predicted by trRoset
 
 SARS-CoV-2, the virus behind the Covid-19 pandemic, has a clever way of entering our cells. It takes advantage of an innocent, blood-pressure regulating protein in our body called [angiotensin-converting enzyme 2 (ACE2)](https://en.wikipedia.org/wiki/Angiotensin-converting_enzyme_2) attached to the cell membrane.
 
-<Figure
-  content={
-    <Image path={require("./images/ACE2.png")} width="50%" mobileWidth="75%" />
-  }
->
+<Figure>
+  <Image slot="content" path="./images/ACE2.png" width="50%" mobileWidth="75%" />
+
   ACE2 on the cell membrane. The coronavirus contains **spike proteins** that
   bind to ACE2. Figure from <Reference id={6} />.
 </Figure>
 
 It anchors itself by binding to an [alpha helix](https://en.wikipedia.org/wiki/Alpha_helix) in ACE2, and then enters the cell:
 
-<Figure content={<Image path={require("./images/ACE2-attacked.png")} />}>
+<Figure>
+  <Image slot="content" path="./images/ACE2-attacked.png" />
+
   The coronavirus takes advantage of ACE2 to enter the cell and eventually dumps
   its viral DNA into the cell :( Figure from <Reference id={6} />.
 </Figure>
@@ -438,9 +417,9 @@ These therapeutic proteins are called **receptor traps**: they trap the receptor
 
 This is exactly our functional site scaffolding problem. Folks at the Baker lab used the composite loss function to hallucinated these receptor traps containing the interface helix (shown on the right).
 
-<Figure
-  content={<Image path={require("./images/ACE2-designs.png")} width="80%" />}
->
+<Figure>
+  <Image slot="content" path="./images/ACE2-designs.png" width="80%" />
+
   Light yellow: Native protein scaffold of ACE2. Grey: hallucinated scaffolds.
   Orange: the interface helix (our target motif). Blue: spike proteins that
   binds to the helix. Figure from <Reference id={5} />.

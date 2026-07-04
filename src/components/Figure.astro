@@ -1,0 +1,14 @@
+---
+// Centered figure content with a caption below. The visualization/image goes in
+// the named "content" slot (so islands can hydrate in element position); the
+// caption is the default slot.
+---
+
+<div class="figure">
+  <div style="text-align: center;">
+    <slot name="content" />
+  </div>
+  <div style="font-size: 13.5px; color: slategrey;">
+    <slot />
+  </div>
+</div>

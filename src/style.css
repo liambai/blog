@@ -1,19 +1,7 @@
 /* CSS Custom Properties Definitions */
 
 :root {
-  --maxWidth-none: "none";
-  --maxWidth-xs: 20rem;
-  --maxWidth-sm: 24rem;
-  --maxWidth-md: 28rem;
-  --maxWidth-lg: 32rem;
-  --maxWidth-xl: 36rem;
-  --maxWidth-2xl: 42rem;
-  --maxWidth-3xl: 48rem;
-  --maxWidth-4xl: 56rem;
-  --maxWidth-5xl: 64rem;
-  --maxWidth-full: "100%";
-  --maxWidth-wrapper: var(--maxWidth-3xl);
-  --spacing-px: "1px";
+  --maxWidth-wrapper: 48rem;
   --spacing-0: 0;
   --spacing-1: 0.25rem;
   --spacing-2: 0.5rem;
@@ -28,19 +16,17 @@
   --spacing-20: 5rem;
   --spacing-24: 6rem;
   --spacing-32: 8rem;
-  --fontFamily-sans: "MontserratVariable", system-ui, -apple-system,
-    BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
-    sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-    "Noto Color Emoji";
-  --fontFamily-serif: "Merriweather", "Georgia", Cambria, "Times New Roman",
-    Times, serif;
+  --fontFamily-sans:
+    "MontserratVariable", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --fontFamily-serif:
+    "Merriweather", "Georgia", Cambria, "Times New Roman", Times, serif;
   --font-body: var(--fontFamily-serif);
   --font-heading: var(--fontFamily-sans);
-  --fontWeight-normal: 400;
   --fontWeight-bold: 700;
   --fontWeight-black: 900;
   --fontSize-root: 16px;
-  --lineHeight-none: 1;
   --lineHeight-tight: 1.1;
   --lineHeight-normal: 1.5;
   --lineHeight-relaxed: 1.625;
@@ -51,7 +37,6 @@
   --fontSize-3: 1.44rem;
   --fontSize-4: 1.728rem;
   --fontSize-5: 2.074rem;
-  --fontSize-6: 2.488rem;
   --fontSize-7: 2.986rem;
   --color-primary: #0f4c5c;
   --color-secondary: #e07a5f;
@@ -64,7 +49,6 @@
   --color-soft: #f6f1e9;
   --color-outline: rgba(15, 76, 92, 0.12);
   --shadow-soft: 0 18px 36px rgba(15, 28, 38, 0.12);
-  --radius-lg: 24px;
   --radius-md: 16px;
   --radius-pill: 999px;
 }
@@ -304,11 +288,6 @@ a:focus {
   color: var(--color-primary);
 }
 
-.main-heading {
-  font-size: var(--fontSize-7);
-  margin: 0;
-}
-
 .post-list-item {
   margin-bottom: var(--spacing-8);
   margin-top: var(--spacing-8);
@@ -329,13 +308,6 @@ a:focus {
   margin-bottom: var(--spacing-4);
 }
 
-.header-link-home {
-  font-weight: var(--fontWeight-bold);
-  font-family: var(--font-heading);
-  text-decoration: none;
-  font-size: var(--fontSize-2);
-}
-
 .page-title {
   margin-top: var(--spacing-0);
   margin-bottom: var(--spacing-6);
@@ -344,14 +316,6 @@ a:focus {
 
 .blog-hero {
   margin-bottom: var(--spacing-12);
-}
-
-.blog-kicker {
-  text-transform: uppercase;
-  letter-spacing: 0.28em;
-  font-size: var(--fontSize-0);
-  color: var(--color-text-light);
-  margin-bottom: var(--spacing-4);
 }
 
 .blog-intro {
@@ -373,13 +337,6 @@ a:focus {
   object-fit: cover;
   flex-shrink: 0;
   box-shadow: var(--shadow-soft);
-}
-
-.blog-empty {
-  background: var(--color-surface);
-  border: 1px solid var(--color-accent);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-6);
 }
 
 .post-list {
@@ -417,26 +374,6 @@ a:focus {
   margin-top: var(--spacing-0);
 }
 
-.landing-eyebrow {
-  font-size: var(--fontSize-0);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--color-text-light);
-  margin-bottom: var(--spacing-4);
-}
-
-.landing-title {
-  margin-top: var(--spacing-0);
-  margin-bottom: var(--spacing-4);
-  font-size: clamp(2.2rem, 3.4vw, 3.2rem);
-}
-
-.landing-lede {
-  font-size: var(--fontSize-2);
-  color: var(--color-heading);
-  margin-bottom: var(--spacing-4);
-}
-
 .landing-summary {
   font-size: var(--fontSize-2);
   line-height: var(--lineHeight-relaxed);
@@ -457,7 +394,9 @@ a:focus {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .landing-links a svg {
@@ -565,11 +504,6 @@ a:focus {
   font-weight: var(--fontWeight-bold);
   text-decoration: none;
   color: var(--color-heading);
-}
-
-.work-description {
-  margin-top: var(--spacing-2);
-  color: var(--color-text-light);
 }
 
 .work-item-paper {
@@ -703,21 +637,66 @@ a:focus {
   font-family: var(--font-heading);
 }
 
-.blog-post-nav ul {
+.blog-post-nav-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  list-style: none;
   margin: var(--spacing-0);
+  padding: var(--spacing-0);
 }
 
-.gatsby-highlight {
+pre[class*="language-"] {
   margin-bottom: var(--spacing-8);
+}
+
+/* Heading anchor links: the octicon sits in the left gutter, hidden until the
+   heading is hovered, so it never shifts the heading text or the resting
+   layout. */
+.blog-post :is(h1, h2, h3, h4, h5, h6) {
+  position: relative;
+}
+
+.blog-post .anchor.before {
+  position: absolute;
+  top: 0;
+  left: -1.4em;
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  padding-right: 0.3em;
+  color: inherit;
+}
+
+.blog-post .anchor svg {
+  visibility: hidden;
+}
+
+.blog-post :is(h1, h2, h3, h4, h5, h6):hover .anchor svg,
+.blog-post .anchor:focus svg {
+  visibility: visible;
 }
 
 .figure {
   margin: var(--spacing-0) var(--spacing-0) var(--spacing-8) var(--spacing-0);
 }
 
-.math-display {
+/* Responsive image widths, driven by image.jsx's --img-* custom properties */
+.content-image {
+  width: var(--img-width, 100%);
+}
+
+@media (max-width: 1224px) {
+  .content-image {
+    width: var(--img-mobile-width, 100%);
+  }
+}
+
+.math-display,
+.katex-display {
   margin: var(--spacing-0) var(--spacing-0) var(--spacing-8) var(--spacing-0);
   overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .littlefoot-button {

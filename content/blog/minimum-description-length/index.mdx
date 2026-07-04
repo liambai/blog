@@ -4,22 +4,17 @@ date: "2025-06-08"
 description: "The Minimum Description Length (MDL) principle, Kolmogorov complexity, linear regression, data compression and learning."
 ---
 
-import { Link } from "gatsby"
-import Figure from "../../../src/components/figure.jsx"
-import Image from "../../../src/components/image.jsx"
 import { Reference, ReferenceList } from "./References.jsx"
 import { Note, NoteList } from "./Notes.jsx"
 
 It's almost impossible to watch this [Kevin clip](https://youtu.be/bctjSvn-OC8?si=Jf1Os9V04MIotRdq&t=48) without coming to the conclusion: he's onto something.
 
-<Figure
-  content={
-    <Image
+<Figure>
+  <Image slot="content"
       href="https://www.youtube.com/watch?v=bctjSvn-OC8&t=48s&ab_channel=ComedyBites"
-      path={require("./images/kevin.jpg")}
+      path="./images/kevin.jpg"
     />
-  }
-/>
+</Figure>
 
 His abbreviated sentences do seem to convey the same information as their verbose original. Can we formalize this idea of using fewer words to say the same thing? How "few" can we go without losing information?
 
@@ -77,7 +72,9 @@ Here's a claim that I'll back up through the rest of this post: compression is a
 
 What is the Kolmogorov complexity of these 10 points?
 
-<Figure content={<Image path={require("./images/points.png")} width="60%" />} />
+<Figure>
+  <Image slot="content" path="./images/points.png" width="60%" />
+</Figure>
 
 That's equivalent to asking for the minimum description length of these points. Of course, we can just describe each point by its coordinate, but can we do better?
 
@@ -85,7 +82,9 @@ Here's an idea: let's draw a line through the points and use it to describe each
 
 Here are some attempts:
 
-<Figure content={<Image path={require("./images/polynomials.png")} />} />
+<Figure>
+  <Image slot="content" path="./images/polynomials.png" />
+</Figure>
 
 My knee-jerk reaction to these lines is: left and right bad, middle good! Under/over-fitting, bias/variance tradeoff, generalizing to unseen data, etc... But there's another way to see why the middle one is best: it gives the _shortest description_ of these points.
 
@@ -113,24 +112,20 @@ Here's a naive way to do it: type the number in Python. The [float](https://en.w
 
 In reality, we're far more likely to see `0` and `0.1` than `1.7976931348623e+308` (assuming the coefficients and errors come from, say, a [Gaussian distribution](https://en.wikipedia.org/wiki/Normal_distribution)). What if we use a shorter code for the more likely numbers like `0` and `0.1`, and a longer code for the those rare events like `1.7976931348623e+308`? Theoretically, the [optimal code length](https://en.wikipedia.org/wiki/Shannon%27s_source_coding_theorem) is $-\log_2(p(x))$, where $p(x)$ is the probability of event $x$.
 
-<Figure
-  content={
-    <Image path={require("./images/optimal-code-length.png")} width="60%" />
-  }
-/>
+<Figure>
+  <Image slot="content" path="./images/optimal-code-length.png" width="60%" />
+</Figure>
 
 For example, if a number comes up as often as 50% of the time, you should represent it with only 1 bit.
 
 Assuming the coefficients and errors follow a Gaussian distribution with mean $0$, we can chop up the real number line into small intervals of size $t$ and assign each interval with a discrete probability $p(x)$.
 
-<Figure
-  content={
-    <Image
-      path={require("./images/hinton-gaussian-interval.png")}
+<Figure>
+  <Image slot="content"
+      path="./images/hinton-gaussian-interval.png"
       width="70%"
     />
-  }
->
+
   Given any real number $v$, we can discretize it by taking a small interval of
   size $t$ around it. For small enough $t$, can approximate the probability
   density at the interval with $t * g(x)$, where $g(x)$ is the [Gaussian
@@ -223,7 +218,9 @@ Back to the claim on compression being the same as learning: perhaps you can agr
 
 Modern LLMs like GPT are large Transformers with billions of parameters. They can also be understood through the lens of compression. Taken literally, we can use LLMs to losslessly compress text, just like `gzip`.
 
-<Figure content={<Image path={require("./images/lossless-compression.png")} />}>
+<Figure>
+  <Image slot="content" path="./images/lossless-compression.png" />
+
   Lossless compression encodes text into a compressed format and enables
   recovering the original text exactly.
   [enwik9](https://mattmahoney.net/dc/textdata.html) is the first GB of the
@@ -235,9 +232,9 @@ Like the polynomial through the points, an LLM can be used as a guide to encode 
 
 Researchers found that this compression method using LLMs is far more efficient than tools like `gzip` <Reference id={5} />.
 
-<Figure
-  content={<Image path={require("./images/LLM-compression-results.png")} />}
->
+<Figure>
+  <Image slot="content" path="./images/LLM-compression-results.png" />
+
   [ImageNet](https://en.wikipedia.org/wiki/ImageNet) and
   [LibriSpeech](https://www.openslr.org/12) are popular image and speech
   datasets. Chunk size accounts for the limited context window of LLMs, whereas
@@ -270,9 +267,9 @@ The MDL principle is such a profound perspective because so many powerful ideas 
 
 [Occam's Razor](https://en.wikipedia.org/wiki/Occam%27s_razor) is the philosophical principle that _the simplest explanation is usually the best_.
 
-<Figure
-  content={<Image path={require("./images/occams-razor.png")} width="60%" />}
-></Figure>
+<Figure>
+  <Image slot="content" path="./images/occams-razor.png" width="60%" />
+</Figure>
 
 In statistical modeling, this is literally true in a mathematically precise way: the model that explains the data in the fewest number of bits is the best.
 
@@ -282,7 +279,9 @@ In statistical modeling, this is literally true in a mathematically precise way:
 
 For example, the best chess algorithms used to encode human-discovered heuristics and strategies, only to be blown away by [a "brute-force" method based only on deep search](<https://en.wikipedia.org/wiki/Deep_Blue_(chess_computer)>). Same story with Go. The [leading algorithms](https://en.wikipedia.org/wiki/AlphaZero) are not told anything about Go beyond its rules: they discover strategies via deep learning, search, and self-play, even [ones](https://x.com/karpathy/status/1884336943321997800?lang=en) that stun the best human player in the world. This lesson has played out in many fields time and again: computer vision, NLP, even protein structure prediction.
 
-<Figure content={<Image path={require("./images/bitter-lesson.png")} />}>
+<Figure>
+  <Image slot="content" path="./images/bitter-lesson.png" />
+
   [https://danieljeffries.substack.com/p/embracing-the-bitter-lesson](https://danieljeffries.substack.com/p/embracing-the-bitter-lesson)
 </Figure>
 
