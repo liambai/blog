@@ -5,6 +5,7 @@ import react from "@astrojs/react"
 import sitemap from "@astrojs/sitemap"
 
 import remarkMath from "remark-math"
+import remarkImageImports from "./src/lib/remark-image-imports.mjs"
 import rehypeKatex from "rehype-katex"
 import rehypePrism from "rehype-prism-plus"
 import rehypeSlug from "rehype-slug"
@@ -65,7 +66,7 @@ export default defineConfig({
     // Disable Astro's built-in Shiki so rehype-prism-plus (+ prism.css theme)
     // is the only code highlighter, preserving the original Prism styling.
     syntaxHighlight: false,
-    remarkPlugins: [remarkMath],
+    remarkPlugins: [remarkMath, remarkImageImports],
     rehypePlugins: [
       rehypeSlug,
       [

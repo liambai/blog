@@ -3,14 +3,7 @@ title: "Protein language models through the logit lens"
 date: "2025-05-21"
 description: Applying the logit lens to ESM-2. Logit visualization & interpretation, attention analysis, looking inside the mind of a protein language model.
 ---
-import img_beta_lactamase_45 from "./images/beta-lactamase-45.png"
-import img_beta_lactamase_106 from "./images/beta-lactamase-106.png"
-import img_antibody_bridge_1 from "./images/antibody-bridge-1.png"
-import img_antibody_bridge_2 from "./images/antibody-bridge-2.png"
-import img_bridge_attention_maps from "./images/bridge-attention-maps.png"
 
-import Figure from "../../../src/components/Figure.astro"
-import Image from "../../../src/components/image.jsx"
 import TopTokensHeatmap from "./d3/top_tokens_heatmap"
 import TrueTokensRanksHeatmap from "./d3/true_tokens_ranks_heatmap"
 import StructureOverlay from "./d3/structure_overlay"
@@ -51,7 +44,7 @@ Each cell below shows the amino acid that ESM is most confident in, colored by i
 - By logit values, ESM clearly believes in some positions more than others. For example, it's super confident in position 45 being S––and it's right! As it turns out, the S at position 45 constitutes a binding site, which means that it is likely highly conserved.
 
 <Figure>
-  <Image slot="content" path={img_beta_lactamase_45} />
+  <Image slot="content" path="./images/beta-lactamase-45.png" />
 
   Beta-lactamse (PDB [4ZAM](https://www.rcsb.org/3d-sequence/4ZAM?asymId=A)) has
   a binding site annotation at position 45. We can see on the right that this
@@ -61,7 +54,7 @@ Each cell below shows the amino acid that ESM is most confident in, colored by i
 - Similarly, ESM also believes strongly––and correctly––in the D at position 106, another binding site. You can explore more annotations at [https://www.rcsb.org/3d-sequence/4ZAM?asymId=A](https://www.rcsb.org/3d-sequence/4ZAM?asymId=A).
 
 <Figure>
-  <Image slot="content" path={img_beta_lactamase_106} />
+  <Image slot="content" path="./images/beta-lactamase-106.png" />
 
   Beta-lactamse (PDB [4ZAM](https://www.rcsb.org/3d-sequence/4ZAM?asymId=A)) has
   another binding site annotation at position 106.
@@ -105,7 +98,7 @@ I repeated this for an [antibody heavy chain](https://en.wikipedia.org/wiki/Immu
 I noticed ESM's high conviction on positions 22 and 96 being C. They form a [disulfide bridge](https://www.creative-proteomics.com/resource/disulfide-bridges-proteins-formation-function-analysis.htm), important for structural stability. Interestingly, ESM started developing this conviction for both positions simultaneously around layer 10.
 
 <Figure>
-  <Image slot="content" path={img_antibody_bridge_1} />
+  <Image slot="content" path="./images/antibody-bridge-1.png" />
 
   PDB [5XRQ](https://www.rcsb.org/3d-sequence/5XRQ?asymId=A) has a disulfide
   bridge across positions 22 and 96.
@@ -114,7 +107,7 @@ I noticed ESM's high conviction on positions 22 and 96 being C. They form a [dis
 There is another disulfide bridge spanning positions 154 - 210. ESM seems to have noticed this one starting from layer 9.
 
 <Figure>
-  <Image slot="content" path={img_antibody_bridge_2} />
+  <Image slot="content" path="./images/antibody-bridge-2.png" />
 
   (PDB [5XRQ](https://www.rcsb.org/3d-sequence/5XRQ?asymId=A)) has another
   disulfide bridge across positions 154 and 210.
@@ -144,7 +137,7 @@ In transformers, attention maps capture relationships between sequence positions
 From layer 9, ESM began noticing the disulfide bridge at positions 154 - 210 in the antibody sequence. What are the attention heads doing at that layer? Below are max-pooled attention maps zoomed in at those positions, comparing layer 8 vs. 9.
 
 <Figure>
-  <Image slot="content" path={img_bridge_attention_maps} />
+  <Image slot="content" path="./images/bridge-attention-maps.png" />
 </Figure>
 
 At least one of the attention heads in layer 9 is attending to the positions of the disulfide bridge, which doesn't seem to be the case for layer 8. This might explain why ESM started "seeing" the bridge at layer 9.

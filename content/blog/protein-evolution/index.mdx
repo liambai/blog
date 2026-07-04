@@ -3,22 +3,12 @@ title: What we can learn from evolving proteins
 date: "2023-09-12"
 description: Predicting protein structure and function. Multiple Sequence Alignments (MSAs), the protein folding problem, the Potts model, Direct Coupling Analysis (DCA), EVCouplings.
 ---
-import img_sequence_evolution from "./images/sequence-evolution.png"
-import img_sequence_logo from "./images/sequence-logo.png"
-import img_potts from "./images/potts.png"
-import img_DI_vs_MI from "./images/DI-vs-MI.png"
-import img_structures from "./images/structures.png"
-import img_deltaE_mutations from "./images/deltaE-mutations.png"
-import img_deltaE_experimental from "./images/deltaE-experimental.png"
-import img_CM_energy from "./images/CM-energy.jpeg"
 
 import MSACoupling from "./d3/MSACoupling.jsx"
 import Distributions from "./d3/Distributions.jsx"
 import MSAHighlighted from "./d3/MSAHighlighted.jsx"
 import MSAFrequencies from "./d3/MSAFrequencies.jsx"
 import MSACovariance from "./d3/MSACovariance.jsx"
-import Figure from "../../../src/components/Figure.astro"
-import Image from "../../../src/components/image.jsx"
 import { Reference, ReferenceList } from "./References.jsx"
 
 Proteins are remarkable molecular machines that orchestrate almost all activity in our biological world, from the budding of seed to the beating of a heart. They keep us alive, and their malfunction makes us sick. Knowing how they work is key to understanding the precise mechanisms behind our diseases – and to coming up with better ways to treat them. This post is a deep dive into some statistical methods that – through the lens of evolution – give us a glimpse into the complex world of proteins.
@@ -26,7 +16,7 @@ Proteins are remarkable molecular machines that orchestrate almost all activity 
 [Amino acids](https://en.wikipedia.org/wiki/Amino_acid) make up proteins and specify their structure and function. Over millions of years, evolution has conducted a massive experiment over the [space](<https://en.wikipedia.org/wiki/Sequence_space_(evolution)>) of all possible amino acid sequences: those that encode a functional protein survive; those that don't are extinct.
 
 <Figure>
-  <Image slot="content" path={img_sequence_evolution} />
+  <Image slot="content" path="./images/sequence-evolution.png" />
 
   Throughout evolution, mutations change the sequences of proteins. Only the
   ones with highest
@@ -89,7 +79,7 @@ To measure this, let's count the frequencies of observing each amino acid at eac
 If we compile these frequencies into a matrix, we get what is known as a **position-specific scoring matrix (PSSM)**, commonly visualized as a [sequence logo](https://en.wikipedia.org/wiki/Sequence_logo).
 
 <Figure>
-  <Image slot="content" path={img_sequence_logo} width="90%" />
+  <Image slot="content" path="./images/sequence-logo.png" width="90%" />
 
   A sequence logo [generated](https://weblogo.berkeley.edu/logo.cgi) from our
   MSA. The height of each amino acid indicates its degree of evolutionary
@@ -136,7 +126,7 @@ As it turns out, physicists have studied this function since the 1950s, in a dif
 They call this the **Potts model**, and a fancy name for the energy function is the [Hamiltonian](<https://en.wikipedia.org/wiki/Hamiltonian_(quantum_mechanics)>). This fascinating field of physics applying these statistical models to explain macroscopic behaviors of matter is called [statistical mechanics](https://en.wikipedia.org/wiki/Statistical_mechanics).
 
 <Figure>
-  <Image slot="content" path={img_potts} width="50%" />
+  <Image slot="content" path="./images/potts.png" width="50%" />
 
   The Potts model on a square lattice. Black and white dots are in different
   states. Figure from
@@ -240,7 +230,7 @@ $$
 This measure is called **direct information**, a more globally-aware measure of pairwise interactions. When compared to real contacts in experimentally determined structures, DI performed much better than MI, demonstrating the usefulness of considering the global sequence context <Reference id={1} />.
 
 <Figure>
-  <Image slot="content" path={img_DI_vs_MI} width="90%" />
+  <Image slot="content" path="./images/DI-vs-MI.png" width="90%" />
 
   Axes are amino acid positions. The grey grooves are the actual contact in the
   experimentally obtained structures. The red dots are the predicted contacts
@@ -253,7 +243,7 @@ This measure is called **direct information**, a more globally-aware measure of 
 Given predicted contacts by DI, we need to carry out a few more computational steps – e.g. [simulated annealing](https://en.wikipedia.org/wiki/Simulated_annealing) – to generate the full predicted 3D structure. Omitting those details: the results are these beautiful predicted structures that closely resemble the real structures.
 
 <Figure>
-  <Image slot="content" path={img_structures} />
+  <Image slot="content" path="./images/structures.png" />
 
   Grey structures are real, experimentally observed; red structures are
   predicted using DI. [Root mean square deviation
@@ -289,7 +279,7 @@ captures how much the mutant's energy improved over the wildtype.
 In this [paper](https://www.nature.com/articles/nbt.3769) introducing the [mutation effect prediction tool](https://marks.hms.harvard.edu/evmutation/) in EVCouplings, researchers computed the $\Delta E$ of each mutant sequence in a saturation mutagenesis experiment on a protein called M.HaeIII <Reference id={3} />.
 
 <Figure>
-  <Image slot="content" path={img_deltaE_mutations} />
+  <Image slot="content" path="./images/deltaE-mutations.png" />
 
   Deeper shades of blue reflect more negative ΔE. Most mutations are damaging.
   Averages across amino acids are shown as a bar on the bottom, labeled with *
@@ -301,7 +291,7 @@ Not all positions are created equal: mutations at some positions are especially 
 The calculated energies correlated strongly with experimentally observed fitness (!), meaning that our energy function provides helpful guidance on how a given mutation might affect function. It's remarkable that with such a simple model and from seemly so little information (just MSAs!), we can attain such profound predictive power.
 
 <Figure>
-  <Image slot="content" path={img_deltaE_experimental} width="90%" />
+  <Image slot="content" path="./images/deltaE-experimental.png" width="90%" />
 
   Evolutionary statistical energy refers to our energy function E. Left plot
   shows all mutants; right plot shows averages over amino acids at each
@@ -341,7 +331,7 @@ When they set $T = 0.33$ (second row in the figure below), they created sequence
 2. enhanced activity compared to natural CM when expressed in E. coli (!)
 
 <Figure>
-  <Image slot="content" path={img_CM_energy} width="90%" />
+  <Image slot="content" path="./images/CM-energy.jpeg" width="90%" />
 
   EcCM is a natural CM whose high activity is used as a benchmark and goalpost.
   Statistical energies on the left are negatives of ours, i.e. the smaller the

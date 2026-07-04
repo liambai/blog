@@ -3,15 +3,6 @@ title: How to represent a protein sequence
 date: "2023-09-29"
 description: Learning protein representations. Transfer learning, protein language models, contextual embeddings, Transformers, masked language modeling, BERT, UniRep, ESM, attention analysis.
 ---
-import img_PDB_sequences_vs_structures from "./images/PDB-sequences-vs-structures.png"
-import img_MLM from "./images/MLM.png"
-import img_architecture from "./images/architecture.png"
-import img_attention_viz from "./images/attention-viz.png"
-import img_UniRep_protein_engineering from "./images/UniRep-protein-engineering.png"
-import img_UniRep_clustering from "./images/UniRep-clustering.png"
-import img_UniRep_helix_sheet_neuron from "./images/UniRep-helix-sheet-neuron.png"
-import img_attention_contact from "./images/attention-contact.png"
-import img_attention_binding_site from "./images/attention-binding-site.png"
 
 import AminoAcidEmbedding from "./d3/AminoAcidEmbedding.jsx"
 import MSACoupling from "../protein-evolution/d3/MSACoupling.jsx"
@@ -19,15 +10,13 @@ import AminoAcidEmbeddingEncoder from "./d3/AminoAcidEmbeddingEncoder.jsx"
 import CharacterEmbedding from "./d3/CharacterEmbedding.jsx"
 import WordEmbedding from "./d3/WordEmbedding.jsx"
 import AminoAcidEmbeddingAverage from "./d3/AminoAcidEmbeddingAverage.jsx"
-import Figure from "../../../src/components/Figure.astro"
-import Image from "../../../src/components/image.jsx"
 import { Reference, ReferenceList } from "./References.jsx"
 
 In the last decade, [innovations in DNA sequencing](https://ourworldindata.org/grapher/cost-of-sequencing-a-full-human-genome) propelled biology into a new information age. This came with a happy conundrum: we now have many orders of magnitude more protein sequences than structural or functional data. We uncovered massive tomes written in nature's language – the blueprint of our wondrous biological tapestry – but lack the ability to understand them.
 
 <Figure>
   <Image slot="content"
-      path={img_PDB_sequences_vs_structures}
+      path="./images/PDB-sequences-vs-structures.png"
       width="70%"
     />
 
@@ -148,7 +137,7 @@ We know the ground truth label from the original sequence, which we can use to g
 This lets us take advantage of the wealth of known sequences, each of which is now a labeled training example. In NLP, this approach is called **masked language modeling (MLM)**, a form of **self-supervised learning**.
 
 <Figure>
-  <Image slot="content" path={img_MLM} style={{ marginBottom: 5 }} />
+  <Image slot="content" path="./images/MLM.png" style={{ marginBottom: 5 }} />
 
   The masked language modelling objective. Hide a token (in this case, R) and
   ask the encoder model to predict the hidden token. The encoder model is set up
@@ -168,7 +157,7 @@ More recently, **Transformer models** that rely on a mechanism called **self- at
 
 <Figure>
   <Image slot="content"
-      path={img_architecture}
+      path="./images/architecture.png"
       style={{ marginBottom: 5 }}
     />
 
@@ -182,7 +171,7 @@ Roughly speaking, the $\alpha_{ij}$ parameters in the self-attention layer (also
 Here's an example of attention scores of a transformer trained on a word-tokenized sentence:
 
 <Figure>
-  <Image slot="content" path={img_attention_viz} width="80%" />
+  <Image slot="content" path="./images/attention-viz.png" width="80%" />
 
   Self-attention visualization of a word-tokenized sentence. Deeper blue
   indicates higher attention score.
@@ -242,7 +231,7 @@ We saw in the <a href="/protein-evolution">previous post</a> that with clever sa
 </ol>
 
 <Figure>
-  <Image slot="content" path={img_UniRep_protein_engineering} />
+  <Image slot="content" path="./images/UniRep-protein-engineering.png" />
 
   Protein engineering with UniRep. This process is analogous to to meandering
   the [sparsely
@@ -259,7 +248,7 @@ We've been talking a lot about all this "information" learned by our representat
 UniRep vectors capture biochemical properties of amino acids and phylogeny in sequences from different organisms.
 
 <Figure>
-  <Image slot="content" path={img_UniRep_clustering} />
+  <Image slot="content" path="./images/UniRep-clustering.png" />
 
   (Left) Feed a single amino acid into UniRep and take the output representation
   vector. Applying
@@ -278,7 +267,7 @@ More incredibly, one of the neurons in UniRep's LSTM network showed firing patte
 
 <Figure>
   <Image slot="content"
-      path={img_UniRep_helix_sheet_neuron}
+      path="./images/UniRep-helix-sheet-neuron.png"
       width="80%"
     />
 
@@ -296,7 +285,7 @@ In NLP, the attention scores in Transformer models tend to relate to the semanti
 Let's look at 5 unsupervised Transformer models on proteins sequences – all trained in the same BERT-inspired way we described <Reference id={7} />. Amino acid pairs that with high attention scores are more often in 3D contact in the folded structure, especially in the deeper layers.
 
 <Figure>
-  <Image slot="content" path={img_attention_contact} />
+  <Image slot="content" path="./images/attention-contact.png" />
 
   The percentage of high-confidence attention scores that correspond to amino
   acids positions in 3D contact. Deeper blue reflects higher correlation between
@@ -308,7 +297,7 @@ Let's look at 5 unsupervised Transformer models on proteins sequences – all tr
 Similarly, a lot of attention is directed to [binding sites](https://en.wikipedia.org/wiki/Binding_site) – the functionally most important regions of a protein – throughout the layers.
 
 <Figure>
-  <Image slot="content" path={img_attention_binding_site} />
+  <Image slot="content" path="./images/attention-binding-site.png" />
 
   The percentage of high-confidence attention scores that correspond to binding
   sites. These are positions j part of binding sites that have high $\alpha_{ij}

@@ -3,15 +3,7 @@ title: "An introduction to variational autoencoders"
 date: "2023-11-04"
 description: Predicting protein function using deep generative models. Latent variable models, reconstruction, variational autoencoders (VAEs), Bayesian inference, evidence lower bound (ELBO).
 ---
-import img_representation from "./images/representation.png"
-import img_encoder_decoder_baby from "./images/encoder-decoder-baby.png"
-import img_encoder_decoder_details from "./images/encoder-decoder-details.png"
-import img_VAE_compression from "./images/VAE-compression.png"
-import img_standard_normal_transformation from "./images/standard-normal-transformation.png"
-import img_MSA_latent from "./images/MSA-latent.png"
 
-import Figure from "../../../src/components/Figure.astro"
-import Image from "../../../src/components/image.jsx"
 import MSACoupling from "../protein-evolution/d3/MSACoupling.jsx"
 import { Note, NoteList } from "./Notes.jsx"
 import DistributionUpdate from "./d3/DistributionUpdate.jsx"
@@ -24,7 +16,7 @@ import { Reference, ReferenceList } from "./References.jsx"
 Here's one way of looking at learning. We interact with the world through observing (hearing, seeing) and acting (speaking, doing). We encode our observations about the world into some _representation_ in our brain – and refine it as we observe more. Our actions reflect this representation.
 
 <Figure>
-  <Image slot="content" path={img_representation} width="50%" />
+  <Image slot="content" path="./images/representation.png" width="50%" />
 </Figure>
 
 ### Encoding & decoding
@@ -32,7 +24,7 @@ Here's one way of looking at learning. We interact with the world through observ
 Imitation is an effective way to learn that engages both observation and action. For example, babies repeat the words of their parents. As they make mistakes and get corrected, they hone their internal representation of the words they hear (the **encoder**) as well as the way they create their own words from that representation (the **decoder**).
 
 <Figure>
-  <Image slot="content" path={img_encoder_decoder_baby} width="50%" />
+  <Image slot="content" path="./images/encoder-decoder-baby.png" width="50%" />
 
   The baby tries to reconstruct the input via its internal representation. In
   this case, he incorrectly reconstructs "Dog" as "Dah".
@@ -47,7 +39,7 @@ Given observation $\mathbf{x}$, the encoder is a distribution $q(z|\mathbf{x})$ 
 Similarly, given some latent variable $\mathbf{z}$, the decoder is a distribution $p(x|\mathbf{z})$. When sampled from, the decoder produces a reconstructed $\mathbf{\tilde{x}}$.
 
 <Figure>
-  <Image slot="content" path={img_encoder_decoder_details} width="50%" />
+  <Image slot="content" path="./images/encoder-decoder-details.png" width="50%" />
 
   The latent variable is a vector $\mathbf{z}$. The encoder and decoder are both
   conditional distributions.
@@ -58,7 +50,7 @@ Similarly, given some latent variable $\mathbf{z}$, the decoder is a distributio
 When neural networks are used as both the encoder and the decoder, the latent variable model is called a **variational autoencoder (VAE)**.
 
 <Figure>
-  <Image slot="content" path={img_VAE_compression} width="60%" />
+  <Image slot="content" path="./images/VAE-compression.png" width="60%" />
 
   Variational autoencoders are a type of encoder-decoder model. Figure from this
   [blog
@@ -128,7 +120,7 @@ $$
 Forcing $p(z)$ to be standard normal might seem strange. Don't we want the distribution of $z$ to be something informative learned by the model? I think about it like this: the encoder and decoder are complex functions with many parameters (they're neural networks!) and _they have all the power_. Under a sufficiently complex function, $p(z) = Normal(0,1)$ can be transformed into _anything you want_. The art is in this transformation.
 
 <Figure>
-  <Image slot="content" path={img_standard_normal_transformation} />
+  <Image slot="content" path="./images/standard-normal-transformation.png" />
 
   On the left are samples from a standard normal distribution. On the right are
   those samples mapped through the function $g(z) = z/10 + z/ \lVert z \rVert$.
@@ -468,7 +460,7 @@ We talked about position-wise models that look at each position and [pair-wise m
 Let's imagine there being some latent variable vector $\mathbf{z}$ that explains _all_ interactions – including higher-order ones.
 
 <Figure>
-  <Image slot="content" path={img_MSA_latent} />
+  <Image slot="content" path="./images/MSA-latent.png" />
 
   Applying latent variable models like VAEs to MSAs. Figure from{" "}
   <Reference id={2} />.

@@ -3,18 +3,7 @@ title: "From Kolmogorov to LLMs: The Compression View of Learning"
 date: "2025-06-08"
 description: "The Minimum Description Length (MDL) principle, Kolmogorov complexity, linear regression, data compression and learning."
 ---
-import img_kevin from "./images/kevin.jpg"
-import img_points from "./images/points.png"
-import img_polynomials from "./images/polynomials.png"
-import img_optimal_code_length from "./images/optimal-code-length.png"
-import img_hinton_gaussian_interval from "./images/hinton-gaussian-interval.png"
-import img_lossless_compression from "./images/lossless-compression.png"
-import img_LLM_compression_results from "./images/LLM-compression-results.png"
-import img_occams_razor from "./images/occams-razor.png"
-import img_bitter_lesson from "./images/bitter-lesson.png"
 
-import Figure from "../../../src/components/Figure.astro"
-import Image from "../../../src/components/image.jsx"
 import { Reference, ReferenceList } from "./References.jsx"
 import { Note, NoteList } from "./Notes.jsx"
 
@@ -23,7 +12,7 @@ It's almost impossible to watch this [Kevin clip](https://youtu.be/bctjSvn-OC8?s
 <Figure>
   <Image slot="content"
       href="https://www.youtube.com/watch?v=bctjSvn-OC8&t=48s&ab_channel=ComedyBites"
-      path={img_kevin}
+      path="./images/kevin.jpg"
     />
 </Figure>
 
@@ -84,7 +73,7 @@ Here's a claim that I'll back up through the rest of this post: compression is a
 What is the Kolmogorov complexity of these 10 points?
 
 <Figure>
-  <Image slot="content" path={img_points} width="60%" />
+  <Image slot="content" path="./images/points.png" width="60%" />
 </Figure>
 
 That's equivalent to asking for the minimum description length of these points. Of course, we can just describe each point by its coordinate, but can we do better?
@@ -94,7 +83,7 @@ Here's an idea: let's draw a line through the points and use it to describe each
 Here are some attempts:
 
 <Figure>
-  <Image slot="content" path={img_polynomials} />
+  <Image slot="content" path="./images/polynomials.png" />
 </Figure>
 
 My knee-jerk reaction to these lines is: left and right bad, middle good! Under/over-fitting, bias/variance tradeoff, generalizing to unseen data, etc... But there's another way to see why the middle one is best: it gives the _shortest description_ of these points.
@@ -124,7 +113,7 @@ Here's a naive way to do it: type the number in Python. The [float](https://en.w
 In reality, we're far more likely to see `0` and `0.1` than `1.7976931348623e+308` (assuming the coefficients and errors come from, say, a [Gaussian distribution](https://en.wikipedia.org/wiki/Normal_distribution)). What if we use a shorter code for the more likely numbers like `0` and `0.1`, and a longer code for the those rare events like `1.7976931348623e+308`? Theoretically, the [optimal code length](https://en.wikipedia.org/wiki/Shannon%27s_source_coding_theorem) is $-\log_2(p(x))$, where $p(x)$ is the probability of event $x$.
 
 <Figure>
-  <Image slot="content" path={img_optimal_code_length} width="60%" />
+  <Image slot="content" path="./images/optimal-code-length.png" width="60%" />
 </Figure>
 
 For example, if a number comes up as often as 50% of the time, you should represent it with only 1 bit.
@@ -133,7 +122,7 @@ Assuming the coefficients and errors follow a Gaussian distribution with mean $0
 
 <Figure>
   <Image slot="content"
-      path={img_hinton_gaussian_interval}
+      path="./images/hinton-gaussian-interval.png"
       width="70%"
     />
 
@@ -230,7 +219,7 @@ Back to the claim on compression being the same as learning: perhaps you can agr
 Modern LLMs like GPT are large Transformers with billions of parameters. They can also be understood through the lens of compression. Taken literally, we can use LLMs to losslessly compress text, just like `gzip`.
 
 <Figure>
-  <Image slot="content" path={img_lossless_compression} />
+  <Image slot="content" path="./images/lossless-compression.png" />
 
   Lossless compression encodes text into a compressed format and enables
   recovering the original text exactly.
@@ -244,7 +233,7 @@ Like the polynomial through the points, an LLM can be used as a guide to encode 
 Researchers found that this compression method using LLMs is far more efficient than tools like `gzip` <Reference id={5} />.
 
 <Figure>
-  <Image slot="content" path={img_LLM_compression_results} />
+  <Image slot="content" path="./images/LLM-compression-results.png" />
 
   [ImageNet](https://en.wikipedia.org/wiki/ImageNet) and
   [LibriSpeech](https://www.openslr.org/12) are popular image and speech
@@ -279,7 +268,7 @@ The MDL principle is such a profound perspective because so many powerful ideas 
 [Occam's Razor](https://en.wikipedia.org/wiki/Occam%27s_razor) is the philosophical principle that _the simplest explanation is usually the best_.
 
 <Figure>
-  <Image slot="content" path={img_occams_razor} width="60%" />
+  <Image slot="content" path="./images/occams-razor.png" width="60%" />
 </Figure>
 
 In statistical modeling, this is literally true in a mathematically precise way: the model that explains the data in the fewest number of bits is the best.
@@ -291,7 +280,7 @@ In statistical modeling, this is literally true in a mathematically precise way:
 For example, the best chess algorithms used to encode human-discovered heuristics and strategies, only to be blown away by [a "brute-force" method based only on deep search](<https://en.wikipedia.org/wiki/Deep_Blue_(chess_computer)>). Same story with Go. The [leading algorithms](https://en.wikipedia.org/wiki/AlphaZero) are not told anything about Go beyond its rules: they discover strategies via deep learning, search, and self-play, even [ones](https://x.com/karpathy/status/1884336943321997800?lang=en) that stun the best human player in the world. This lesson has played out in many fields time and again: computer vision, NLP, even protein structure prediction.
 
 <Figure>
-  <Image slot="content" path={img_bitter_lesson} />
+  <Image slot="content" path="./images/bitter-lesson.png" />
 
   [https://danieljeffries.substack.com/p/embracing-the-bitter-lesson](https://danieljeffries.substack.com/p/embracing-the-bitter-lesson)
 </Figure>

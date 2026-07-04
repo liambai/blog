@@ -3,23 +3,7 @@ title: "Protein VAEs"
 date: "2024-02-11"
 description: Predicting variant effects with variational autoencoders. DeepSequence, EVE, EVEScape. Machine learning for clinical decisions, improving pandemic preparedness by predicting antibody escape.
 ---
-import img_binding_site from "./images/binding-site.png"
-import img_spoons from "./images/spoons.png"
-import img_MSA_latent from "../variational-autoencoder/images/MSA-latent.png"
-import img_VAE_compression from "../variational-autoencoder/images/VAE-compression.png"
-import img_protein_vae_architecture from "./images/protein-vae-architecture.png"
-import img_mutation_effect_heatmap from "./images/mutation-effect-heatmap.png"
-import img_EVE_ClinVar from "./images/EVE-ClinVar.png"
-import img_EVEScape from "./images/EVEScape.png"
-import img_EVEScape_timeline from "./images/EVEScape-timeline.png"
-import img_DeepSequence_vs_others from "./images/DeepSequence-vs-others.png"
-import img_DeepSequence_vs_independent from "./images/DeepSequence-vs-independent.png"
-import img_filter from "./images/filter.png"
-import img_sobel_vs_scharr from "./images/sobel-vs-scharr.png"
-import img_learned_filter from "./images/learned-filter.png"
 
-import Figure from "../../../src/components/Figure.astro"
-import Image from "../../../src/components/image.jsx"
 import LinkPreview from "../../../src/components/link-preview.jsx"
 import MSACoupling from "../protein-evolution/d3/MSACoupling.jsx"
 import { Note, NoteList } from "./Notes.jsx"
@@ -31,7 +15,7 @@ Life, in essence, is a dizzying chemical dance choreographed by proteins. It's s
 
 <Figure>
   <Image slot="content"
-      path={img_binding_site}
+      path="./images/binding-site.png"
       width="40%"
       mobileWidth="60%"
     />
@@ -44,7 +28,7 @@ Over billions of years, evolution introduces random mutations into every protein
 
 <Figure>
   <Image slot="content"
-      path={img_spoons}
+      path="./images/spoons.png"
       width="50%"
       mobileWidth="60%"
     />
@@ -82,7 +66,7 @@ This post is about a solution to this problem of accounting for these far-too-nu
 Imagine some vector $\mathbf{z}$, a **latent variable**, that distills all the information in the MSA. All the interactions: pairwise, any 3 positions, any 4... Knowing $\mathbf{z}$, we'd have a pretty good idea about the important characteristics of our protein.
 
 <Figure>
-  <Image slot="content" path={img_MSA_latent} />
+  <Image slot="content" path="../variational-autoencoder/images/MSA-latent.png" />
 
   Applying latent variable models like VAEs to MSAs. Figure from{" "}
   <Reference id={1} />.
@@ -102,7 +86,7 @@ The tension between these two rules – and the need to balance them – is a co
 
 <Figure>
   <Image slot="content"
-      path={img_VAE_compression}
+      path="../variational-autoencoder/images/VAE-compression.png"
       width="60%"
     />
 
@@ -146,7 +130,7 @@ Now, when given an unknown input sequence, we can pass it through the VAE in th
 
 <Figure>
   <Image slot="content"
-      path={img_protein_vae_architecture}
+      path="./images/protein-vae-architecture.png"
       width="90%"
     />
 </Figure>
@@ -173,7 +157,7 @@ For example, [genomAD](https://gnomad.broadinstitute.org/) is a massive database
 Imagine an _in-silico_ tool that can look at every of possible variant of a protein and make a prediction about its consequence: producing a heatmap like this, where red tiles flag potentially pathogenic variants to watch out for.
 
 <Figure>
-  <Image slot="content" path={img_mutation_effect_heatmap} />
+  <Image slot="content" path="./images/mutation-effect-heatmap.png" />
 
   [EVE (Evolutionary model for Variant Effect)](https://evemodel.org/) is a
   protein VAE. Here is a heatmap of it's predictions on the
@@ -204,7 +188,7 @@ We can create our map by simply computing this log ratio, a measure of pathogeni
 How do our model's prediction match up against actual experimental outcomes? On benchmark datasets, the VAE-based [EVE](https://evemodel.org/) did better than all previous models.
 
 <Figure>
-  <Image slot="content" path={img_EVE_ClinVar} />
+  <Image slot="content" path="./images/EVE-ClinVar.png" />
 
   EVE outperforms other computational methods of variant effect prediction in
   concordance with two experimental dataset. On the x-axis,
@@ -226,7 +210,7 @@ Could we have flagged these dangerous variants ahead of their breakout? Such ear
 VAEs to the rescue: [EVEScape](https://evescape.org/) is a tool that combines EVE's mutation fitness predictions with biophysical data to achieve accurate predictions on antibody escape.
 
 <Figure>
-  <Image slot="content" path={img_EVEScape} />
+  <Image slot="content" path="./images/EVEScape.png" />
 
   Given a mutation, [EVEScape](https://evescape.org/) leverages the VAE-based
   EVE's predictions in conjunction with biophysical information to produce a
@@ -236,7 +220,7 @@ VAEs to the rescue: [EVEScape](https://evescape.org/) is a tool that combines EV
 Had we employed EVEScape early in the pandemic – which only requires information available at the time – we would have been alerted of harmful variants months before their breakout.
 
 <Figure>
-  <Image slot="content" path={img_EVEScape_timeline} />
+  <Image slot="content" path="./images/EVEScape-timeline.png" />
 
   Figure from <Reference id={3} />.
 </Figure>
@@ -250,7 +234,7 @@ Applicable also to other viruses such influenza and HIV, machine learning tools 
 Compared to the independent and pair-wise statistical models from a <a href="/protein-evolution">previous post</a>, VAEs are much more accurate.
 
 <Figure>
-  <Image slot="content" path={img_DeepSequence_vs_others} />
+  <Image slot="content" path="./images/DeepSequence-vs-others.png" />
 
   Comparing [DeepSequence](https://www.nature.com/articles/s41592-018-0138-4), a
   VAE, to statistical models on variant effect prediction, evaluated on [Deep
@@ -270,7 +254,7 @@ Compared to the independent and pair-wise statistical models from a <a href="/pr
 The positions at which their accuracy improved the most are ones that cooperate with several other positions – e.g. in forming binding pockets! The latent variable model is better at capturing these complex, multi-position interactions.
 
 <Figure>
-  <Image slot="content" path={img_DeepSequence_vs_independent} />
+  <Image slot="content" path="./images/DeepSequence-vs-independent.png" />
 
   For each protein, the top 5 positions at which DeepSequence showed the most
   improvement over the independent model. They tend to collaboratively
@@ -288,7 +272,7 @@ Enter neural networks, which are much better than us at recognizing those signal
 Computer vision had a similar Eureka moment. When processing an image – in the gory details of its complex pixels arrangements – a first step is to extract some salients features we can work with, e.g. vertical edges. To do this, we use a matrix called a **filter** (also known as a **kernel**).
 
 <Figure>
-  <Image slot="content" path={img_filter} />
+  <Image slot="content" path="./images/filter.png" />
 </Figure>
 
 For example, this 3x3 matrix encodes what it means to be a vertical edge. Multiplying it element-wise with a patch in our image and summing the results tells us how much that patch resembles a vertical edge. Repeating this for each patch, we get a **convolution**, the basis of [Convolutional Neural Networks (CNNs)](https://en.wikipedia.org/wiki/Convolutional_neural_network).
@@ -296,14 +280,14 @@ For example, this 3x3 matrix encodes what it means to be a vertical edge. Multip
 For a while, researchers came up with carefully crafted filters, each with its mathematical justifications. For example, there was the [Sobel filter](https://en.wikipedia.org/wiki/Sobel_operator), the [Scharr filter](https://plantcv.readthedocs.io/en/v3.11.0/scharr_filter/)...
 
 <Figure>
-  <Image slot="content" path={img_sobel_vs_scharr} />
+  <Image slot="content" path="./images/sobel-vs-scharr.png" />
 </Figure>
 
 But what if we don't really know what the best filter should look like? In fact, we probably don't even know _what to look for_: vertical edges, horizontal edges, 45% edges, something else entirely... So why not leave these as parameters to be learned by neural networks? That's the key insight of [Yann LeCun](https://en.wikipedia.org/wiki/Yann_LeCun) in his early work on character recognition, inspiring a revolution in computer vision.
 
 <Figure>
   <Image slot="content"
-      path={img_learned_filter}
+      path="./images/learned-filter.png"
       width="40%"
       mobileWidth="50%"
     />

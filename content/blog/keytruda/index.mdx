@@ -3,16 +3,12 @@ title: "A visual guide to Keytruda"
 date: "2025-12-31"
 description: PD-1/PD-L1, immuno-oncology, checkpoint inhibition, binding visualizations, antibody anatomy.
 ---
-import img_PD1_PDL1_with_membranes from "./images/PD1_PDL1_with_membranes.png"
-import img_tumor_tcell_interactions from "./images/tumor_tcell_interactions.jpg"
 
 import Pd1Pdl1Viewer from "./viz/pd1_pdl1_viewer"
 import Pd1KeytrudaViewer from "./viz/pd1_keytruda_viewer"
 import Pd1PoseOverlayViewer from "./viz/pd1_pose_overlay_viewer"
 import KeytrudaFullViewer from "./viz/keytruda_full_viewer"
 import AlphafoldPd1Viewer from "./viz/alphafold_pd1_viewer"
-import Figure from "../../../src/components/Figure.astro"
-import Image from "../../../src/components/image.jsx"
 import { Note, NoteList } from "./Notes.jsx"
 import FeedbackForm from "../../../src/components/feedback-form.jsx"
 
@@ -31,7 +27,7 @@ Here's a close-up of PD-L1 binding PD-1. Try the toggles for a few ways of visua
 Above are just the extracellular portions of PD-1 and PD-L1. Both are transmembrane proteins anchored in cell membranes, with flexible tails extending into the cell's interior.
 
 <Figure>
-  <Image slot="content" path={img_PD1_PDL1_with_membranes} />
+  <Image slot="content" path="./images/PD1_PDL1_with_membranes.png" />
 
   PD-1 binding to PD-L1. Grey vertical regions represent the cell membranes.
   Adapted from
@@ -49,7 +45,7 @@ The extracellular binding domain and the [transmembrane helix](https://en.wikipe
 It is perhaps unsurprising that **a common strategy cancer cells use to evade our immune system is by overexpressing PD-L1**. By doing so, they engage PD-1 on T cells and effectively disarm them.
 
 <Figure>
-  <Image slot="content" path={img_tumor_tcell_interactions} />
+  <Image slot="content" path="./images/tumor_tcell_interactions.jpg" />
 
   Left: A tumor cell expressing PD-L1 can activate PD-1 and evade the T cell's
   attack. Right: By blocking PD-L1 or PD-1 with another molecule, we can disrupt

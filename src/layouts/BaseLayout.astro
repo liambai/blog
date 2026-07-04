@@ -75,10 +75,12 @@ const gtagId = SITE.gtagId
             src={`https://www.googletagmanager.com/gtag/js?id=${gtagId}`}
           />
           <script is:inline define:vars={{ gtagId }}>
-            {`window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', gtagId);`}
+            window.dataLayer = window.dataLayer || []
+            function gtag() {
+              dataLayer.push(arguments)
+            }
+            gtag("js", new Date())
+            gtag("config", gtagId)
           </script>
         </>
       )
