@@ -12,8 +12,6 @@ import BaseLayout from "../layouts/BaseLayout.astro"
 import InterProtPreview from "../components/interprot-preview.jsx"
 import { SITE } from "../config"
 import profilePic from "../images/liam.jpeg"
-
-const social = SITE.social
 ---
 
 <BaseLayout>
@@ -46,7 +44,7 @@ const social = SITE.social
     </a>
     <div class="landing-links">
       <a
-        href={`https://www.x.com/${social.twitter}`}
+        href={SITE.socialUrls.twitter}
         aria-label="Twitter"
         target="_blank"
         rel="noopener noreferrer"
@@ -70,7 +68,7 @@ const social = SITE.social
         <FaGraduationCap />
       </a>
       <a
-        href={`https://www.linkedin.com/in/${social.linkedin}`}
+        href={SITE.socialUrls.linkedin}
         aria-label="LinkedIn"
         target="_blank"
         rel="noopener noreferrer"

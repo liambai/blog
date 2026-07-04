@@ -1,12 +1,10 @@
 ---
-import { getCollection } from "astro:content"
 import BaseLayout from "../layouts/BaseLayout.astro"
 import Avatar from "../components/Avatar.astro"
 import { formatPostDate } from "../lib/format"
+import { getSortedPosts, postPath } from "../lib/posts"
 
-const posts = (await getCollection("blog")).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
-)
+const posts = await getSortedPosts()
 ---
 
 <BaseLayout title="Blog">
@@ -30,7 +28,7 @@ const posts = (await getCollection("blog")).sort(
           >
             <header>
               <h2>
-                <a href={`/${post.id}/`} itemprop="url">
+                <a href={postPath(post.id)} itemprop="url">
                   <span itemprop="headline">{post.data.title}</span>
                 </a>
               </h2>

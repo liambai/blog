@@ -1,8 +1,6 @@
 ---
 import Avatar from "./Avatar.astro"
 import { SITE } from "../config"
-
-const social = SITE.social
 ---
 
 <div class="bio">
@@ -13,11 +11,11 @@ const social = SITE.social
       target="_blank"
       rel="noopener noreferrer">Generate:Biomedicines</a
     > and writes about machine learning and biology. He is on <a
-      href={`https://x.com/${social.twitter}`}
+      href={SITE.socialUrls.twitter}
       target="_blank"
       rel="noopener noreferrer">Twitter</a
     > and <a
-      href={`https://www.linkedin.com/in/${social.linkedin}`}
+      href={SITE.socialUrls.linkedin}
       target="_blank"
       rel="noopener noreferrer">LinkedIn</a
     >.

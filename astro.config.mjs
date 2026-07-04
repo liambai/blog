@@ -39,6 +39,12 @@ const anchorIcon = {
 // https://astro.build/config
 export default defineConfig({
   site: "https://liambai.com",
+  build: {
+    // Inline all CSS into the HTML: the site's entire stylesheet is only a few
+    // KB compressed, and inlining removes the render-blocking fetch that
+    // delays first paint on slow connections.
+    inlineStylesheets: "always",
+  },
   image: {
     // Content images are plain Vite asset imports (not Astro's <Image>), so we
     // don't need the sharp-based optimizer.

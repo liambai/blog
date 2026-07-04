@@ -1,11 +1,9 @@
 import rss from "@astrojs/rss"
-import { getCollection } from "astro:content"
 import { SITE } from "../config"
+import { getSortedPosts, postPath } from "../lib/posts"
 
 export async function GET(context) {
-  const posts = (await getCollection("blog")).sort(
-    (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
-  )
+  const posts = await getSortedPosts()
 
   return rss({
     title: "Liam Bai Blog RSS Feed",
@@ -15,7 +13,7 @@ export async function GET(context) {
       title: post.data.title,
       pubDate: post.data.date,
       description: post.data.description,
-      link: `/${post.id}/`,
+      link: postPath(post.id),
     })),
   })
 }

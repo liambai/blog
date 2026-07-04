@@ -29,8 +29,7 @@ const canonicalUrl = new URL(pathname, siteUrl).href
 // handles both absolute preview URLs and the relative default image.
 const imageUrl = new URL(image || SITE.defaultImage, siteUrl).href
 
-const twitterHandle = SITE.social?.twitter
-const twitterCreator = twitterHandle ? `@${twitterHandle}` : ""
+const twitterCreator = `@${SITE.social.twitter}`
 
 const gtagId = SITE.gtagId
 ---
@@ -60,14 +59,8 @@ const gtagId = SITE.gtagId
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:image" content={imageUrl} />
     <meta name="twitter:card" content="summary_large_image" />
-    {
-      twitterCreator && (
-        <>
-          <meta name="twitter:creator" content={twitterCreator} />
-          <meta name="twitter:site" content={twitterCreator} />
-        </>
-      )
-    }
+    <meta name="twitter:creator" content={twitterCreator} />
+    <meta name="twitter:site" content={twitterCreator} />
     <meta name="twitter:image" content={imageUrl} />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={metaDescription} />

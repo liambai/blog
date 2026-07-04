@@ -55,8 +55,6 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "develop": "astro dev",
-    "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "smoke": "astro build && node scripts/smoke.mjs preview",

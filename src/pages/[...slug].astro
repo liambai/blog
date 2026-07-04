@@ -1,10 +1,11 @@
 ---
-import { getCollection, render } from "astro:content"
+import { render } from "astro:content"
 import BaseLayout from "../layouts/BaseLayout.astro"
 import Bio from "../components/Bio.astro"
 import Comments from "../components/Comments.astro"
 import { SITE } from "../config"
 import { formatPostDate } from "../lib/format"
+import { getSortedPosts, postPath } from "../lib/posts"
 
 // Code highlighting, math, and footnote styles are only needed on posts.
 import "prismjs/themes/prism.css"
@@ -12,10 +13,8 @@ import "katex/dist/katex.min.css"
 import "littlefoot/dist/littlefoot.css"
 
 export async function getStaticPaths() {
-  // Sorted oldest-first so previous = older post and next = newer post.
-  const posts = (await getCollection("blog")).sort(
-    (a, b) => a.data.date.valueOf() - b.data.date.valueOf(),
-  )
+  // Reversed to oldest-first so previous = older post and next = newer post.
+  const posts = (await getSortedPosts()).reverse()
   return posts.map((post, i) => ({
     params: { slug: post.id },
     props: {
@@ -31,7 +30,7 @@ const { Content } = await render(post)
 
 const dateStr = formatPostDate(post.data.date)
 
-const previewUrl = `${SITE.siteUrl}/previews/${post.id.replace(/\//g, "")}.png`
+const previewUrl = `${SITE.siteUrl}/previews/${post.id}.png`
 ---
 
 <BaseLayout
@@ -60,7 +59,7 @@ const previewUrl = `${SITE.siteUrl}/previews/${post.id.replace(/\//g, "")}.png`
       <li>
         {
           previous && (
-            <a href={`/${previous.id}/`} rel="prev">
+            <a href={postPath(previous.id)} rel="prev">
               ← {previous.data.title}
             </a>
           )
@@ -69,7 +68,7 @@ const previewUrl = `${SITE.siteUrl}/previews/${post.id.replace(/\//g, "")}.png`
       <li>
         {
           next && (
-            <a href={`/${next.id}/`} rel="next">
+            <a href={postPath(next.id)} rel="next">
               {next.data.title} →
             </a>
           )
