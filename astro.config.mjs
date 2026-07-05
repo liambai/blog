@@ -72,10 +72,9 @@ export default defineConfig({
     // Disable Astro's built-in Shiki so rehype-prism-plus (+ prism.css theme)
     // is the only code highlighter, preserving the original Prism styling.
     syntaxHighlight: false,
-    // Astro 7 deprecated top-level `markdown.remarkPlugins`/`rehypePlugins`;
-    // the plugin pipeline now lives on a `unified()` processor instead. The
-    // top-level `syntaxHighlight` above is still honored — it's forwarded into
-    // this processor when Astro builds the renderer.
+    // Astro 7 deprecated the top-level `markdown.remarkPlugins`/`rehypePlugins`
+    // arrays in favor of a `unified()` processor. `syntaxHighlight` above still
+    // applies — Astro forwards it into the processor when building the renderer.
     processor: unified({
       remarkPlugins: [remarkMath, remarkImageImports],
       rehypePlugins: [
