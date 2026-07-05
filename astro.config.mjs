@@ -53,12 +53,17 @@ export default defineConfig({
   },
   integrations: [react(), mdx(), sitemap()],
   vite: {
-    ssr: {
-      // Bundle these for SSR: their ESM entries expose the named exports we
-      // import, and molstar's extensionless internal imports need a bundler to
-      // resolve. (react-katex is handled instead by default-importing it and
-      // destructuring — its UMD build breaks named-export detection AND the
-      // prop-types interop when bundled, so it's left external.)
+    resolve: {
+      // Bundle these rather than externalizing them for server rendering: their
+      // ESM entries expose the named exports we import, and molstar's
+      // extensionless internal imports need a bundler to resolve. (react-katex
+      // is handled instead by default-importing it and destructuring — its UMD
+      // build breaks named-export detection AND the prop-types interop when
+      // bundled, so it's left external.)
+      //
+      // This lives under `resolve` (not `ssr`) so it applies to every Vite
+      // environment — in particular Astro's separate `prerender` build, which
+      // the deprecated `ssr.noExternal` alias doesn't reach.
       noExternal: ["react-responsive", "d3-simple-slider", "molstar"],
     },
   },
