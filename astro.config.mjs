@@ -3,6 +3,7 @@ import { defineConfig, passthroughImageService } from "astro/config"
 import mdx from "@astrojs/mdx"
 import react from "@astrojs/react"
 import sitemap from "@astrojs/sitemap"
+import { unified } from "@astrojs/markdown-remark"
 
 import remarkMath from "remark-math"
 import remarkImageImports from "./src/lib/remark-image-imports.mjs"
@@ -71,27 +72,33 @@ export default defineConfig({
     // Disable Astro's built-in Shiki so rehype-prism-plus (+ prism.css theme)
     // is the only code highlighter, preserving the original Prism styling.
     syntaxHighlight: false,
-    remarkPlugins: [remarkMath, remarkImageImports],
-    rehypePlugins: [
-      rehypeSlug,
-      [
-        rehypeAutolinkHeadings,
-        {
-          behavior: "prepend",
-          properties: {
-            class: "anchor before",
-            ariaHidden: true,
-            tabIndex: -1,
+    // Astro 7 deprecated top-level `markdown.remarkPlugins`/`rehypePlugins`;
+    // the plugin pipeline now lives on a `unified()` processor instead. The
+    // top-level `syntaxHighlight` above is still honored — it's forwarded into
+    // this processor when Astro builds the renderer.
+    processor: unified({
+      remarkPlugins: [remarkMath, remarkImageImports],
+      rehypePlugins: [
+        rehypeSlug,
+        [
+          rehypeAutolinkHeadings,
+          {
+            behavior: "prepend",
+            properties: {
+              class: "anchor before",
+              ariaHidden: true,
+              tabIndex: -1,
+            },
+            content: anchorIcon,
           },
-          content: anchorIcon,
-        },
+        ],
+        rehypeKatex,
+        [rehypePrism, { ignoreMissing: true }],
+        [
+          rehypeExternalLinks,
+          { target: "_blank", rel: ["noopener", "noreferrer"] },
+        ],
       ],
-      rehypeKatex,
-      [rehypePrism, { ignoreMissing: true }],
-      [
-        rehypeExternalLinks,
-        { target: "_blank", rel: ["noopener", "noreferrer"] },
-      ],
-    ],
+    }),
   },
 })
