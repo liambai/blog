@@ -3,6 +3,7 @@ import { defineConfig, passthroughImageService } from "astro/config"
 import mdx from "@astrojs/mdx"
 import react from "@astrojs/react"
 import sitemap from "@astrojs/sitemap"
+import { unified } from "@astrojs/markdown-remark"
 
 import remarkMath from "remark-math"
 import remarkImageImports from "./src/lib/remark-image-imports.mjs"
@@ -53,12 +54,17 @@ export default defineConfig({
   },
   integrations: [react(), mdx(), sitemap()],
   vite: {
-    ssr: {
-      // Bundle these for SSR: their ESM entries expose the named exports we
-      // import, and molstar's extensionless internal imports need a bundler to
-      // resolve. (react-katex is handled instead by default-importing it and
-      // destructuring — its UMD build breaks named-export detection AND the
-      // prop-types interop when bundled, so it's left external.)
+    resolve: {
+      // Bundle these rather than externalizing them for server rendering: their
+      // ESM entries expose the named exports we import, and molstar's
+      // extensionless internal imports need a bundler to resolve. (react-katex
+      // is handled instead by default-importing it and destructuring — its UMD
+      // build breaks named-export detection AND the prop-types interop when
+      // bundled, so it's left external.)
+      //
+      // This lives under `resolve` (not `ssr`) so it applies to every Vite
+      // environment — in particular Astro's separate `prerender` build, which
+      // the deprecated `ssr.noExternal` alias doesn't reach.
       noExternal: ["react-responsive", "d3-simple-slider", "molstar"],
     },
   },
@@ -66,27 +72,32 @@ export default defineConfig({
     // Disable Astro's built-in Shiki so rehype-prism-plus (+ prism.css theme)
     // is the only code highlighter, preserving the original Prism styling.
     syntaxHighlight: false,
-    remarkPlugins: [remarkMath, remarkImageImports],
-    rehypePlugins: [
-      rehypeSlug,
-      [
-        rehypeAutolinkHeadings,
-        {
-          behavior: "prepend",
-          properties: {
-            class: "anchor before",
-            ariaHidden: true,
-            tabIndex: -1,
+    // Astro 7 deprecated the top-level `markdown.remarkPlugins`/`rehypePlugins`
+    // arrays in favor of a `unified()` processor. `syntaxHighlight` above still
+    // applies — Astro forwards it into the processor when building the renderer.
+    processor: unified({
+      remarkPlugins: [remarkMath, remarkImageImports],
+      rehypePlugins: [
+        rehypeSlug,
+        [
+          rehypeAutolinkHeadings,
+          {
+            behavior: "prepend",
+            properties: {
+              class: "anchor before",
+              ariaHidden: true,
+              tabIndex: -1,
+            },
+            content: anchorIcon,
           },
-          content: anchorIcon,
-        },
+        ],
+        rehypeKatex,
+        [rehypePrism, { ignoreMissing: true }],
+        [
+          rehypeExternalLinks,
+          { target: "_blank", rel: ["noopener", "noreferrer"] },
+        ],
       ],
-      rehypeKatex,
-      [rehypePrism, { ignoreMissing: true }],
-      [
-        rehypeExternalLinks,
-        { target: "_blank", rel: ["noopener", "noreferrer"] },
-      ],
-    ],
+    }),
   },
 })
