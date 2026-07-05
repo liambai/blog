@@ -57,8 +57,6 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "smoke": "astro build && node scripts/smoke.mjs preview",
-    "smoke:dev": "node scripts/smoke.mjs dev",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,astro,json,md}\"",
     "astro": "astro"
   }
