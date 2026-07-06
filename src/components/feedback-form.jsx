@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import { useState } from "react"
 
 const FORMSPREE_ENDPOINT = "https://formspree.io/f/xnjqrjqo"
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from "react"
+import { useEffect, useRef, useState, useCallback } from "react"
 import { FaHandPointer } from "react-icons/fa"
 
 const PDB_ID = "7KYX"
@@ -236,7 +236,8 @@ const InterProtPreview = ({ width = "100%", height = "100%" }) => {
       }
       setIsStructureLoaded(false)
     }
-  }, [width, height])
+    // Mount-once: the effect reads only refs + setState, never width/height.
+  }, [])
 
   useEffect(() => {
     if (!pluginRef.current || !isStructureLoaded) {
