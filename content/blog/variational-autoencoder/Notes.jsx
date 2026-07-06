@@ -1,6 +1,6 @@
 import React from "react"
 import getNoteComponents from "../../../src/components/notes"
-import { InlineMath } from "../../../src/lib/react-katex"
+import { InlineMath } from "../../../src/lib/math"
 
 const notes = {
   1: "We also use log probability for mathematical convenience.",

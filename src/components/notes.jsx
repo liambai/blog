@@ -1,5 +1,5 @@
 import React from "react"
-import { InlineMath } from "../lib/react-katex"
+import { InlineMath } from "../lib/math"
 
 const MARKDOWN_PATTERNS = [
   {

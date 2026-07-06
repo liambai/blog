@@ -11,5 +11,8 @@ node_modules/
 # Environment variables
 .env*
 
+# Local Claude Code state (agent worktrees, etc.)
+.claude/
+
 # macOS
 .DS_Store

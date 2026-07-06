@@ -1,5 +1,3 @@
-import React from "react"
-
 import "./link-preview.css"
 
 const LinkPreview = ({ url, title, description, ogImageSrc }) => {
