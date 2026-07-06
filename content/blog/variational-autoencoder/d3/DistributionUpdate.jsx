@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react"
 import * as d3 from "d3"
 import { useMediaQuery } from "react-responsive"
-import { InlineMath } from "../../../../src/lib/react-katex"
+import { InlineMath } from "../../../../src/lib/math"
 
 const initialProbs = {
   "z = [-0.1, 0.2, 0.5]": 0.09,
