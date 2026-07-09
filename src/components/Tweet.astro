@@ -1,0 +1,76 @@
+---
+// Embeds an X/Twitter post. The tweet's HTML — including its text as a no-JS
+// fallback — is fetched from X's oEmbed API at build time; the widgets.js script
+// loaded below then upgrades the blockquote into the rich embedded card on the
+// client. If the build-time fetch fails (network/rate limit), we degrade to a
+// plain link to the post.
+interface Props {
+  url: string
+}
+
+const { url } = Astro.props
+
+const endpoint = new URL("https://publish.twitter.com/oembed")
+endpoint.searchParams.set("url", url)
+endpoint.searchParams.set("omit_script", "true") // widgets.js is loaded once below
+endpoint.searchParams.set("dnt", "true")
+endpoint.searchParams.set("align", "center")
+
+let html = ""
+try {
+  const res = await fetch(endpoint)
+  if (res.ok) {
+    html = (await res.json()).html
+  } else {
+    console.error(`Tweet oEmbed failed (${res.status}) for ${url}`)
+  }
+} catch (err) {
+  console.error(`Tweet oEmbed error for ${url}:`, err)
+}
+---
+
+{
+  html ? (
+    <div class="tweet-embed" set:html={html} />
+  ) : (
+    <p style="text-align: center;">
+      <a href={url} target="_blank" rel="noopener noreferrer">
+        View post on X
+      </a>
+    </p>
+  )
+}
+
+<script>
+  // Load X's widgets.js once per page, then (re)scan for tweet blockquotes.
+  // Scripts injected via set:html don't execute, so we load it ourselves here.
+  const load = () => window.twttr?.widgets?.load()
+  if (window.twttr?.widgets) {
+    load()
+  } else if (!document.getElementById("twitter-wjs")) {
+    const s = document.createElement("script")
+    s.id = "twitter-wjs"
+    s.async = true
+    s.src = "https://platform.x.com/widgets.js"
+    s.addEventListener("load", load)
+    document.head.appendChild(s)
+  }
+</script>
+
+<style>
+  /* Match the site's block rhythm: no top margin, one paragraph-sized gap
+     below (--spacing-8). */
+  .tweet-embed {
+    margin-bottom: var(--spacing-8);
+  }
+
+  /* Center the raw blockquote before widgets.js swaps in the (self-centering)
+     rendered card, and strip the iframe's own top/bottom margins so spacing is
+     controlled by the container above rather than doubling up. */
+  .tweet-embed :global(.twitter-tweet) {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+</style>

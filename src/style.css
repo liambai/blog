@@ -158,7 +158,7 @@ p {
   line-height: var(--lineHeight-relaxed);
   --baseline-multiplier: 0.179;
   --x-height-multiplier: 0.35;
-  margin: var(--spacing-0) var(--spacing-0) var(--spacing-8) var(--spacing-0);
+  margin: var(--spacing-0) var(--spacing-0) var(--spacing-6) var(--spacing-0);
   padding: var(--spacing-0);
 }
 
@@ -690,6 +690,72 @@ pre[class*="language-"] {
   .content-image {
     width: var(--img-mobile-width, 100%);
   }
+}
+
+/* Chat message examples (e.g. jailbreak prompts). The card is a sans-serif
+   aside against the serif body; `.chat-message-role` is the badge straddling
+   the top border, and the highlight spans color parts of the prompt. */
+.chat-message {
+  position: relative;
+  margin: var(--spacing-8) var(--spacing-0);
+  padding: var(--spacing-6) var(--spacing-5) var(--spacing-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-md);
+  font-family: var(--fontFamily-sans);
+  color: var(--color-text);
+}
+
+.chat-message-role {
+  position: absolute;
+  top: 0;
+  left: var(--spacing-5);
+  transform: translateY(-50%);
+  padding: var(--spacing-1) var(--spacing-3);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-heading);
+  border-radius: var(--spacing-2);
+  font-weight: var(--fontWeight-bold);
+  font-size: var(--fontSize-0);
+  line-height: 1;
+  color: var(--color-heading);
+}
+
+.chat-message-body p {
+  line-height: var(--lineHeight-relaxed);
+  margin-bottom: var(--spacing-4);
+}
+
+.chat-message-body p:last-child {
+  margin-bottom: var(--spacing-0);
+}
+
+.chat-inject {
+  color: #b0243a;
+}
+
+.chat-request {
+  color: #2f63c7;
+}
+
+/* Monospace span for control glyphs, dividers, and encoded payloads. Inherits
+   color so it can be nested inside `.chat-inject` to render a red glyph. */
+.chat-mono {
+  font-family: var(--fontFamily-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.9em;
+  background: var(--color-code-bg, rgba(128, 128, 128, 0.12));
+  padding: 0.05em 0.3em;
+  border-radius: 3px;
+  word-break: break-word;
+}
+
+/* Censor bar: children stay in flow to size the bar but are painted over. */
+.chat-redact {
+  background: #1a1a1a;
+  color: transparent;
+  border-radius: 2px;
+  padding: 0 0.15em;
+  user-select: none;
 }
 
 .math-display,
