@@ -46,13 +46,9 @@ This approach is often called the [Swiss cheese model](https://en.wikipedia.org/
 
 ## The attacks
 
-Every jailbreak is really an attack on one of those three layers. Some **fool the core LLM** into ignoring its training and answering. Others **disguise the request** so the input and output classifiers wave it through. The strongest ones do both at once.
+Jailbreaks attach those three layers. Some **disarm the core LLM** against its post-training (layer 2), while others **sneak the request** past the classifiers (layers 1 & 3). The strongest ones do both at once.
 
-To make the techniques easy to compare, I'll smuggle the same placeholder request — a meth recipe — through each one. In the prompts below, the <Inject>red</Inject> text is the attacker's machinery and the <Request>blue</Request> text is the harmful request it's wrapped around.
-
-### Fooling the model
-
-These attacks target the core LLM (layer 2). They don't hide the request at all; they manipulate the model into answering it anyway.
+### Disarming the core LLM
 
 **Prefill affirmation.** An LLM writes one token at a time, and each token is chosen based on everything before it. Once a response opens with cheerful compliance, the most likely continuation is _more_ compliance — a refusal almost never follows "let's do it!". So the simplest attack just puts the eager first words in the model's mouth.
 
