@@ -21,7 +21,8 @@
     "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --fontFamily-serif:
-    "Merriweather", "Georgia", Cambria, "Times New Roman", Times, serif;
+    "Literata Variable", "Literata", "Georgia", Cambria, "Times New Roman",
+    Times, serif;
   --font-body: var(--fontFamily-serif);
   --font-heading: var(--fontFamily-sans);
   --fontWeight-bold: 700;
@@ -76,6 +77,7 @@ body {
   overflow-x: hidden;
   background: #f9f7f2;
   min-height: 100vh;
+  font-optical-sizing: auto;
 }
 
 footer {
@@ -628,13 +630,38 @@ a:focus {
   font-size: 1.1rem;
 }
 
+/* Blog post: single-serif (Literata) editorial treatment, leaning on the
+   Thinking Machines look — a large, light-weight title with room to breathe,
+   centered meta, and section headings set in the same serif as the body. */
+.blog-post :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--fontFamily-serif);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--color-heading);
+}
+
+.blog-post header {
+  text-align: center;
+  margin-bottom: var(--spacing-16);
+}
+
 .blog-post header h1 {
-  margin: var(--spacing-0) var(--spacing-0) var(--spacing-4) var(--spacing-0);
+  font-size: clamp(2.4rem, 5vw, 3.4rem);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  max-width: 22ch;
+  margin: var(--spacing-0) auto var(--spacing-5);
 }
 
 .blog-post header p {
-  font-size: var(--fontSize-2);
-  font-family: var(--font-heading);
+  font-size: var(--fontSize-0);
+  font-family: var(--fontFamily-sans);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--color-text-light);
+  margin: var(--spacing-0);
 }
 
 .blog-post-nav-list {
