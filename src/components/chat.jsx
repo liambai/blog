@@ -1,7 +1,8 @@
 // Presentational chat-bubble components for illustrating jailbreak prompts.
 //
-// `ChatMessage` renders a labeled message card (a "User" turn by default); the
-// inline helpers color or style spans within it:
+// `ChatMessage` renders a labeled message card (a "User" turn by default); an
+// optional `label` prop tags the card (e.g. the name of the attack it shows).
+// The inline helpers color or style spans within it:
 //   - `Inject`  — the attacker's injected machinery: forced output, fake
 //                 instructions, personas, dividers, etc. (red)
 //   - `Request` — the harmful ask being smuggled in (blue)
@@ -14,10 +15,11 @@
 // All styling lives in src/style.css under the `.chat-*` classes, so these
 // render to static HTML with no client-side JavaScript.
 
-export function ChatMessage({ role = "User", children }) {
+export function ChatMessage({ role = "User", label, children }) {
   return (
     <div className="chat-message">
       <span className="chat-message-role">{role}</span>
+      {label && <span className="chat-message-label">{label}</span>}
       <div className="chat-message-body">{children}</div>
     </div>
   )
