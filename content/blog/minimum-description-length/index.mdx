@@ -1,5 +1,5 @@
 ---
-title: "From Kolmogorov to LLMs: The Compression View of Learning"
+title: "From Kolmogorov to LLMs: The compression view of learning"
 date: "2025-06-08"
 description: "The Minimum Description Length (MDL) principle, Kolmogorov complexity, linear regression, data compression and learning."
 ---
@@ -10,10 +10,11 @@ import { Note, NoteList } from "./Notes.jsx"
 It's almost impossible to watch this [Kevin clip](https://youtu.be/bctjSvn-OC8?si=Jf1Os9V04MIotRdq&t=48) without coming to the conclusion: he's onto something.
 
 <Figure>
-  <Image slot="content"
-      href="https://www.youtube.com/watch?v=bctjSvn-OC8&t=48s&ab_channel=ComedyBites"
-      path="./images/kevin.jpg"
-    />
+  <Image
+    slot="content"
+    href="https://www.youtube.com/watch?v=bctjSvn-OC8&t=48s&ab_channel=ComedyBites"
+    path="./images/kevin.jpg"
+  />
 </Figure>
 
 His abbreviated sentences do seem to convey the same information as their verbose original. Can we formalize this idea of using fewer words to say the same thing? How "few" can we go without losing information?
@@ -126,12 +127,13 @@ Assuming the coefficients and errors follow a Gaussian distribution with mean $0
       width="70%"
     />
 
-  Given any real number $v$, we can discretize it by taking a small interval of
-  size $t$ around it. For small enough $t$, can approximate the probability
-  density at the interval with $t * g(x)$, where $g(x)$ is the [Gaussian
-  pdf](https://en.wikipedia.org/wiki/Normal_distribution) with mean $0$. The
-  picture is from sections 3 and 4 of Hinton et al. <Reference id={3} />, which
-  contain a detailed explanation of this method.
+Given any real number $v$, we can discretize it by taking a small interval of
+size $t$ around it. For small enough $t$, can approximate the probability
+density at the interval with $t * g(x)$, where $g(x)$ is the [Gaussian
+pdf](https://en.wikipedia.org/wiki/Normal_distribution) with mean $0$. The
+picture is from sections 3 and 4 of Hinton et al. <Reference id={3} />, which
+contain a detailed explanation of this method.
+
 </Figure>
 
 Given a probability, we can assume the optimal code length $-\log_2(p(x))$ and calculate the minimum number of bits needed to encode our number <Note id={3} />.
@@ -221,11 +223,12 @@ Modern LLMs like GPT are large Transformers with billions of parameters. They ca
 <Figure>
   <Image slot="content" path="./images/lossless-compression.png" />
 
-  Lossless compression encodes text into a compressed format and enables
-  recovering the original text exactly.
-  [enwik9](https://mattmahoney.net/dc/textdata.html) is the first GB of the
-  English Wikipedia dump on Mar. 3, 2006, used in the [Large Text Compression
-  Benchmark](https://mattmahoney.net/dc/text.html).
+Lossless compression encodes text into a compressed format and enables
+recovering the original text exactly.
+[enwik9](https://mattmahoney.net/dc/textdata.html) is the first GB of the
+English Wikipedia dump on Mar. 3, 2006, used in the [Large Text Compression
+Benchmark](https://mattmahoney.net/dc/text.html).
+
 </Figure>
 
 Like the polynomial through the points, an LLM can be used as a guide to encode text. Instead of describing each word literally, we only need to describe "how far" it is from the LLM's predictions. I'll omit the details, but you can read more about this encoding method, called **arithmetic coding**, [here](https://go-compression.github.io/algorithms/arithmetic/).
@@ -235,11 +238,12 @@ Researchers found that this compression method using LLMs is far more efficient 
 <Figure>
   <Image slot="content" path="./images/LLM-compression-results.png" />
 
-  [ImageNet](https://en.wikipedia.org/wiki/ImageNet) and
-  [LibriSpeech](https://www.openslr.org/12) are popular image and speech
-  datasets. Chunk size accounts for the limited context window of LLMs, whereas
-  `gzip` can operate on a much larger range and exploit more compressible
-  patterns.
+[ImageNet](https://en.wikipedia.org/wiki/ImageNet) and
+[LibriSpeech](https://www.openslr.org/12) are popular image and speech
+datasets. Chunk size accounts for the limited context window of LLMs, whereas
+`gzip` can operate on a much larger range and exploit more compressible
+patterns.
+
 </Figure>
 
 LLMs like Llama and Chinchilla managed to compress [enwik9](https://mattmahoney.net/dc/textdata.html), a text file used to benchmark compression algorithm, to 10% its original size, compared to `gzip`'s 30%. LLMs have clearly learned patterns in the text that are useful for compression.
@@ -282,7 +286,8 @@ For example, the best chess algorithms used to encode human-discovered heuristic
 <Figure>
   <Image slot="content" path="./images/bitter-lesson.png" />
 
-  [https://danieljeffries.substack.com/p/embracing-the-bitter-lesson](https://danieljeffries.substack.com/p/embracing-the-bitter-lesson)
+[https://danieljeffries.substack.com/p/embracing-the-bitter-lesson](https://danieljeffries.substack.com/p/embracing-the-bitter-lesson)
+
 </Figure>
 
 The story of machine learning is one of the repeated failure of our biases, clever tricks, and desire to teach our models the world in the way _we_ see it. From the MDL perspective, the best model of the world is the one with the minimum description. Each bias we remove is a simplification of our description. The simplest description always wins.
