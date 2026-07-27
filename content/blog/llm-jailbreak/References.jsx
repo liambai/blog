@@ -8,7 +8,14 @@ const references = {
     journal: "OpenAI",
     year: 2024,
   },
-  // 2: {
+  2: {
+    title: "A General Language Assistant as a Laboratory for Alignment",
+    author: "Askell, A. et al.",
+    url: "https://arxiv.org/abs/2112.00861",
+    journal: "arXiv",
+    year: 2021,
+  },
+  // 3: {
   //   title: "Jailbroken: How Does LLM Safety Training Fail?",
   //   author: "Wei, A. et al.",
   //   url: "https://arxiv.org/pdf/2307.02483",
