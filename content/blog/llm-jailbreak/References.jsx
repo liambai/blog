@@ -15,13 +15,13 @@ const references = {
     journal: "arXiv",
     year: 2021,
   },
-  // 3: {
-  //   title: "Jailbroken: How Does LLM Safety Training Fail?",
-  //   author: "Wei, A. et al.",
-  //   url: "https://arxiv.org/pdf/2307.02483",
-  //   journal: "NeurIPS",
-  //   year: 2023,
-  // },
+  3: {
+    title: "Jailbroken: How Does LLM Safety Training Fail?",
+    author: "Wei, A. et al.",
+    url: "https://arxiv.org/pdf/2307.02483",
+    journal: "NeurIPS",
+    year: 2023,
+  },
 }
 
 export const { Reference, ReferenceList } = getReferenceComponents(references)

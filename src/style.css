@@ -43,6 +43,7 @@
   --color-secondary: #e07a5f;
   --color-text: #1f2a33;
   --color-text-light: #55606c;
+  --color-text-muted: #3b4753;
   --color-heading: #0b1d26;
   --color-heading-black: #0b1d26;
   --color-accent: #e6ded2;
@@ -194,13 +195,12 @@ li > ul {
 }
 
 blockquote {
-  color: var(--color-text-light);
+  color: var(--color-text-muted);
   margin-left: calc(-1 * var(--spacing-6));
   margin-right: var(--spacing-8);
   padding: var(--spacing-0) var(--spacing-0) var(--spacing-0) var(--spacing-6);
   border-left: var(--spacing-1) solid var(--color-primary);
-  font-size: var(--fontSize-1);
-  font-style: italic;
+  font-size: inherit;
   margin-bottom: var(--spacing-8);
 }
 
@@ -628,6 +628,12 @@ a:focus {
 
 .blog-post {
   font-size: 1.1rem;
+  /* Hold the text column near 65-70 characters per line. The wrapper is 48rem,
+     which reads at ~77ch and is wide enough that the eye loses the line on the
+     return sweep. */
+  max-width: 41rem;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Blog post: single-serif (Literata) editorial treatment, leaning on the
@@ -638,6 +644,13 @@ a:focus {
   font-weight: 600;
   letter-spacing: -0.015em;
   color: var(--color-heading);
+}
+
+/* Paragraph gap has to clear one line of leading (1.625em), or the space
+   between paragraphs reads as tighter than the space within one. */
+.blog-post > :is(p, ul, ol),
+.blog-post blockquote > p {
+  margin-bottom: var(--spacing-8);
 }
 
 .blog-post header {
