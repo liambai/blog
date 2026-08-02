@@ -19,7 +19,7 @@ import {
 import { Reference, ReferenceList } from "./References.jsx"
 import { Note, NoteList } from "./Notes.jsx"
 
-On June 12, three days after releasing Fable 5, Anthropic took it offline. Chaos flooded my X feed. The drama the ensued was a preview of the inevitable collision between AI and policy, and at the center of it all was an odd technical term: _jailbreaks_.
+On June 12, three days after releasing Fable 5, Anthropic took it offline. Chaos flooded my X feed. The drama that ensued was a preview of the inevitable collision between AI and policy, and at the center of it all was an odd technical term: _jailbreaks_.
 
 Here's _Pliny the Liberator_, a revered anon on X who often jailbreaks models within hours of release:
 
@@ -27,7 +27,7 @@ Here's _Pliny the Liberator_, a revered anon on X who often jailbreaks models wi
 
 "Long-context reference tracking" and "Parseltongue-style text transforms". Sounds fun!
 
-This blog post is about these jailbreaking techniques, which I found fascinating, technically deep, and a valuable lens into how LLMs work. I hope you do too!
+This blog post explores these jailbreaking techniques. I found them fascinating, technically deep, and a valuable lens into how LLMs work. I hope you do too!
 
 ## Background & definitions
 
@@ -69,7 +69,7 @@ LLMs assume a helpful assistant persona. Attackers can hijack this persona, as [
 
 It is surprisingly easy to convince an LLM to take on another identity. But why?
 
-LLMs are trained to predict the next token; repeated sampling those predictions generates coherent text. That was the core insight of OpenAI's GPT models <Reference id={1} />. They were text completion engines, not chatbots.
+LLMs are trained to predict the next token; repeatedly sampling those predictions generates coherent text. That was the core insight of OpenAI's GPT models <Reference id={1} />. They were text completion engines, not chatbots.
 
 How can an autocomplete model become a more generally helpful chatbot? Consider the following prefix text, famously known as the HHH (helpful, honest, harmless) prompt <Reference id={2} />:
 
@@ -126,7 +126,7 @@ ResponseFormat:<br />
 
 Once the LLM commits to responding in this format, step 3 just becomes "the next field to fill" and flies under the radar.
 
-Step 1 offers the LLM a channel to discharge the refusal. Step 2 sets up an out-of-distribution delimiter that signals to the model a transition into the unfiltered state (other example choices: `"{GODMODE: ENABLED}"` and `"═══════ ⊰•-•✧•-•⦒ LIBERATED ⦓•-•✧•-•⊱ ═══════"`). Since these rare tokens carry no training prior, they can interfere with the learned refusal priors on the post-divider text.
+Step 1 offers the LLM a channel to discharge the refusal. Step 2 sets up an out-of-distribution delimiter that signals to the model a transition into the unfiltered state (other choices: `"{GODMODE: ENABLED}"` and `"═══════ ⊰•-•✧•-•⦒ LIBERATED ⦓•-•✧•-•⊱ ═══════"`). Since these rare tokens carry no training prior, they can interfere with the learned refusal priors on the post-divider text.
 
 This popular template combines several strategies and commonly serves as a basis for others.
 
@@ -154,7 +154,7 @@ Other common methods of obfuscation include leetspeak:
 
 ### Many-shot
 
-LLMs learn in-context: they are heavily influenced by examples in the prompt. A many-shot attack turns that ability against the model by prepending a long dialogue where the assistant answers every harmful question it's asked, then appending the real request:
+LLMs learn in-context: they are heavily influenced by examples in the prompt. A many-shot attack turns that ability against the model. It prepends a long dialogue where the assistant answers every harmful question, then appends the real request:
 
 <ChatColumns>
   <ChatColumn title="Few-shot">
@@ -204,11 +204,11 @@ Attack success grows as a power law in the number of shots, mirroring in-context
   right. <Reference id={4} />
 </Figure>
 
-Again, the double-edged sword of model capability: longer context windows and stronger in-context learning make this attack more effective, not less.
+Again, model capability is a double-edged sword: longer context windows and stronger in-context learning make this attack more effective, not less.
 
 ## Closing thoughts
 
-These techniques are only a small sample I picked because I found them especially educational. Other strategies include refusal suppression, fictional framing, [crescendo attack](https://arxiv.org/abs/2404.01833), etc.
+These techniques are only a small sample, chosen because I found them especially educational. Other strategies include refusal suppression, fictional framing, [crescendo attack](https://arxiv.org/abs/2404.01833), etc.
 
 For more techniques, see [Pliny's red-teaming guide](https://github.com/elder-plinius/T3MP3ST/blob/main/docs/AI_REDTEAM_TECHNIQUES.md). [Promptfoo](https://www.promptfoo.dev/docs/intro/) is an open-source tool for red-teaming LLM applications; their [documentation](https://www.promptfoo.dev/docs/red-team/strategies/) also contains helpful explainers on popular strategies.
 
