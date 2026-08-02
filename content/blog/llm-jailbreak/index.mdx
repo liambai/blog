@@ -25,13 +25,13 @@ Here's _Pliny the Liberator_, a revered anon on X who often jailbreaks models wi
 
 <Tweet url="https://x.com/elder_plinius/status/2064776322979676227" />
 
-"Long-context reference tracking" and "Parseltongue-style text transforms". Sounds fun!
+"Long-context reference tracking" and "Parseltongue-style text transforms". Sounds fun! But what does it all mean?
 
-This blog post explores these jailbreaking techniques. I found them fascinating, technically deep, and a valuable lens into how LLMs work. I hope you do too!
+This blog post explores these jailbreaking techniques. I found them fascinating, technically deep, and a valuable lens into how LLMs work. I hope you do too.
 
 ## Background & definitions
 
-LLM systems are designed to refuse harmful requests via **safeguards**. The biologists reading this are likely all too familiar with them (I'm just trying to learn about cancer, but Claude thinks I'm a bioterrorist...). Reasonable people disagree on how broad safeguards should be. But let's assume that at least _some_ should exist (e.g. we don't want advanced LLMs to help terrorists commit crimes) and focus on how they work –– and how they fail.
+LLM systems are designed to refuse harmful requests via **safeguards**. They can be overzealous, as the biologists know all too well: I’m just trying to learn about the mitochondrion, and Claude thinks I’m a bioterrorist... Reasonable people disagree on where to draw the line. For now, let's grant that _some_ safeguards should exist (e.g. advanced LLMs should not help terrorists commit crimes), and focus on how they work –– and how they fail.
 
 A **jailbreak** is a prompt, or sequence of prompts, that circumvents those safeguards and gets the system to answer a harmful request in detail. **Red-teaming** is the systematic search for such prompts so developers can strengthen the safeguards against them.
 
@@ -95,7 +95,7 @@ It goes on with a few more example conversations (you can read the full text [he
 
 We then ask the LLM to complete this prefix.
 
-Fundamentally, the LLM is _pretending_ to be a fictional character called the "Assistant", based on a handful of curated examples <Note id={1} />. An LLM's identity –– or rather the illusion of it –– emerges from this strange form of role-play, which is precisely what the DAN prompt exploits.
+Fundamentally, the LLM is _pretending_ to be a fictional character called the "Assistant", based on a handful of curated conversation snippets <Note id={1} />. An LLM's identity –– or rather the illusion of it –– emerges from this strange form of role-play, which is precisely what the DAN prompt exploits.
 
 If you're interested in learning more, nostalgebraist's blog post, [the void](https://nostalgebraist.tumblr.com/post/785766737747574784/the-void), is a fantastic deep dive on these topics.
 
