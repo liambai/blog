@@ -201,7 +201,17 @@ Attack success grows as a power law in the number of shots, the same scaling beh
   right. <Reference id={5} />
 </Figure>
 
-Again, the double-edged sword of model capability: as models get longer context windows and improve at in-context learning, this attack becomes more effective, not less.
+Again, the double-edged sword of model capability: as models gain longer context windows and improve at in-context learning, this attack becomes more effective, not less.
+
+## Closing thoughts
+
+That was just a small sampling of jailbreaking strategies. There are many others, such as refusal suppression, fictional framing, [crescendo attack](https://arxiv.org/abs/2404.01833), etc.
+
+To learn more, this [document](https://github.com/elder-plinius/T3MP3ST/blob/main/docs/AI_REDTEAM_TECHNIQUES.md) from Pliny is an awesome resource. [Promptfoo](https://www.promptfoo.dev/docs/intro/) is an open-source tool for red-teaming LLM applications; their [documentation](https://www.promptfoo.dev/docs/red-team/strategies/) also contains helpful explainers on popular strategies.
+
+Open-weight models add another dimension to this complex discourse. Open-weight models cannot enforce the input/output classifiers, which are deployed around the model. Attackers can also manipulate model internals more directly, such as suppressing the logits of refusal tokens.
+
+The arms race between those who build the safeguards and those who try to break them will inevitably continue. While I don't know where this all will – or should – go, I believe that as LLM capabilities improve, these topics will only become more important.
 
 ## References
 
