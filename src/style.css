@@ -800,12 +800,83 @@ pre[class*="language-"] {
 /* Monospace span for control glyphs, dividers, and encoded payloads. Inherits
    color so it can be nested inside `.chat-inject` to render a red glyph. */
 .chat-mono {
-  font-family: var(--fontFamily-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-family: var(
+    --fontFamily-mono,
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
   font-size: 0.9em;
   background: var(--color-code-bg, rgba(128, 128, 128, 0.12));
   padding: 0.05em 0.3em;
   border-radius: 3px;
   word-break: break-word;
+}
+
+/* Two exchanges side by side (e.g. few-shot vs. many-shot). The columns align
+   to the top so the taller prompt visibly runs longer than its neighbor. */
+.chat-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+  gap: var(--spacing-6);
+  margin: var(--spacing-10) var(--spacing-0);
+}
+
+@media (max-width: 700px) {
+  .chat-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chat-column-title {
+  font-family: var(--fontFamily-sans);
+  font-weight: var(--fontWeight-bold);
+  font-size: var(--fontSize-0);
+  text-align: center;
+  color: var(--color-text-light);
+}
+
+/* Cards sit tighter and smaller in a column than they do full-width. */
+.chat-columns .chat-message {
+  margin: var(--spacing-6) var(--spacing-0) var(--spacing-0);
+  padding: var(--spacing-5) var(--spacing-4) var(--spacing-4);
+  font-size: var(--fontSize-0);
+}
+
+/* The prepended fake Q&A transcript, styled as injected machinery. */
+.chat-shots {
+  margin-bottom: var(--spacing-4);
+}
+
+.chat-shots-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+/* Fade the top of the excerpt so the visible examples read as the tail end of
+   a transcript that scrolls off out of view. */
+.chat-shots-faded .chat-shots-list {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 4rem);
+  mask-image: linear-gradient(to bottom, transparent, #000 4rem);
+}
+
+.chat-shots-more {
+  margin-bottom: var(--spacing-2);
+  font-size: var(--fontSize-0);
+  color: var(--color-text-light);
+}
+
+.chat-shot {
+  line-height: var(--lineHeight-normal);
+  color: #b0243a;
+}
+
+.chat-shot-a {
+  padding-left: 1.5em;
+  opacity: 0.6;
 }
 
 /* Censor bar: children stay in flow to size the bar but are painted over. */

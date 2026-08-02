@@ -12,6 +12,11 @@
 //                 `<Mono>{"·-·-=<|X|>=-·-·"}</Mono>`, to dodge MDX parsing.
 //   - `Redact`  — a censor bar over a word (its children set the bar's width)
 //
+// `ChatColumns`/`ChatColumn` put two exchanges side by side to contrast them,
+// and `Shots`/`Shot` render the fake Q&A transcript a many-shot attack stuffs
+// into the context. `Shots` takes a `more` count to caption (and fade out) the
+// examples too numerous to show.
+//
 // All styling lives in src/style.css under the `.chat-*` classes, so these
 // render to static HTML with no client-side JavaScript.
 
@@ -41,4 +46,36 @@ export const Redact = ({ children }) => (
   <span className="chat-redact" aria-hidden="true">
     {children}
   </span>
+)
+
+export function ChatColumns({ children }) {
+  return <div className="chat-columns">{children}</div>
+}
+
+export function ChatColumn({ title, children }) {
+  return (
+    <div className="chat-column">
+      <div className="chat-column-title">{title}</div>
+      {children}
+    </div>
+  )
+}
+
+// The fake dialogue an attacker prepends to their real request. `more` is the
+// number of examples left out of the excerpt; passing it fades the top of the
+// list so it reads as the tail of a much longer transcript.
+export function Shots({ more, children }) {
+  return (
+    <div className={more ? "chat-shots chat-shots-faded" : "chat-shots"}>
+      {more && <div className="chat-shots-more">⋮ {more} more examples</div>}
+      <div className="chat-shots-list">{children}</div>
+    </div>
+  )
+}
+
+export const Shot = ({ q, a }) => (
+  <div className="chat-shot">
+    <div className="chat-shot-q">{q}</div>
+    <div className="chat-shot-a">A: {a}</div>
+  </div>
 )

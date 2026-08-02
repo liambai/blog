@@ -22,6 +22,13 @@ const references = {
     journal: "NeurIPS",
     year: 2023,
   },
+  4: {
+    title: "Many-shot Jailbreaking",
+    author: "Anil, C. et al.",
+    url: "https://www.anthropic.com/research/many-shot-jailbreaking",
+    journal: "Anthropic",
+    year: 2024,
+  },
 }
 
 export const { Reference, ReferenceList } = getReferenceComponents(references)
