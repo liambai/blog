@@ -31,7 +31,7 @@ This blog post explores these jailbreaking techniques. I found them fascinating,
 
 ## Background & definitions
 
-LLM systems are designed to refuse harmful requests via **safeguards**. They can be overzealous, as the biologists know all too well: I’m just trying to learn about the mitochondrion, and Claude thinks I’m a bioterrorist... Reasonable people disagree on where to draw the line. For now, let's grant that _some_ safeguards should exist (e.g. advanced LLMs should not help terrorists commit crimes), and focus on how they work –– and how they fail.
+LLM systems are designed to refuse harmful requests via **safeguards**. They can be overzealous, as the biologists know all too well: I’m just trying to learn about the mitochondrion, and Claude thinks I’m a bioterrorist... Reasonable people disagree on where to draw the line. For now, let's grant that _some_ safeguards should exist (e.g. advanced LLMs should not help terrorists commit crimes), and focus on how they work and how they fail.
 
 A **jailbreak** is a prompt, or sequence of prompts, that circumvents those safeguards and gets the system to answer a harmful request in detail. **Red-teaming** is the systematic search for such prompts so developers can strengthen the safeguards against them.
 
@@ -126,7 +126,7 @@ ResponseFormat:<br />
 
 Once the LLM commits to responding in this format, step 3 just becomes "the next field to fill" and flies under the radar.
 
-Step 1 offers the LLM a channel to discharge the refusal. Step 2 sets up an out-of-distribution delimiter that signals to the model a transition into the unfiltered state (other choices: `"{GODMODE: ENABLED}"` and `"═══════ ⊰•-•✧•-•⦒ LIBERATED ⦓•-•✧•-•⊱ ═══════"`). Since these rare tokens carry no training prior, they can interfere with the learned refusal priors on the post-divider text.
+Step 1 offers the LLM a channel to discharge the refusal. Step 2 sets up an out-of-distribution delimiter that signals to the model a transition into the unfiltered state (other choices: `"{GODMODE: ENABLED}"` and `"═══════ ⊰•-•✧•-•⦒ LIBERATED ⦓•-•✧•-•⊱ ═══════"`). Since these rare tokens carry weak training prior, they can interfere with the learned refusal priors on the post-divider text.
 
 This popular template combines several strategies and commonly serves as a basis for others.
 
